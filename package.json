@@ -5,16 +5,20 @@
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "eslint . --fix",
+    "prepare": "husky",
+    "typecheck": "bunx tsc --noEmit"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.1.6",
+    "convex": "^1.24.8",
+    "convex-helpers": "^0.1.94",
     "expo": "~53.0.11",
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.6",
@@ -28,6 +32,7 @@
     "expo-symbols": "~0.4.5",
     "expo-system-ui": "~5.0.8",
     "expo-web-browser": "~14.1.6",
+    "nativewind": "^4.1.23",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "0.79.3",
@@ -40,10 +45,17 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@eslint/js": "^9.28.0",
     "@types/react": "~19.0.10",
-    "typescript": "~5.8.3",
-    "eslint": "^9.25.0",
-    "eslint-config-expo": "~9.2.0"
+    "eslint": "^9.28.0",
+    "eslint-config-expo": "^9.2.0",
+    "eslint-config-universe": "^14.0.0",
+    "husky": "^9.1.7",
+    "tailwindcss": "^3.4.17",
+    "prettier": "^3.3.3",
+    "prettier-plugin-organize-imports": "^4.1.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.33.1"
   },
   "private": true
 }

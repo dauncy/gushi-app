@@ -1,0 +1,6 @@
+*.md
+*.mdc
+*.json
+convex/_generated/*
+*.mp3
+*.wav
