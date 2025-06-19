@@ -1,14 +1,55 @@
-import { zodToConvex } from "convex-helpers/server/zod";
+import { zid, zodToConvex } from "convex-helpers/server/zod";
 import { defineTable } from "convex/server";
 import { z } from "zod";
 
-export const stories = defineTable(
+export const images = defineTable(
 	zodToConvex(
 		z.object({
-			title: z.string(),
-			body: z.string(),
+			storageId: zid("_storage"),
 			createdAt: z.string().datetime(),
 			updatedAt: z.string().datetime(),
 		}),
 	),
 );
+
+export const audio = defineTable(
+	zodToConvex(
+		z.object({
+			storageId: zid("_storage"),
+			createdAt: z.string().datetime(),
+			updatedAt: z.string().datetime(),
+		}),
+	),
+);
+
+const wordTranscriptSchema = z.object({
+	text: z.string(),
+	start_time: z.number(),
+	end_time: z.number(),
+});
+
+const segmentTranscriptSchema = z.object({
+	text: z.string(),
+	start_time: z.number(),
+	end_time: z.number(),
+	words: z.array(wordTranscriptSchema),
+});
+
+const storiesSchema = z.object({
+	title: z.string(),
+	body: z.string(),
+	transcript: z.array(segmentTranscriptSchema),
+	enabled: z.boolean().default(false),
+	subscription_required: z.boolean().default(true),
+	imageId: zid("images"),
+	audioId: zid("audio"),
+	createdAt: z.string().datetime(),
+	updatedAt: z.string().datetime(),
+});
+
+export type StoryPrivate = z.infer<typeof storiesSchema>;
+export type StoryPublic = Omit<StoryPrivate, "body" | "enabled" | "subscription_required" | "transcript">;
+
+export const stories = defineTable(zodToConvex(storiesSchema))
+	.index("by_enabled", ["enabled"])
+	.index("by_subscription_required", ["subscription_required"]);

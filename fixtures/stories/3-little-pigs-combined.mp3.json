@@ -1,0 +1,5295 @@
+{
+  "language_code": null,
+  "segments": [
+    {
+      "text": "The sun rises in the valley. It is the",
+      "start_time": 0.119,
+      "end_time": 2.48,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "The",
+          "start_time": 0.119,
+          "end_time": 0.219
+        },
+        {
+          "text": " ",
+          "start_time": 0.219,
+          "end_time": 0.34
+        },
+        {
+          "text": "sun",
+          "start_time": 0.34,
+          "end_time": 0.659
+        },
+        {
+          "text": " ",
+          "start_time": 0.659,
+          "end_time": 0.74
+        },
+        {
+          "text": "rises",
+          "start_time": 0.74,
+          "end_time": 1.159
+        },
+        {
+          "text": " ",
+          "start_time": 1.159,
+          "end_time": 1.179
+        },
+        {
+          "text": "in",
+          "start_time": 1.179,
+          "end_time": 1.259
+        },
+        {
+          "text": " ",
+          "start_time": 1.259,
+          "end_time": 1.259
+        },
+        {
+          "text": "the",
+          "start_time": 1.259,
+          "end_time": 1.339
+        },
+        {
+          "text": " ",
+          "start_time": 1.339,
+          "end_time": 1.419
+        },
+        {
+          "text": "valley.",
+          "start_time": 1.419,
+          "end_time": 1.939
+        },
+        {
+          "text": " ",
+          "start_time": 1.939,
+          "end_time": 2.2
+        },
+        {
+          "text": "It",
+          "start_time": 2.2,
+          "end_time": 2.279
+        },
+        {
+          "text": " ",
+          "start_time": 2.279,
+          "end_time": 2.299
+        },
+        {
+          "text": "is",
+          "start_time": 2.299,
+          "end_time": 2.419
+        },
+        {
+          "text": " ",
+          "start_time": 2.419,
+          "end_time": 2.44
+        },
+        {
+          "text": "the",
+          "start_time": 2.44,
+          "end_time": 2.48
+        }
+      ]
+    },
+    {
+      "text": "beginning of the new spring season.",
+      "start_time": 2.519,
+      "end_time": 4.799,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "beginning",
+          "start_time": 2.519,
+          "end_time": 3.059
+        },
+        {
+          "text": " ",
+          "start_time": 3.059,
+          "end_time": 3.059
+        },
+        {
+          "text": "of",
+          "start_time": 3.059,
+          "end_time": 3.179
+        },
+        {
+          "text": " ",
+          "start_time": 3.179,
+          "end_time": 3.179
+        },
+        {
+          "text": "the",
+          "start_time": 3.179,
+          "end_time": 3.279
+        },
+        {
+          "text": " ",
+          "start_time": 3.279,
+          "end_time": 3.399
+        },
+        {
+          "text": "new",
+          "start_time": 3.399,
+          "end_time": 3.639
+        },
+        {
+          "text": " ",
+          "start_time": 3.639,
+          "end_time": 3.759
+        },
+        {
+          "text": "spring",
+          "start_time": 3.759,
+          "end_time": 4.119
+        },
+        {
+          "text": " ",
+          "start_time": 4.119,
+          "end_time": 4.259
+        },
+        {
+          "text": "season.",
+          "start_time": 4.259,
+          "end_time": 4.799
+        }
+      ]
+    },
+    {
+      "text": "Three pig brothers, Bartholomew, Clarence,",
+      "start_time": 11.939,
+      "end_time": 14.879,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "Three",
+          "start_time": 11.939,
+          "end_time": 12.199
+        },
+        {
+          "text": " ",
+          "start_time": 12.199,
+          "end_time": 12.279
+        },
+        {
+          "text": "pig",
+          "start_time": 12.279,
+          "end_time": 12.52
+        },
+        {
+          "text": " ",
+          "start_time": 12.52,
+          "end_time": 12.559
+        },
+        {
+          "text": "brothers,",
+          "start_time": 12.559,
+          "end_time": 13.1
+        },
+        {
+          "text": " ",
+          "start_time": 13.1,
+          "end_time": 13.38
+        },
+        {
+          "text": "Bartholomew,",
+          "start_time": 13.38,
+          "end_time": 14.279
+        },
+        {
+          "text": " ",
+          "start_time": 14.279,
+          "end_time": 14.359
+        },
+        {
+          "text": "Clarence,",
+          "start_time": 14.359,
+          "end_time": 14.879
+        }
+      ]
+    },
+    {
+      "text": "and Frank, decide to build new homes.",
+      "start_time": 14.899,
+      "end_time": 17.539,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "and",
+          "start_time": 14.899,
+          "end_time": 15.0
+        },
+        {
+          "text": " ",
+          "start_time": 15.0,
+          "end_time": 15.099
+        },
+        {
+          "text": "Frank,",
+          "start_time": 15.099,
+          "end_time": 15.499
+        },
+        {
+          "text": " ",
+          "start_time": 15.499,
+          "end_time": 15.699
+        },
+        {
+          "text": "decide",
+          "start_time": 15.699,
+          "end_time": 16.079
+        },
+        {
+          "text": " ",
+          "start_time": 16.079,
+          "end_time": 16.119
+        },
+        {
+          "text": "to",
+          "start_time": 16.119,
+          "end_time": 16.219
+        },
+        {
+          "text": " ",
+          "start_time": 16.219,
+          "end_time": 16.279
+        },
+        {
+          "text": "build",
+          "start_time": 16.279,
+          "end_time": 16.54
+        },
+        {
+          "text": " ",
+          "start_time": 16.54,
+          "end_time": 16.619
+        },
+        {
+          "text": "new",
+          "start_time": 16.619,
+          "end_time": 16.84
+        },
+        {
+          "text": " ",
+          "start_time": 16.84,
+          "end_time": 16.92
+        },
+        {
+          "text": "homes.",
+          "start_time": 16.92,
+          "end_time": 17.539
+        }
+      ]
+    },
+    {
+      "text": "Bartholomew jumps to play. Clarence likes",
+      "start_time": 18.139,
+      "end_time": 21.539,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "Bartholomew",
+          "start_time": 18.139,
+          "end_time": 18.899
+        },
+        {
+          "text": " ",
+          "start_time": 18.899,
+          "end_time": 19.159
+        },
+        {
+          "text": "jumps",
+          "start_time": 19.159,
+          "end_time": 19.439
+        },
+        {
+          "text": " ",
+          "start_time": 19.439,
+          "end_time": 19.459
+        },
+        {
+          "text": "to",
+          "start_time": 19.459,
+          "end_time": 19.559
+        },
+        {
+          "text": " ",
+          "start_time": 19.559,
+          "end_time": 19.6
+        },
+        {
+          "text": "play.",
+          "start_time": 19.6,
+          "end_time": 20.039
+        },
+        {
+          "text": " ",
+          "start_time": 20.039,
+          "end_time": 20.539
+        },
+        {
+          "text": "Clarence",
+          "start_time": 20.539,
+          "end_time": 21.019
+        },
+        {
+          "text": " ",
+          "start_time": 21.019,
+          "end_time": 21.299
+        },
+        {
+          "text": "likes",
+          "start_time": 21.299,
+          "end_time": 21.539
+        }
+      ]
+    },
+    {
+      "text": "to take his time. Frank thinks carefully",
+      "start_time": 21.559,
+      "end_time": 24.859,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "to",
+          "start_time": 21.559,
+          "end_time": 21.68
+        },
+        {
+          "text": " ",
+          "start_time": 21.68,
+          "end_time": 21.719
+        },
+        {
+          "text": "take",
+          "start_time": 21.719,
+          "end_time": 21.899
+        },
+        {
+          "text": " ",
+          "start_time": 21.899,
+          "end_time": 21.899
+        },
+        {
+          "text": "his",
+          "start_time": 21.899,
+          "end_time": 22.079
+        },
+        {
+          "text": " ",
+          "start_time": 22.079,
+          "end_time": 22.139
+        },
+        {
+          "text": "time.",
+          "start_time": 22.139,
+          "end_time": 22.619
+        },
+        {
+          "text": " ",
+          "start_time": 22.619,
+          "end_time": 23.199
+        },
+        {
+          "text": "Frank",
+          "start_time": 23.199,
+          "end_time": 23.619
+        },
+        {
+          "text": " ",
+          "start_time": 23.619,
+          "end_time": 23.84
+        },
+        {
+          "text": "thinks",
+          "start_time": 23.84,
+          "end_time": 24.139
+        },
+        {
+          "text": " ",
+          "start_time": 24.139,
+          "end_time": 24.299
+        },
+        {
+          "text": "carefully",
+          "start_time": 24.299,
+          "end_time": 24.859
+        }
+      ]
+    },
+    {
+      "text": "about everything.",
+      "start_time": 24.859,
+      "end_time": 25.859,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "about",
+          "start_time": 24.859,
+          "end_time": 25.18
+        },
+        {
+          "text": " ",
+          "start_time": 25.18,
+          "end_time": 25.239
+        },
+        {
+          "text": "everything.",
+          "start_time": 25.239,
+          "end_time": 25.859
+        }
+      ]
+    },
+    {
+      "text": "Straws quick, y'all. I can build this in a",
+      "start_time": 26.42,
+      "end_time": 28.92,
+      "speaker": {
+        "id": "speaker_1",
+        "name": "Speaker 1"
+      },
+      "words": [
+        {
+          "text": "Straws",
+          "start_time": 26.42,
+          "end_time": 26.899
+        },
+        {
+          "text": " ",
+          "start_time": 26.899,
+          "end_time": 26.959
+        },
+        {
+          "text": "quick,",
+          "start_time": 26.959,
+          "end_time": 27.259
+        },
+        {
+          "text": " ",
+          "start_time": 27.259,
+          "end_time": 27.299
+        },
+        {
+          "text": "y'all.",
+          "start_time": 27.299,
+          "end_time": 27.719
+        },
+        {
+          "text": " ",
+          "start_time": 27.719,
+          "end_time": 27.959
+        },
+        {
+          "text": "I",
+          "start_time": 27.959,
+          "end_time": 28.059
+        },
+        {
+          "text": " ",
+          "start_time": 28.059,
+          "end_time": 28.119
+        },
+        {
+          "text": "can",
+          "start_time": 28.119,
+          "end_time": 28.22
+        },
+        {
+          "text": " ",
+          "start_time": 28.22,
+          "end_time": 28.239
+        },
+        {
+          "text": "build",
+          "start_time": 28.239,
+          "end_time": 28.479
+        },
+        {
+          "text": " ",
+          "start_time": 28.479,
+          "end_time": 28.479
+        },
+        {
+          "text": "this",
+          "start_time": 28.479,
+          "end_time": 28.68
+        },
+        {
+          "text": " ",
+          "start_time": 28.68,
+          "end_time": 28.699
+        },
+        {
+          "text": "in",
+          "start_time": 28.699,
+          "end_time": 28.799
+        },
+        {
+          "text": " ",
+          "start_time": 28.799,
+          "end_time": 28.84
+        },
+        {
+          "text": "a",
+          "start_time": 28.84,
+          "end_time": 28.92
+        }
+      ]
+    },
+    {
+      "text": "flash. Then I'm fixing to nap before",
+      "start_time": 28.959,
+      "end_time": 31.259,
+      "speaker": {
+        "id": "speaker_1",
+        "name": "Speaker 1"
+      },
+      "words": [
+        {
+          "text": "flash.",
+          "start_time": 28.959,
+          "end_time": 29.559
+        },
+        {
+          "text": " ",
+          "start_time": 29.559,
+          "end_time": 29.84
+        },
+        {
+          "text": "Then",
+          "start_time": 29.84,
+          "end_time": 29.999
+        },
+        {
+          "text": " ",
+          "start_time": 29.999,
+          "end_time": 30.019
+        },
+        {
+          "text": "I'm",
+          "start_time": 30.019,
+          "end_time": 30.179
+        },
+        {
+          "text": " ",
+          "start_time": 30.179,
+          "end_time": 30.179
+        },
+        {
+          "text": "fixing",
+          "start_time": 30.179,
+          "end_time": 30.499
+        },
+        {
+          "text": " ",
+          "start_time": 30.499,
+          "end_time": 30.5
+        },
+        {
+          "text": "to",
+          "start_time": 30.5,
+          "end_time": 30.639
+        },
+        {
+          "text": " ",
+          "start_time": 30.639,
+          "end_time": 30.639
+        },
+        {
+          "text": "nap",
+          "start_time": 30.639,
+          "end_time": 30.879
+        },
+        {
+          "text": " ",
+          "start_time": 30.879,
+          "end_time": 30.92
+        },
+        {
+          "text": "before",
+          "start_time": 30.92,
+          "end_time": 31.259
+        }
+      ]
+    },
+    {
+      "text": "supper. It'll be a fine lighthouse.",
+      "start_time": 31.359,
+      "end_time": 34.299,
+      "speaker": {
+        "id": "speaker_1",
+        "name": "Speaker 1"
+      },
+      "words": [
+        {
+          "text": "supper.",
+          "start_time": 31.359,
+          "end_time": 31.819
+        },
+        {
+          "text": " ",
+          "start_time": 31.819,
+          "end_time": 32.139
+        },
+        {
+          "text": "It'll",
+          "start_time": 32.139,
+          "end_time": 32.4
+        },
+        {
+          "text": " ",
+          "start_time": 32.4,
+          "end_time": 32.419
+        },
+        {
+          "text": "be",
+          "start_time": 32.419,
+          "end_time": 32.539
+        },
+        {
+          "text": " ",
+          "start_time": 32.539,
+          "end_time": 32.579
+        },
+        {
+          "text": "a",
+          "start_time": 32.579,
+          "end_time": 32.719
+        },
+        {
+          "text": " ",
+          "start_time": 32.719,
+          "end_time": 32.759
+        },
+        {
+          "text": "fine",
+          "start_time": 32.759,
+          "end_time": 33.299
+        },
+        {
+          "text": " ",
+          "start_time": 33.299,
+          "end_time": 33.399
+        },
+        {
+          "text": "lighthouse.",
+          "start_time": 33.399,
+          "end_time": 34.299
+        }
+      ]
+    },
+    {
+      "text": "Bartholomew quickly gathers straw and ties",
+      "start_time": 34.779,
+      "end_time": 37.68,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "Bartholomew",
+          "start_time": 34.779,
+          "end_time": 35.619
+        },
+        {
+          "text": " ",
+          "start_time": 35.619,
+          "end_time": 35.619
+        },
+        {
+          "text": "quickly",
+          "start_time": 35.619,
+          "end_time": 36.0
+        },
+        {
+          "text": " ",
+          "start_time": 36.0,
+          "end_time": 36.079
+        },
+        {
+          "text": "gathers",
+          "start_time": 36.079,
+          "end_time": 36.479
+        },
+        {
+          "text": " ",
+          "start_time": 36.479,
+          "end_time": 36.5
+        },
+        {
+          "text": "straw",
+          "start_time": 36.5,
+          "end_time": 36.959
+        },
+        {
+          "text": " ",
+          "start_time": 36.959,
+          "end_time": 37.139
+        },
+        {
+          "text": "and",
+          "start_time": 37.139,
+          "end_time": 37.379
+        },
+        {
+          "text": " ",
+          "start_time": 37.379,
+          "end_time": 37.399
+        },
+        {
+          "text": "ties",
+          "start_time": 37.399,
+          "end_time": 37.68
+        }
+      ]
+    },
+    {
+      "text": "it together. His house stands tall, but",
+      "start_time": 37.7,
+      "end_time": 40.2,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "it",
+          "start_time": 37.7,
+          "end_time": 37.799
+        },
+        {
+          "text": " ",
+          "start_time": 37.799,
+          "end_time": 37.84
+        },
+        {
+          "text": "together.",
+          "start_time": 37.84,
+          "end_time": 38.34
+        },
+        {
+          "text": " ",
+          "start_time": 38.34,
+          "end_time": 38.599
+        },
+        {
+          "text": "His",
+          "start_time": 38.599,
+          "end_time": 38.779
+        },
+        {
+          "text": " ",
+          "start_time": 38.779,
+          "end_time": 38.799
+        },
+        {
+          "text": "house",
+          "start_time": 38.799,
+          "end_time": 39.079
+        },
+        {
+          "text": " ",
+          "start_time": 39.079,
+          "end_time": 39.079
+        },
+        {
+          "text": "stands",
+          "start_time": 39.079,
+          "end_time": 39.439
+        },
+        {
+          "text": " ",
+          "start_time": 39.439,
+          "end_time": 39.52
+        },
+        {
+          "text": "tall,",
+          "start_time": 39.52,
+          "end_time": 39.96
+        },
+        {
+          "text": " ",
+          "start_time": 39.96,
+          "end_time": 40.099
+        },
+        {
+          "text": "but",
+          "start_time": 40.099,
+          "end_time": 40.2
+        }
+      ]
+    },
+    {
+      "text": "it looks a bit shaky.",
+      "start_time": 40.219,
+      "end_time": 41.599,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "it",
+          "start_time": 40.219,
+          "end_time": 40.339
+        },
+        {
+          "text": " ",
+          "start_time": 40.339,
+          "end_time": 40.36
+        },
+        {
+          "text": "looks",
+          "start_time": 40.36,
+          "end_time": 40.599
+        },
+        {
+          "text": " ",
+          "start_time": 40.599,
+          "end_time": 40.639
+        },
+        {
+          "text": "a",
+          "start_time": 40.639,
+          "end_time": 40.7
+        },
+        {
+          "text": " ",
+          "start_time": 40.7,
+          "end_time": 40.799
+        },
+        {
+          "text": "bit",
+          "start_time": 40.799,
+          "end_time": 40.999
+        },
+        {
+          "text": " ",
+          "start_time": 40.999,
+          "end_time": 41.099
+        },
+        {
+          "text": "shaky.",
+          "start_time": 41.099,
+          "end_time": 41.599
+        }
+      ]
+    },
+    {
+      "text": "I'm done. I think I'll go play in the",
+      "start_time": 42.139,
+      "end_time": 44.06,
+      "speaker": {
+        "id": "speaker_1",
+        "name": "Speaker 1"
+      },
+      "words": [
+        {
+          "text": "I'm",
+          "start_time": 42.139,
+          "end_time": 42.339
+        },
+        {
+          "text": " ",
+          "start_time": 42.339,
+          "end_time": 42.36
+        },
+        {
+          "text": "done.",
+          "start_time": 42.36,
+          "end_time": 42.759
+        },
+        {
+          "text": " ",
+          "start_time": 42.759,
+          "end_time": 42.979
+        },
+        {
+          "text": "I",
+          "start_time": 42.979,
+          "end_time": 43.079
+        },
+        {
+          "text": " ",
+          "start_time": 43.079,
+          "end_time": 43.119
+        },
+        {
+          "text": "think",
+          "start_time": 43.119,
+          "end_time": 43.319
+        },
+        {
+          "text": " ",
+          "start_time": 43.319,
+          "end_time": 43.36
+        },
+        {
+          "text": "I'll",
+          "start_time": 43.36,
+          "end_time": 43.5
+        },
+        {
+          "text": " ",
+          "start_time": 43.5,
+          "end_time": 43.52
+        },
+        {
+          "text": "go",
+          "start_time": 43.52,
+          "end_time": 43.639
+        },
+        {
+          "text": " ",
+          "start_time": 43.639,
+          "end_time": 43.719
+        },
+        {
+          "text": "play",
+          "start_time": 43.719,
+          "end_time": 43.92
+        },
+        {
+          "text": " ",
+          "start_time": 43.92,
+          "end_time": 43.939
+        },
+        {
+          "text": "in",
+          "start_time": 43.939,
+          "end_time": 44.02
+        },
+        {
+          "text": " ",
+          "start_time": 44.02,
+          "end_time": 44.02
+        },
+        {
+          "text": "the",
+          "start_time": 44.02,
+          "end_time": 44.06
+        }
+      ]
+    },
+    {
+      "text": "creek now.",
+      "start_time": 44.139,
+      "end_time": 44.759,
+      "speaker": {
+        "id": "speaker_1",
+        "name": "Speaker 1"
+      },
+      "words": [
+        {
+          "text": "creek",
+          "start_time": 44.139,
+          "end_time": 44.419
+        },
+        {
+          "text": " ",
+          "start_time": 44.419,
+          "end_time": 44.419
+        },
+        {
+          "text": "now.",
+          "start_time": 44.419,
+          "end_time": 44.759
+        }
+      ]
+    },
+    {
+      "text": "Clarence starts on his house next.",
+      "start_time": 45.319,
+      "end_time": 47.939,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "Clarence",
+          "start_time": 45.319,
+          "end_time": 45.919
+        },
+        {
+          "text": " ",
+          "start_time": 45.919,
+          "end_time": 46.139
+        },
+        {
+          "text": "starts",
+          "start_time": 46.139,
+          "end_time": 46.54
+        },
+        {
+          "text": " ",
+          "start_time": 46.54,
+          "end_time": 46.559
+        },
+        {
+          "text": "on",
+          "start_time": 46.559,
+          "end_time": 46.699
+        },
+        {
+          "text": " ",
+          "start_time": 46.699,
+          "end_time": 46.779
+        },
+        {
+          "text": "his",
+          "start_time": 46.779,
+          "end_time": 46.999
+        },
+        {
+          "text": " ",
+          "start_time": 46.999,
+          "end_time": 47.039
+        },
+        {
+          "text": "house",
+          "start_time": 47.039,
+          "end_time": 47.399
+        },
+        {
+          "text": " ",
+          "start_time": 47.399,
+          "end_time": 47.479
+        },
+        {
+          "text": "next.",
+          "start_time": 47.479,
+          "end_time": 47.939
+        }
+      ]
+    },
+    {
+      "text": "Wood's sturdier, Bart. Don't want no wind",
+      "start_time": 48.459,
+      "end_time": 50.579,
+      "speaker": {
+        "id": "speaker_2",
+        "name": "Speaker 2"
+      },
+      "words": [
+        {
+          "text": "Wood's",
+          "start_time": 48.459,
+          "end_time": 48.799
+        },
+        {
+          "text": " ",
+          "start_time": 48.799,
+          "end_time": 48.799
+        },
+        {
+          "text": "sturdier,",
+          "start_time": 48.799,
+          "end_time": 49.279
+        },
+        {
+          "text": " ",
+          "start_time": 49.279,
+          "end_time": 49.279
+        },
+        {
+          "text": "Bart.",
+          "start_time": 49.279,
+          "end_time": 49.639
+        },
+        {
+          "text": " ",
+          "start_time": 49.639,
+          "end_time": 49.899
+        },
+        {
+          "text": "Don't",
+          "start_time": 49.899,
+          "end_time": 50.06
+        },
+        {
+          "text": " ",
+          "start_time": 50.06,
+          "end_time": 50.079
+        },
+        {
+          "text": "want",
+          "start_time": 50.079,
+          "end_time": 50.18
+        },
+        {
+          "text": " ",
+          "start_time": 50.18,
+          "end_time": 50.219
+        },
+        {
+          "text": "no",
+          "start_time": 50.219,
+          "end_time": 50.34
+        },
+        {
+          "text": " ",
+          "start_time": 50.34,
+          "end_time": 50.399
+        },
+        {
+          "text": "wind",
+          "start_time": 50.399,
+          "end_time": 50.579
+        }
+      ]
+    },
+    {
+      "text": "whipping through. A good strong frame",
+      "start_time": 50.599,
+      "end_time": 53.08,
+      "speaker": {
+        "id": "speaker_2",
+        "name": "Speaker 2"
+      },
+      "words": [
+        {
+          "text": "whipping",
+          "start_time": 50.599,
+          "end_time": 50.88
+        },
+        {
+          "text": " ",
+          "start_time": 50.88,
+          "end_time": 50.919
+        },
+        {
+          "text": "through.",
+          "start_time": 50.919,
+          "end_time": 51.299
+        },
+        {
+          "text": " ",
+          "start_time": 51.299,
+          "end_time": 51.739
+        },
+        {
+          "text": "A",
+          "start_time": 51.739,
+          "end_time": 51.819
+        },
+        {
+          "text": " ",
+          "start_time": 51.819,
+          "end_time": 52.0
+        },
+        {
+          "text": "good",
+          "start_time": 52.0,
+          "end_time": 52.299
+        },
+        {
+          "text": " ",
+          "start_time": 52.299,
+          "end_time": 52.319
+        },
+        {
+          "text": "strong",
+          "start_time": 52.319,
+          "end_time": 52.699
+        },
+        {
+          "text": " ",
+          "start_time": 52.699,
+          "end_time": 52.779
+        },
+        {
+          "text": "frame",
+          "start_time": 52.779,
+          "end_time": 53.08
+        }
+      ]
+    },
+    {
+      "text": "makes a difference. This will take me a",
+      "start_time": 53.099,
+      "end_time": 55.119,
+      "speaker": {
+        "id": "speaker_2",
+        "name": "Speaker 2"
+      },
+      "words": [
+        {
+          "text": "makes",
+          "start_time": 53.099,
+          "end_time": 53.359
+        },
+        {
+          "text": " ",
+          "start_time": 53.359,
+          "end_time": 53.379
+        },
+        {
+          "text": "a",
+          "start_time": 53.379,
+          "end_time": 53.419
+        },
+        {
+          "text": " ",
+          "start_time": 53.419,
+          "end_time": 53.479
+        },
+        {
+          "text": "difference.",
+          "start_time": 53.479,
+          "end_time": 54.0
+        },
+        {
+          "text": " ",
+          "start_time": 54.0,
+          "end_time": 54.379
+        },
+        {
+          "text": "This",
+          "start_time": 54.379,
+          "end_time": 54.539
+        },
+        {
+          "text": " ",
+          "start_time": 54.539,
+          "end_time": 54.559
+        },
+        {
+          "text": "will",
+          "start_time": 54.559,
+          "end_time": 54.7
+        },
+        {
+          "text": " ",
+          "start_time": 54.7,
+          "end_time": 54.719
+        },
+        {
+          "text": "take",
+          "start_time": 54.719,
+          "end_time": 54.919
+        },
+        {
+          "text": " ",
+          "start_time": 54.919,
+          "end_time": 54.959
+        },
+        {
+          "text": "me",
+          "start_time": 54.959,
+          "end_time": 55.06
+        },
+        {
+          "text": " ",
+          "start_time": 55.06,
+          "end_time": 55.099
+        },
+        {
+          "text": "a",
+          "start_time": 55.099,
+          "end_time": 55.119
+        }
+      ]
+    },
+    {
+      "text": "little longer.",
+      "start_time": 55.18,
+      "end_time": 55.819,
+      "speaker": {
+        "id": "speaker_2",
+        "name": "Speaker 2"
+      },
+      "words": [
+        {
+          "text": "little",
+          "start_time": 55.18,
+          "end_time": 55.319
+        },
+        {
+          "text": " ",
+          "start_time": 55.319,
+          "end_time": 55.379
+        },
+        {
+          "text": "longer.",
+          "start_time": 55.379,
+          "end_time": 55.819
+        }
+      ]
+    },
+    {
+      "text": "Clarence saws and hammers, putting wooden",
+      "start_time": 56.299,
+      "end_time": 58.799,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "Clarence",
+          "start_time": 56.299,
+          "end_time": 56.899
+        },
+        {
+          "text": " ",
+          "start_time": 56.899,
+          "end_time": 56.919
+        },
+        {
+          "text": "saws",
+          "start_time": 56.919,
+          "end_time": 57.379
+        },
+        {
+          "text": " ",
+          "start_time": 57.379,
+          "end_time": 57.379
+        },
+        {
+          "text": "and",
+          "start_time": 57.379,
+          "end_time": 57.5
+        },
+        {
+          "text": " ",
+          "start_time": 57.5,
+          "end_time": 57.559
+        },
+        {
+          "text": "hammers,",
+          "start_time": 57.559,
+          "end_time": 58.12
+        },
+        {
+          "text": " ",
+          "start_time": 58.12,
+          "end_time": 58.239
+        },
+        {
+          "text": "putting",
+          "start_time": 58.239,
+          "end_time": 58.499
+        },
+        {
+          "text": " ",
+          "start_time": 58.499,
+          "end_time": 58.559
+        },
+        {
+          "text": "wooden",
+          "start_time": 58.559,
+          "end_time": 58.799
+        }
+      ]
+    },
+    {
+      "text": "planks together. His house is strong and",
+      "start_time": 58.879,
+      "end_time": 61.999,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "planks",
+          "start_time": 58.879,
+          "end_time": 59.2
+        },
+        {
+          "text": " ",
+          "start_time": 59.2,
+          "end_time": 59.239
+        },
+        {
+          "text": "together.",
+          "start_time": 59.239,
+          "end_time": 59.719
+        },
+        {
+          "text": " ",
+          "start_time": 59.719,
+          "end_time": 59.719
+        },
+        {
+          "text": "His",
+          "start_time": 59.719,
+          "end_time": 59.799
+        },
+        {
+          "text": " ",
+          "start_time": 59.799,
+          "end_time": 60.259
+        },
+        {
+          "text": "house",
+          "start_time": 60.259,
+          "end_time": 60.979
+        },
+        {
+          "text": " ",
+          "start_time": 60.979,
+          "end_time": 61.019
+        },
+        {
+          "text": "is",
+          "start_time": 61.019,
+          "end_time": 61.219
+        },
+        {
+          "text": " ",
+          "start_time": 61.219,
+          "end_time": 61.239
+        },
+        {
+          "text": "strong",
+          "start_time": 61.239,
+          "end_time": 61.839
+        },
+        {
+          "text": " ",
+          "start_time": 61.839,
+          "end_time": 61.879
+        },
+        {
+          "text": "and",
+          "start_time": 61.879,
+          "end_time": 61.999
+        }
+      ]
+    },
+    {
+      "text": "brown.",
+      "start_time": 62.079,
+      "end_time": 62.759,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "brown.",
+          "start_time": 62.079,
+          "end_time": 62.759
+        }
+      ]
+    },
+    {
+      "text": "Ah,",
+      "start_time": 63.819,
+      "end_time": 64.139,
+      "speaker": {
+        "id": "speaker_2",
+        "name": "Speaker 2"
+      },
+      "words": [
+        {
+          "text": "Ah,",
+          "start_time": 63.819,
+          "end_time": 64.139
+        }
+      ]
+    },
+    {
+      "text": "what a beauty.",
+      "start_time": 65.859,
+      "end_time": 66.659,
+      "speaker": {
+        "id": "speaker_2",
+        "name": "Speaker 2"
+      },
+      "words": [
+        {
+          "text": "what",
+          "start_time": 65.859,
+          "end_time": 66.039
+        },
+        {
+          "text": " ",
+          "start_time": 66.039,
+          "end_time": 66.079
+        },
+        {
+          "text": "a",
+          "start_time": 66.079,
+          "end_time": 66.119
+        },
+        {
+          "text": " ",
+          "start_time": 66.119,
+          "end_time": 66.199
+        },
+        {
+          "text": "beauty.",
+          "start_time": 66.199,
+          "end_time": 66.659
+        }
+      ]
+    },
+    {
+      "text": "Frank, the oldest brother, starts on his",
+      "start_time": 67.519,
+      "end_time": 70.099,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "Frank,",
+          "start_time": 67.519,
+          "end_time": 68.059
+        },
+        {
+          "text": " ",
+          "start_time": 68.059,
+          "end_time": 68.299
+        },
+        {
+          "text": "the",
+          "start_time": 68.299,
+          "end_time": 68.379
+        },
+        {
+          "text": " ",
+          "start_time": 68.379,
+          "end_time": 68.399
+        },
+        {
+          "text": "oldest",
+          "start_time": 68.399,
+          "end_time": 68.759
+        },
+        {
+          "text": " ",
+          "start_time": 68.759,
+          "end_time": 68.819
+        },
+        {
+          "text": "brother,",
+          "start_time": 68.819,
+          "end_time": 69.239
+        },
+        {
+          "text": " ",
+          "start_time": 69.239,
+          "end_time": 69.439
+        },
+        {
+          "text": "starts",
+          "start_time": 69.439,
+          "end_time": 69.819
+        },
+        {
+          "text": " ",
+          "start_time": 69.819,
+          "end_time": 69.839
+        },
+        {
+          "text": "on",
+          "start_time": 69.839,
+          "end_time": 69.919
+        },
+        {
+          "text": " ",
+          "start_time": 69.919,
+          "end_time": 69.919
+        },
+        {
+          "text": "his",
+          "start_time": 69.919,
+          "end_time": 70.099
+        }
+      ]
+    },
+    {
+      "text": "own house.",
+      "start_time": 70.139,
+      "end_time": 70.799,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "own",
+          "start_time": 70.139,
+          "end_time": 70.319
+        },
+        {
+          "text": " ",
+          "start_time": 70.319,
+          "end_time": 70.359
+        },
+        {
+          "text": "house.",
+          "start_time": 70.359,
+          "end_time": 70.799
+        }
+      ]
+    },
+    {
+      "text": "Bricks are best, strong and steady.",
+      "start_time": 71.099,
+      "end_time": 72.999,
+      "speaker": {
+        "id": "speaker_3",
+        "name": "Speaker 3"
+      },
+      "words": [
+        {
+          "text": "Bricks",
+          "start_time": 71.099,
+          "end_time": 71.419
+        },
+        {
+          "text": " ",
+          "start_time": 71.419,
+          "end_time": 71.419
+        },
+        {
+          "text": "are",
+          "start_time": 71.419,
+          "end_time": 71.539
+        },
+        {
+          "text": " ",
+          "start_time": 71.539,
+          "end_time": 71.539
+        },
+        {
+          "text": "best,",
+          "start_time": 71.539,
+          "end_time": 71.979
+        },
+        {
+          "text": " ",
+          "start_time": 71.979,
+          "end_time": 72.059
+        },
+        {
+          "text": "strong",
+          "start_time": 72.059,
+          "end_time": 72.439
+        },
+        {
+          "text": " ",
+          "start_time": 72.439,
+          "end_time": 72.459
+        },
+        {
+          "text": "and",
+          "start_time": 72.459,
+          "end_time": 72.539
+        },
+        {
+          "text": " ",
+          "start_time": 72.539,
+          "end_time": 72.579
+        },
+        {
+          "text": "steady.",
+          "start_time": 72.579,
+          "end_time": 72.999
+        }
+      ]
+    },
+    {
+      "text": "They take the longest, but this house will",
+      "start_time": 73.619,
+      "end_time": 75.579,
+      "speaker": {
+        "id": "speaker_3",
+        "name": "Speaker 3"
+      },
+      "words": [
+        {
+          "text": "They",
+          "start_time": 73.619,
+          "end_time": 73.759
+        },
+        {
+          "text": " ",
+          "start_time": 73.759,
+          "end_time": 73.839
+        },
+        {
+          "text": "take",
+          "start_time": 73.839,
+          "end_time": 73.979
+        },
+        {
+          "text": " ",
+          "start_time": 73.979,
+          "end_time": 74.039
+        },
+        {
+          "text": "the",
+          "start_time": 74.039,
+          "end_time": 74.099
+        },
+        {
+          "text": " ",
+          "start_time": 74.099,
+          "end_time": 74.139
+        },
+        {
+          "text": "longest,",
+          "start_time": 74.139,
+          "end_time": 74.659
+        },
+        {
+          "text": " ",
+          "start_time": 74.659,
+          "end_time": 74.659
+        },
+        {
+          "text": "but",
+          "start_time": 74.659,
+          "end_time": 74.839
+        },
+        {
+          "text": " ",
+          "start_time": 74.839,
+          "end_time": 74.879
+        },
+        {
+          "text": "this",
+          "start_time": 74.879,
+          "end_time": 75.059
+        },
+        {
+          "text": " ",
+          "start_time": 75.059,
+          "end_time": 75.079
+        },
+        {
+          "text": "house",
+          "start_time": 75.079,
+          "end_time": 75.399
+        },
+        {
+          "text": " ",
+          "start_time": 75.399,
+          "end_time": 75.439
+        },
+        {
+          "text": "will",
+          "start_time": 75.439,
+          "end_time": 75.579
+        }
+      ]
+    },
+    {
+      "text": "last.",
+      "start_time": 75.659,
+      "end_time": 76.279,
+      "speaker": {
+        "id": "speaker_3",
+        "name": "Speaker 3"
+      },
+      "words": [
+        {
+          "text": "last.",
+          "start_time": 75.659,
+          "end_time": 76.279
+        }
+      ]
+    },
+    {
+      "text": "Frank mixes mortar and lays each brick",
+      "start_time": 78.299,
+      "end_time": 80.899,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "Frank",
+          "start_time": 78.299,
+          "end_time": 78.699
+        },
+        {
+          "text": " ",
+          "start_time": 78.699,
+          "end_time": 78.759
+        },
+        {
+          "text": "mixes",
+          "start_time": 78.759,
+          "end_time": 79.179
+        },
+        {
+          "text": " ",
+          "start_time": 79.179,
+          "end_time": 79.259
+        },
+        {
+          "text": "mortar",
+          "start_time": 79.259,
+          "end_time": 79.679
+        },
+        {
+          "text": " ",
+          "start_time": 79.679,
+          "end_time": 79.679
+        },
+        {
+          "text": "and",
+          "start_time": 79.679,
+          "end_time": 79.839
+        },
+        {
+          "text": " ",
+          "start_time": 79.839,
+          "end_time": 79.899
+        },
+        {
+          "text": "lays",
+          "start_time": 79.899,
+          "end_time": 80.199
+        },
+        {
+          "text": " ",
+          "start_time": 80.199,
+          "end_time": 80.319
+        },
+        {
+          "text": "each",
+          "start_time": 80.319,
+          "end_time": 80.559
+        },
+        {
+          "text": " ",
+          "start_time": 80.559,
+          "end_time": 80.639
+        },
+        {
+          "text": "brick",
+          "start_time": 80.639,
+          "end_time": 80.899
+        }
+      ]
+    },
+    {
+      "text": "with care. His house is solid and red.",
+      "start_time": 80.919,
+      "end_time": 83.839,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "with",
+          "start_time": 80.919,
+          "end_time": 81.079
+        },
+        {
+          "text": " ",
+          "start_time": 81.079,
+          "end_time": 81.159
+        },
+        {
+          "text": "care.",
+          "start_time": 81.159,
+          "end_time": 81.579
+        },
+        {
+          "text": " ",
+          "start_time": 81.579,
+          "end_time": 82.019
+        },
+        {
+          "text": "His",
+          "start_time": 82.019,
+          "end_time": 82.179
+        },
+        {
+          "text": " ",
+          "start_time": 82.179,
+          "end_time": 82.179
+        },
+        {
+          "text": "house",
+          "start_time": 82.179,
+          "end_time": 82.439
+        },
+        {
+          "text": " ",
+          "start_time": 82.439,
+          "end_time": 82.459
+        },
+        {
+          "text": "is",
+          "start_time": 82.459,
+          "end_time": 82.659
+        },
+        {
+          "text": " ",
+          "start_time": 82.659,
+          "end_time": 82.699
+        },
+        {
+          "text": "solid",
+          "start_time": 82.699,
+          "end_time": 83.099
+        },
+        {
+          "text": " ",
+          "start_time": 83.099,
+          "end_time": 83.119
+        },
+        {
+          "text": "and",
+          "start_time": 83.119,
+          "end_time": 83.259
+        },
+        {
+          "text": " ",
+          "start_time": 83.259,
+          "end_time": 83.339
+        },
+        {
+          "text": "red.",
+          "start_time": 83.339,
+          "end_time": 83.839
+        }
+      ]
+    },
+    {
+      "text": "Soon all three houses are ready.",
+      "start_time": 84.479,
+      "end_time": 86.559,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "Soon",
+          "start_time": 84.479,
+          "end_time": 84.859
+        },
+        {
+          "text": " ",
+          "start_time": 84.859,
+          "end_time": 84.919
+        },
+        {
+          "text": "all",
+          "start_time": 84.919,
+          "end_time": 85.119
+        },
+        {
+          "text": " ",
+          "start_time": 85.119,
+          "end_time": 85.219
+        },
+        {
+          "text": "three",
+          "start_time": 85.219,
+          "end_time": 85.419
+        },
+        {
+          "text": " ",
+          "start_time": 85.419,
+          "end_time": 85.479
+        },
+        {
+          "text": "houses",
+          "start_time": 85.479,
+          "end_time": 85.959
+        },
+        {
+          "text": " ",
+          "start_time": 85.959,
+          "end_time": 85.979
+        },
+        {
+          "text": "are",
+          "start_time": 85.979,
+          "end_time": 86.079
+        },
+        {
+          "text": " ",
+          "start_time": 86.079,
+          "end_time": 86.139
+        },
+        {
+          "text": "ready.",
+          "start_time": 86.139,
+          "end_time": 86.559
+        }
+      ]
+    },
+    {
+      "text": "A big hungry wolf walks by. He sniffs the",
+      "start_time": 87.219,
+      "end_time": 90.759,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "A",
+          "start_time": 87.219,
+          "end_time": 87.359
+        },
+        {
+          "text": " ",
+          "start_time": 87.359,
+          "end_time": 87.439
+        },
+        {
+          "text": "big",
+          "start_time": 87.439,
+          "end_time": 87.739
+        },
+        {
+          "text": " ",
+          "start_time": 87.739,
+          "end_time": 87.839
+        },
+        {
+          "text": "hungry",
+          "start_time": 87.839,
+          "end_time": 88.279
+        },
+        {
+          "text": " ",
+          "start_time": 88.279,
+          "end_time": 88.379
+        },
+        {
+          "text": "wolf",
+          "start_time": 88.379,
+          "end_time": 88.699
+        },
+        {
+          "text": " ",
+          "start_time": 88.699,
+          "end_time": 88.779
+        },
+        {
+          "text": "walks",
+          "start_time": 88.779,
+          "end_time": 89.079
+        },
+        {
+          "text": " ",
+          "start_time": 89.079,
+          "end_time": 89.159
+        },
+        {
+          "text": "by.",
+          "start_time": 89.159,
+          "end_time": 89.619
+        },
+        {
+          "text": " ",
+          "start_time": 89.619,
+          "end_time": 90.099
+        },
+        {
+          "text": "He",
+          "start_time": 90.099,
+          "end_time": 90.299
+        },
+        {
+          "text": " ",
+          "start_time": 90.299,
+          "end_time": 90.319
+        },
+        {
+          "text": "sniffs",
+          "start_time": 90.319,
+          "end_time": 90.619
+        },
+        {
+          "text": " ",
+          "start_time": 90.619,
+          "end_time": 90.639
+        },
+        {
+          "text": "the",
+          "start_time": 90.639,
+          "end_time": 90.759
+        }
+      ]
+    },
+    {
+      "text": "air and spots the piggies. He approaches",
+      "start_time": 90.799,
+      "end_time": 93.819,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "air",
+          "start_time": 90.799,
+          "end_time": 91.159
+        },
+        {
+          "text": " ",
+          "start_time": 91.159,
+          "end_time": 91.379
+        },
+        {
+          "text": "and",
+          "start_time": 91.379,
+          "end_time": 91.479
+        },
+        {
+          "text": " ",
+          "start_time": 91.479,
+          "end_time": 91.559
+        },
+        {
+          "text": "spots",
+          "start_time": 91.559,
+          "end_time": 91.959
+        },
+        {
+          "text": " ",
+          "start_time": 91.959,
+          "end_time": 91.979
+        },
+        {
+          "text": "the",
+          "start_time": 91.979,
+          "end_time": 92.059
+        },
+        {
+          "text": " ",
+          "start_time": 92.059,
+          "end_time": 92.119
+        },
+        {
+          "text": "piggies.",
+          "start_time": 92.119,
+          "end_time": 92.639
+        },
+        {
+          "text": " ",
+          "start_time": 92.639,
+          "end_time": 93.159
+        },
+        {
+          "text": "He",
+          "start_time": 93.159,
+          "end_time": 93.279
+        },
+        {
+          "text": " ",
+          "start_time": 93.279,
+          "end_time": 93.299
+        },
+        {
+          "text": "approaches",
+          "start_time": 93.299,
+          "end_time": 93.819
+        }
+      ]
+    },
+    {
+      "text": "the straw house.",
+      "start_time": 93.839,
+      "end_time": 94.839,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "the",
+          "start_time": 93.839,
+          "end_time": 93.939
+        },
+        {
+          "text": " ",
+          "start_time": 93.939,
+          "end_time": 93.999
+        },
+        {
+          "text": "straw",
+          "start_time": 93.999,
+          "end_time": 94.359
+        },
+        {
+          "text": " ",
+          "start_time": 94.359,
+          "end_time": 94.439
+        },
+        {
+          "text": "house.",
+          "start_time": 94.439,
+          "end_time": 94.839
+        }
+      ]
+    },
+    {
+      "text": "My, oh, my, that smells good.",
+      "start_time": 96.419,
+      "end_time": 99.259,
+      "speaker": {
+        "id": "speaker_3",
+        "name": "Speaker 3"
+      },
+      "words": [
+        {
+          "text": "My,",
+          "start_time": 96.419,
+          "end_time": 96.779
+        },
+        {
+          "text": " ",
+          "start_time": 96.779,
+          "end_time": 96.819
+        },
+        {
+          "text": "oh,",
+          "start_time": 96.819,
+          "end_time": 96.999
+        },
+        {
+          "text": " ",
+          "start_time": 96.999,
+          "end_time": 97.059
+        },
+        {
+          "text": "my,",
+          "start_time": 97.059,
+          "end_time": 97.559
+        },
+        {
+          "text": " ",
+          "start_time": 97.559,
+          "end_time": 97.899
+        },
+        {
+          "text": "that",
+          "start_time": 97.899,
+          "end_time": 98.079
+        },
+        {
+          "text": " ",
+          "start_time": 98.079,
+          "end_time": 98.179
+        },
+        {
+          "text": "smells",
+          "start_time": 98.179,
+          "end_time": 98.639
+        },
+        {
+          "text": " ",
+          "start_time": 98.639,
+          "end_time": 98.699
+        },
+        {
+          "text": "good.",
+          "start_time": 98.699,
+          "end_time": 99.259
+        }
+      ]
+    },
+    {
+      "text": "Little pig, little pig, let me in.",
+      "start_time": 100.359,
+      "end_time": 103.499,
+      "speaker": {
+        "id": "speaker_3",
+        "name": "Speaker 3"
+      },
+      "words": [
+        {
+          "text": "Little",
+          "start_time": 100.359,
+          "end_time": 100.639
+        },
+        {
+          "text": " ",
+          "start_time": 100.639,
+          "end_time": 100.759
+        },
+        {
+          "text": "pig,",
+          "start_time": 100.759,
+          "end_time": 101.199
+        },
+        {
+          "text": " ",
+          "start_time": 101.199,
+          "end_time": 101.239
+        },
+        {
+          "text": "little",
+          "start_time": 101.239,
+          "end_time": 101.499
+        },
+        {
+          "text": " ",
+          "start_time": 101.499,
+          "end_time": 101.639
+        },
+        {
+          "text": "pig,",
+          "start_time": 101.639,
+          "end_time": 102.079
+        },
+        {
+          "text": " ",
+          "start_time": 102.079,
+          "end_time": 102.239
+        },
+        {
+          "text": "let",
+          "start_time": 102.239,
+          "end_time": 102.479
+        },
+        {
+          "text": " ",
+          "start_time": 102.479,
+          "end_time": 102.599
+        },
+        {
+          "text": "me",
+          "start_time": 102.599,
+          "end_time": 102.839
+        },
+        {
+          "text": " ",
+          "start_time": 102.839,
+          "end_time": 103.039
+        },
+        {
+          "text": "in.",
+          "start_time": 103.039,
+          "end_time": 103.499
+        }
+      ]
+    },
+    {
+      "text": "No, sir, not by the hair of my",
+      "start_time": 103.999,
+      "end_time": 106.299,
+      "speaker": {
+        "id": "speaker_1",
+        "name": "Speaker 1"
+      },
+      "words": [
+        {
+          "text": "No,",
+          "start_time": 103.999,
+          "end_time": 104.359
+        },
+        {
+          "text": " ",
+          "start_time": 104.359,
+          "end_time": 104.499
+        },
+        {
+          "text": "sir,",
+          "start_time": 104.499,
+          "end_time": 104.919
+        },
+        {
+          "text": " ",
+          "start_time": 104.919,
+          "end_time": 105.179
+        },
+        {
+          "text": "not",
+          "start_time": 105.179,
+          "end_time": 105.379
+        },
+        {
+          "text": " ",
+          "start_time": 105.379,
+          "end_time": 105.439
+        },
+        {
+          "text": "by",
+          "start_time": 105.439,
+          "end_time": 105.659
+        },
+        {
+          "text": " ",
+          "start_time": 105.659,
+          "end_time": 105.679
+        },
+        {
+          "text": "the",
+          "start_time": 105.679,
+          "end_time": 105.759
+        },
+        {
+          "text": " ",
+          "start_time": 105.759,
+          "end_time": 105.819
+        },
+        {
+          "text": "hair",
+          "start_time": 105.819,
+          "end_time": 106.019
+        },
+        {
+          "text": " ",
+          "start_time": 106.019,
+          "end_time": 106.039
+        },
+        {
+          "text": "of",
+          "start_time": 106.039,
+          "end_time": 106.099
+        },
+        {
+          "text": " ",
+          "start_time": 106.099,
+          "end_time": 106.139
+        },
+        {
+          "text": "my",
+          "start_time": 106.139,
+          "end_time": 106.299
+        }
+      ]
+    },
+    {
+      "text": "chinny-chin-chin. You can't come in.",
+      "start_time": 106.379,
+      "end_time": 108.619,
+      "speaker": {
+        "id": "speaker_1",
+        "name": "Speaker 1"
+      },
+      "words": [
+        {
+          "text": "chinny-chin-chin.",
+          "start_time": 106.379,
+          "end_time": 107.499
+        },
+        {
+          "text": " ",
+          "start_time": 107.499,
+          "end_time": 107.659
+        },
+        {
+          "text": "You",
+          "start_time": 107.659,
+          "end_time": 107.759
+        },
+        {
+          "text": " ",
+          "start_time": 107.759,
+          "end_time": 107.779
+        },
+        {
+          "text": "can't",
+          "start_time": 107.779,
+          "end_time": 107.999
+        },
+        {
+          "text": " ",
+          "start_time": 107.999,
+          "end_time": 108.019
+        },
+        {
+          "text": "come",
+          "start_time": 108.019,
+          "end_time": 108.259
+        },
+        {
+          "text": " ",
+          "start_time": 108.259,
+          "end_time": 108.299
+        },
+        {
+          "text": "in.",
+          "start_time": 108.299,
+          "end_time": 108.619
+        }
+      ]
+    },
+    {
+      "text": "Then I'll huff and I'll puff and I'll blow",
+      "start_time": 111.859,
+      "end_time": 116.499,
+      "speaker": {
+        "id": "speaker_3",
+        "name": "Speaker 3"
+      },
+      "words": [
+        {
+          "text": "Then",
+          "start_time": 111.859,
+          "end_time": 112.019
+        },
+        {
+          "text": " ",
+          "start_time": 112.019,
+          "end_time": 112.059
+        },
+        {
+          "text": "I'll",
+          "start_time": 112.059,
+          "end_time": 112.339
+        },
+        {
+          "text": " ",
+          "start_time": 112.339,
+          "end_time": 112.479
+        },
+        {
+          "text": "huff",
+          "start_time": 112.479,
+          "end_time": 113.019
+        },
+        {
+          "text": " ",
+          "start_time": 113.019,
+          "end_time": 113.439
+        },
+        {
+          "text": "and",
+          "start_time": 113.439,
+          "end_time": 113.599
+        },
+        {
+          "text": " ",
+          "start_time": 113.599,
+          "end_time": 113.639
+        },
+        {
+          "text": "I'll",
+          "start_time": 113.639,
+          "end_time": 113.959
+        },
+        {
+          "text": " ",
+          "start_time": 113.959,
+          "end_time": 114.119
+        },
+        {
+          "text": "puff",
+          "start_time": 114.119,
+          "end_time": 114.639
+        },
+        {
+          "text": " ",
+          "start_time": 114.639,
+          "end_time": 115.159
+        },
+        {
+          "text": "and",
+          "start_time": 115.159,
+          "end_time": 115.299
+        },
+        {
+          "text": " ",
+          "start_time": 115.299,
+          "end_time": 115.359
+        },
+        {
+          "text": "I'll",
+          "start_time": 115.359,
+          "end_time": 115.699
+        },
+        {
+          "text": " ",
+          "start_time": 115.699,
+          "end_time": 115.879
+        },
+        {
+          "text": "blow",
+          "start_time": 115.879,
+          "end_time": 116.499
+        }
+      ]
+    },
+    {
+      "text": "your house down.",
+      "start_time": 116.639,
+      "end_time": 118.379,
+      "speaker": {
+        "id": "speaker_3",
+        "name": "Speaker 3"
+      },
+      "words": [
+        {
+          "text": "your",
+          "start_time": 116.639,
+          "end_time": 116.959
+        },
+        {
+          "text": " ",
+          "start_time": 116.959,
+          "end_time": 117.139
+        },
+        {
+          "text": "house",
+          "start_time": 117.139,
+          "end_time": 117.699
+        },
+        {
+          "text": " ",
+          "start_time": 117.699,
+          "end_time": 117.879
+        },
+        {
+          "text": "down.",
+          "start_time": 117.879,
+          "end_time": 118.379
+        }
+      ]
+    },
+    {
+      "text": "The wolf takes a deep breath. He huffs and",
+      "start_time": 119.019,
+      "end_time": 121.659,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "The",
+          "start_time": 119.019,
+          "end_time": 119.139
+        },
+        {
+          "text": " ",
+          "start_time": 119.139,
+          "end_time": 119.199
+        },
+        {
+          "text": "wolf",
+          "start_time": 119.199,
+          "end_time": 119.459
+        },
+        {
+          "text": " ",
+          "start_time": 119.459,
+          "end_time": 119.519
+        },
+        {
+          "text": "takes",
+          "start_time": 119.519,
+          "end_time": 119.759
+        },
+        {
+          "text": " ",
+          "start_time": 119.759,
+          "end_time": 119.799
+        },
+        {
+          "text": "a",
+          "start_time": 119.799,
+          "end_time": 119.879
+        },
+        {
+          "text": " ",
+          "start_time": 119.879,
+          "end_time": 119.999
+        },
+        {
+          "text": "deep",
+          "start_time": 119.999,
+          "end_time": 120.259
+        },
+        {
+          "text": " ",
+          "start_time": 120.259,
+          "end_time": 120.299
+        },
+        {
+          "text": "breath.",
+          "start_time": 120.299,
+          "end_time": 120.719
+        },
+        {
+          "text": " ",
+          "start_time": 120.719,
+          "end_time": 120.979
+        },
+        {
+          "text": "He",
+          "start_time": 120.979,
+          "end_time": 121.179
+        },
+        {
+          "text": " ",
+          "start_time": 121.179,
+          "end_time": 121.199
+        },
+        {
+          "text": "huffs",
+          "start_time": 121.199,
+          "end_time": 121.539
+        },
+        {
+          "text": " ",
+          "start_time": 121.539,
+          "end_time": 121.559
+        },
+        {
+          "text": "and",
+          "start_time": 121.559,
+          "end_time": 121.659
+        }
+      ]
+    },
+    {
+      "text": "he puffs with all his might. The straw",
+      "start_time": 121.659,
+      "end_time": 124.199,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "he",
+          "start_time": 121.659,
+          "end_time": 121.859
+        },
+        {
+          "text": " ",
+          "start_time": 121.859,
+          "end_time": 121.879
+        },
+        {
+          "text": "puffs",
+          "start_time": 121.879,
+          "end_time": 122.199
+        },
+        {
+          "text": " ",
+          "start_time": 122.199,
+          "end_time": 122.219
+        },
+        {
+          "text": "with",
+          "start_time": 122.219,
+          "end_time": 122.379
+        },
+        {
+          "text": " ",
+          "start_time": 122.379,
+          "end_time": 122.419
+        },
+        {
+          "text": "all",
+          "start_time": 122.419,
+          "end_time": 122.639
+        },
+        {
+          "text": " ",
+          "start_time": 122.639,
+          "end_time": 122.659
+        },
+        {
+          "text": "his",
+          "start_time": 122.659,
+          "end_time": 122.839
+        },
+        {
+          "text": " ",
+          "start_time": 122.839,
+          "end_time": 122.939
+        },
+        {
+          "text": "might.",
+          "start_time": 122.939,
+          "end_time": 123.319
+        },
+        {
+          "text": " ",
+          "start_time": 123.319,
+          "end_time": 123.679
+        },
+        {
+          "text": "The",
+          "start_time": 123.679,
+          "end_time": 123.779
+        },
+        {
+          "text": " ",
+          "start_time": 123.779,
+          "end_time": 123.839
+        },
+        {
+          "text": "straw",
+          "start_time": 123.839,
+          "end_time": 124.199
+        }
+      ]
+    },
+    {
+      "text": "house shakes and then falls apart.",
+      "start_time": 124.259,
+      "end_time": 126.499,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "house",
+          "start_time": 124.259,
+          "end_time": 124.579
+        },
+        {
+          "text": " ",
+          "start_time": 124.579,
+          "end_time": 124.599
+        },
+        {
+          "text": "shakes",
+          "start_time": 124.599,
+          "end_time": 124.999
+        },
+        {
+          "text": " ",
+          "start_time": 124.999,
+          "end_time": 125.139
+        },
+        {
+          "text": "and",
+          "start_time": 125.139,
+          "end_time": 125.259
+        },
+        {
+          "text": " ",
+          "start_time": 125.259,
+          "end_time": 125.279
+        },
+        {
+          "text": "then",
+          "start_time": 125.279,
+          "end_time": 125.399
+        },
+        {
+          "text": " ",
+          "start_time": 125.399,
+          "end_time": 125.579
+        },
+        {
+          "text": "falls",
+          "start_time": 125.579,
+          "end_time": 125.879
+        },
+        {
+          "text": " ",
+          "start_time": 125.879,
+          "end_time": 125.919
+        },
+        {
+          "text": "apart.",
+          "start_time": 125.919,
+          "end_time": 126.499
+        }
+      ]
+    },
+    {
+      "text": "Bartholomew screams and runs as fast as",
+      "start_time": 126.919,
+      "end_time": 129.619,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "Bartholomew",
+          "start_time": 126.919,
+          "end_time": 127.679
+        },
+        {
+          "text": " ",
+          "start_time": 127.679,
+          "end_time": 127.719
+        },
+        {
+          "text": "screams",
+          "start_time": 127.719,
+          "end_time": 128.279
+        },
+        {
+          "text": " ",
+          "start_time": 128.279,
+          "end_time": 128.299
+        },
+        {
+          "text": "and",
+          "start_time": 128.299,
+          "end_time": 128.419
+        },
+        {
+          "text": " ",
+          "start_time": 128.419,
+          "end_time": 128.499
+        },
+        {
+          "text": "runs",
+          "start_time": 128.499,
+          "end_time": 128.859
+        },
+        {
+          "text": " ",
+          "start_time": 128.859,
+          "end_time": 128.879
+        },
+        {
+          "text": "as",
+          "start_time": 128.879,
+          "end_time": 129.039
+        },
+        {
+          "text": " ",
+          "start_time": 129.039,
+          "end_time": 129.159
+        },
+        {
+          "text": "fast",
+          "start_time": 129.159,
+          "end_time": 129.499
+        },
+        {
+          "text": " ",
+          "start_time": 129.499,
+          "end_time": 129.499
+        },
+        {
+          "text": "as",
+          "start_time": 129.499,
+          "end_time": 129.619
+        }
+      ]
+    },
+    {
+      "text": "his little legs can carry him.",
+      "start_time": 129.639,
+      "end_time": 131.259,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "his",
+          "start_time": 129.639,
+          "end_time": 129.779
+        },
+        {
+          "text": " ",
+          "start_time": 129.779,
+          "end_time": 129.859
+        },
+        {
+          "text": "little",
+          "start_time": 129.859,
+          "end_time": 130.059
+        },
+        {
+          "text": " ",
+          "start_time": 130.059,
+          "end_time": 130.139
+        },
+        {
+          "text": "legs",
+          "start_time": 130.139,
+          "end_time": 130.379
+        },
+        {
+          "text": " ",
+          "start_time": 130.379,
+          "end_time": 130.419
+        },
+        {
+          "text": "can",
+          "start_time": 130.419,
+          "end_time": 130.559
+        },
+        {
+          "text": " ",
+          "start_time": 130.559,
+          "end_time": 130.639
+        },
+        {
+          "text": "carry",
+          "start_time": 130.639,
+          "end_time": 130.979
+        },
+        {
+          "text": " ",
+          "start_time": 130.979,
+          "end_time": 130.999
+        },
+        {
+          "text": "him.",
+          "start_time": 130.999,
+          "end_time": 131.259
+        }
+      ]
+    },
+    {
+      "text": "He dashes to Clarence's wood house.",
+      "start_time": 133.759,
+      "end_time": 135.879,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "He",
+          "start_time": 133.759,
+          "end_time": 133.959
+        },
+        {
+          "text": " ",
+          "start_time": 133.959,
+          "end_time": 133.979
+        },
+        {
+          "text": "dashes",
+          "start_time": 133.979,
+          "end_time": 134.399
+        },
+        {
+          "text": " ",
+          "start_time": 134.399,
+          "end_time": 134.439
+        },
+        {
+          "text": "to",
+          "start_time": 134.439,
+          "end_time": 134.579
+        },
+        {
+          "text": " ",
+          "start_time": 134.579,
+          "end_time": 134.599
+        },
+        {
+          "text": "Clarence's",
+          "start_time": 134.599,
+          "end_time": 135.139
+        },
+        {
+          "text": " ",
+          "start_time": 135.139,
+          "end_time": 135.219
+        },
+        {
+          "text": "wood",
+          "start_time": 135.219,
+          "end_time": 135.419
+        },
+        {
+          "text": " ",
+          "start_time": 135.419,
+          "end_time": 135.459
+        },
+        {
+          "text": "house.",
+          "start_time": 135.459,
+          "end_time": 135.879
+        }
+      ]
+    },
+    {
+      "text": "Two little pigs, let me in. I know you're",
+      "start_time": 136.259,
+      "end_time": 139.519,
+      "speaker": {
+        "id": "speaker_3",
+        "name": "Speaker 3"
+      },
+      "words": [
+        {
+          "text": "Two",
+          "start_time": 136.259,
+          "end_time": 136.619
+        },
+        {
+          "text": " ",
+          "start_time": 136.619,
+          "end_time": 136.739
+        },
+        {
+          "text": "little",
+          "start_time": 136.739,
+          "end_time": 137.019
+        },
+        {
+          "text": " ",
+          "start_time": 137.019,
+          "end_time": 137.139
+        },
+        {
+          "text": "pigs,",
+          "start_time": 137.139,
+          "end_time": 137.659
+        },
+        {
+          "text": " ",
+          "start_time": 137.659,
+          "end_time": 137.899
+        },
+        {
+          "text": "let",
+          "start_time": 137.899,
+          "end_time": 138.119
+        },
+        {
+          "text": " ",
+          "start_time": 138.119,
+          "end_time": 138.139
+        },
+        {
+          "text": "me",
+          "start_time": 138.139,
+          "end_time": 138.299
+        },
+        {
+          "text": " ",
+          "start_time": 138.299,
+          "end_time": 138.319
+        },
+        {
+          "text": "in.",
+          "start_time": 138.319,
+          "end_time": 138.679
+        },
+        {
+          "text": " ",
+          "start_time": 138.679,
+          "end_time": 138.959
+        },
+        {
+          "text": "I",
+          "start_time": 138.959,
+          "end_time": 139.099
+        },
+        {
+          "text": " ",
+          "start_time": 139.099,
+          "end_time": 139.159
+        },
+        {
+          "text": "know",
+          "start_time": 139.159,
+          "end_time": 139.319
+        },
+        {
+          "text": " ",
+          "start_time": 139.319,
+          "end_time": 139.359
+        },
+        {
+          "text": "you're",
+          "start_time": 139.359,
+          "end_time": 139.519
+        }
+      ]
+    },
+    {
+      "text": "in there.",
+      "start_time": 139.539,
+      "end_time": 140.079,
+      "speaker": {
+        "id": "speaker_3",
+        "name": "Speaker 3"
+      },
+      "words": [
+        {
+          "text": "in",
+          "start_time": 139.539,
+          "end_time": 139.699
+        },
+        {
+          "text": " ",
+          "start_time": 139.699,
+          "end_time": 139.719
+        },
+        {
+          "text": "there.",
+          "start_time": 139.719,
+          "end_time": 140.079
+        }
+      ]
+    },
+    {
+      "text": "Never. You won't get in here.",
+      "start_time": 140.619,
+      "end_time": 142.199,
+      "speaker": {
+        "id": "speaker_2",
+        "name": "Speaker 2"
+      },
+      "words": [
+        {
+          "text": "Never.",
+          "start_time": 140.619,
+          "end_time": 141.039
+        },
+        {
+          "text": " ",
+          "start_time": 141.039,
+          "end_time": 141.219
+        },
+        {
+          "text": "You",
+          "start_time": 141.219,
+          "end_time": 141.339
+        },
+        {
+          "text": " ",
+          "start_time": 141.339,
+          "end_time": 141.359
+        },
+        {
+          "text": "won't",
+          "start_time": 141.359,
+          "end_time": 141.519
+        },
+        {
+          "text": " ",
+          "start_time": 141.519,
+          "end_time": 141.599
+        },
+        {
+          "text": "get",
+          "start_time": 141.599,
+          "end_time": 141.719
+        },
+        {
+          "text": " ",
+          "start_time": 141.719,
+          "end_time": 141.759
+        },
+        {
+          "text": "in",
+          "start_time": 141.759,
+          "end_time": 141.859
+        },
+        {
+          "text": " ",
+          "start_time": 141.859,
+          "end_time": 141.919
+        },
+        {
+          "text": "here.",
+          "start_time": 141.919,
+          "end_time": 142.199
+        }
+      ]
+    },
+    {
+      "text": "The wolf tries again. He huffs and he",
+      "start_time": 142.539,
+      "end_time": 144.939,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "The",
+          "start_time": 142.539,
+          "end_time": 142.619
+        },
+        {
+          "text": " ",
+          "start_time": 142.619,
+          "end_time": 142.679
+        },
+        {
+          "text": "wolf",
+          "start_time": 142.679,
+          "end_time": 142.899
+        },
+        {
+          "text": " ",
+          "start_time": 142.899,
+          "end_time": 142.979
+        },
+        {
+          "text": "tries",
+          "start_time": 142.979,
+          "end_time": 143.339
+        },
+        {
+          "text": " ",
+          "start_time": 143.339,
+          "end_time": 143.379
+        },
+        {
+          "text": "again.",
+          "start_time": 143.379,
+          "end_time": 143.959
+        },
+        {
+          "text": " ",
+          "start_time": 143.959,
+          "end_time": 144.139
+        },
+        {
+          "text": "He",
+          "start_time": 144.139,
+          "end_time": 144.299
+        },
+        {
+          "text": " ",
+          "start_time": 144.299,
+          "end_time": 144.299
+        },
+        {
+          "text": "huffs",
+          "start_time": 144.299,
+          "end_time": 144.639
+        },
+        {
+          "text": " ",
+          "start_time": 144.639,
+          "end_time": 144.639
+        },
+        {
+          "text": "and",
+          "start_time": 144.639,
+          "end_time": 144.759
+        },
+        {
+          "text": " ",
+          "start_time": 144.759,
+          "end_time": 144.759
+        },
+        {
+          "text": "he",
+          "start_time": 144.759,
+          "end_time": 144.939
+        }
+      ]
+    },
+    {
+      "text": "puffs. The wood house creaks and groans.",
+      "start_time": 144.959,
+      "end_time": 147.619,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "puffs.",
+          "start_time": 144.959,
+          "end_time": 145.399
+        },
+        {
+          "text": " ",
+          "start_time": 145.399,
+          "end_time": 145.659
+        },
+        {
+          "text": "The",
+          "start_time": 145.659,
+          "end_time": 145.739
+        },
+        {
+          "text": " ",
+          "start_time": 145.739,
+          "end_time": 145.779
+        },
+        {
+          "text": "wood",
+          "start_time": 145.779,
+          "end_time": 145.939
+        },
+        {
+          "text": " ",
+          "start_time": 145.939,
+          "end_time": 145.979
+        },
+        {
+          "text": "house",
+          "start_time": 145.979,
+          "end_time": 146.239
+        },
+        {
+          "text": " ",
+          "start_time": 146.239,
+          "end_time": 146.299
+        },
+        {
+          "text": "creaks",
+          "start_time": 146.299,
+          "end_time": 146.739
+        },
+        {
+          "text": " ",
+          "start_time": 146.739,
+          "end_time": 146.759
+        },
+        {
+          "text": "and",
+          "start_time": 146.759,
+          "end_time": 146.879
+        },
+        {
+          "text": " ",
+          "start_time": 146.879,
+          "end_time": 146.959
+        },
+        {
+          "text": "groans.",
+          "start_time": 146.959,
+          "end_time": 147.619
+        }
+      ]
+    },
+    {
+      "text": "It shakes hard, but it stays up. The wolf",
+      "start_time": 149.499,
+      "end_time": 152.059,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "It",
+          "start_time": 149.499,
+          "end_time": 149.659
+        },
+        {
+          "text": " ",
+          "start_time": 149.659,
+          "end_time": 149.739
+        },
+        {
+          "text": "shakes",
+          "start_time": 149.739,
+          "end_time": 150.079
+        },
+        {
+          "text": " ",
+          "start_time": 150.079,
+          "end_time": 150.119
+        },
+        {
+          "text": "hard,",
+          "start_time": 150.119,
+          "end_time": 150.479
+        },
+        {
+          "text": " ",
+          "start_time": 150.479,
+          "end_time": 150.499
+        },
+        {
+          "text": "but",
+          "start_time": 150.499,
+          "end_time": 150.579
+        },
+        {
+          "text": " ",
+          "start_time": 150.579,
+          "end_time": 150.619
+        },
+        {
+          "text": "it",
+          "start_time": 150.619,
+          "end_time": 150.739
+        },
+        {
+          "text": " ",
+          "start_time": 150.739,
+          "end_time": 150.779
+        },
+        {
+          "text": "stays",
+          "start_time": 150.779,
+          "end_time": 151.179
+        },
+        {
+          "text": " ",
+          "start_time": 151.179,
+          "end_time": 151.239
+        },
+        {
+          "text": "up.",
+          "start_time": 151.239,
+          "end_time": 151.519
+        },
+        {
+          "text": " ",
+          "start_time": 151.519,
+          "end_time": 151.699
+        },
+        {
+          "text": "The",
+          "start_time": 151.699,
+          "end_time": 151.779
+        },
+        {
+          "text": " ",
+          "start_time": 151.779,
+          "end_time": 151.839
+        },
+        {
+          "text": "wolf",
+          "start_time": 151.839,
+          "end_time": 152.059
+        }
+      ]
+    },
+    {
+      "text": "tries one more time, huffing even harder.",
+      "start_time": 152.119,
+      "end_time": 155.039,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "tries",
+          "start_time": 152.119,
+          "end_time": 152.459
+        },
+        {
+          "text": " ",
+          "start_time": 152.459,
+          "end_time": 152.559
+        },
+        {
+          "text": "one",
+          "start_time": 152.559,
+          "end_time": 152.739
+        },
+        {
+          "text": " ",
+          "start_time": 152.739,
+          "end_time": 152.799
+        },
+        {
+          "text": "more",
+          "start_time": 152.799,
+          "end_time": 152.959
+        },
+        {
+          "text": " ",
+          "start_time": 152.959,
+          "end_time": 153.079
+        },
+        {
+          "text": "time,",
+          "start_time": 153.079,
+          "end_time": 153.539
+        },
+        {
+          "text": " ",
+          "start_time": 153.539,
+          "end_time": 153.599
+        },
+        {
+          "text": "huffing",
+          "start_time": 153.599,
+          "end_time": 153.959
+        },
+        {
+          "text": " ",
+          "start_time": 153.959,
+          "end_time": 154.059
+        },
+        {
+          "text": "even",
+          "start_time": 154.059,
+          "end_time": 154.379
+        },
+        {
+          "text": " ",
+          "start_time": 154.379,
+          "end_time": 154.499
+        },
+        {
+          "text": "harder.",
+          "start_time": 154.499,
+          "end_time": 155.039
+        }
+      ]
+    },
+    {
+      "text": "The wood house trembles, but it holds",
+      "start_time": 157.359,
+      "end_time": 159.599,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "The",
+          "start_time": 157.359,
+          "end_time": 157.439
+        },
+        {
+          "text": " ",
+          "start_time": 157.439,
+          "end_time": 157.499
+        },
+        {
+          "text": "wood",
+          "start_time": 157.499,
+          "end_time": 157.659
+        },
+        {
+          "text": " ",
+          "start_time": 157.659,
+          "end_time": 157.699
+        },
+        {
+          "text": "house",
+          "start_time": 157.699,
+          "end_time": 157.939
+        },
+        {
+          "text": " ",
+          "start_time": 157.939,
+          "end_time": 158.039
+        },
+        {
+          "text": "trembles,",
+          "start_time": 158.039,
+          "end_time": 158.679
+        },
+        {
+          "text": " ",
+          "start_time": 158.679,
+          "end_time": 158.899
+        },
+        {
+          "text": "but",
+          "start_time": 158.899,
+          "end_time": 158.999
+        },
+        {
+          "text": " ",
+          "start_time": 158.999,
+          "end_time": 159.019
+        },
+        {
+          "text": "it",
+          "start_time": 159.019,
+          "end_time": 159.159
+        },
+        {
+          "text": " ",
+          "start_time": 159.159,
+          "end_time": 159.179
+        },
+        {
+          "text": "holds",
+          "start_time": 159.179,
+          "end_time": 159.599
+        }
+      ]
+    },
+    {
+      "text": "strong.",
+      "start_time": 159.619,
+      "end_time": 160.359,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "strong.",
+          "start_time": 159.619,
+          "end_time": 160.359
+        }
+      ]
+    },
+    {
+      "text": "Bartholomew and Clarence look at each",
+      "start_time": 161.059,
+      "end_time": 163.119,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "Bartholomew",
+          "start_time": 161.059,
+          "end_time": 161.819
+        },
+        {
+          "text": " ",
+          "start_time": 161.819,
+          "end_time": 161.839
+        },
+        {
+          "text": "and",
+          "start_time": 161.839,
+          "end_time": 161.939
+        },
+        {
+          "text": " ",
+          "start_time": 161.939,
+          "end_time": 162.039
+        },
+        {
+          "text": "Clarence",
+          "start_time": 162.039,
+          "end_time": 162.599
+        },
+        {
+          "text": " ",
+          "start_time": 162.599,
+          "end_time": 162.659
+        },
+        {
+          "text": "look",
+          "start_time": 162.659,
+          "end_time": 162.799
+        },
+        {
+          "text": " ",
+          "start_time": 162.799,
+          "end_time": 162.819
+        },
+        {
+          "text": "at",
+          "start_time": 162.819,
+          "end_time": 162.899
+        },
+        {
+          "text": " ",
+          "start_time": 162.899,
+          "end_time": 162.919
+        },
+        {
+          "text": "each",
+          "start_time": 162.919,
+          "end_time": 163.119
+        }
+      ]
+    },
+    {
+      "text": "other, worried. They know they need to get",
+      "start_time": 163.159,
+      "end_time": 166.079,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "other,",
+          "start_time": 163.159,
+          "end_time": 163.499
+        },
+        {
+          "text": " ",
+          "start_time": 163.499,
+          "end_time": 163.819
+        },
+        {
+          "text": "worried.",
+          "start_time": 163.819,
+          "end_time": 164.419
+        },
+        {
+          "text": " ",
+          "start_time": 164.419,
+          "end_time": 164.899
+        },
+        {
+          "text": "They",
+          "start_time": 164.899,
+          "end_time": 165.119
+        },
+        {
+          "text": " ",
+          "start_time": 165.119,
+          "end_time": 165.139
+        },
+        {
+          "text": "know",
+          "start_time": 165.139,
+          "end_time": 165.319
+        },
+        {
+          "text": " ",
+          "start_time": 165.319,
+          "end_time": 165.379
+        },
+        {
+          "text": "they",
+          "start_time": 165.379,
+          "end_time": 165.499
+        },
+        {
+          "text": " ",
+          "start_time": 165.499,
+          "end_time": 165.579
+        },
+        {
+          "text": "need",
+          "start_time": 165.579,
+          "end_time": 165.739
+        },
+        {
+          "text": " ",
+          "start_time": 165.739,
+          "end_time": 165.759
+        },
+        {
+          "text": "to",
+          "start_time": 165.759,
+          "end_time": 165.839
+        },
+        {
+          "text": " ",
+          "start_time": 165.839,
+          "end_time": 165.919
+        },
+        {
+          "text": "get",
+          "start_time": 165.919,
+          "end_time": 166.079
+        }
+      ]
+    },
+    {
+      "text": "to Frank's house. They peek out the",
+      "start_time": 166.079,
+      "end_time": 168.379,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "to",
+          "start_time": 166.079,
+          "end_time": 166.199
+        },
+        {
+          "text": " ",
+          "start_time": 166.199,
+          "end_time": 166.299
+        },
+        {
+          "text": "Frank's",
+          "start_time": 166.299,
+          "end_time": 166.659
+        },
+        {
+          "text": " ",
+          "start_time": 166.659,
+          "end_time": 166.679
+        },
+        {
+          "text": "house.",
+          "start_time": 166.679,
+          "end_time": 167.099
+        },
+        {
+          "text": " ",
+          "start_time": 167.099,
+          "end_time": 167.639
+        },
+        {
+          "text": "They",
+          "start_time": 167.639,
+          "end_time": 167.819
+        },
+        {
+          "text": " ",
+          "start_time": 167.819,
+          "end_time": 167.839
+        },
+        {
+          "text": "peek",
+          "start_time": 167.839,
+          "end_time": 168.059
+        },
+        {
+          "text": " ",
+          "start_time": 168.059,
+          "end_time": 168.099
+        },
+        {
+          "text": "out",
+          "start_time": 168.099,
+          "end_time": 168.279
+        },
+        {
+          "text": " ",
+          "start_time": 168.279,
+          "end_time": 168.299
+        },
+        {
+          "text": "the",
+          "start_time": 168.299,
+          "end_time": 168.379
+        }
+      ]
+    },
+    {
+      "text": "window",
+      "start_time": 168.459,
+      "end_time": 168.939,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "window",
+          "start_time": 168.459,
+          "end_time": 168.939
+        }
+      ]
+    },
+    {
+      "text": "and see the wolf still huffing. They sneak",
+      "start_time": 171.499,
+      "end_time": 174.159,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "and",
+          "start_time": 171.499,
+          "end_time": 171.619
+        },
+        {
+          "text": " ",
+          "start_time": 171.619,
+          "end_time": 171.659
+        },
+        {
+          "text": "see",
+          "start_time": 171.659,
+          "end_time": 171.799
+        },
+        {
+          "text": " ",
+          "start_time": 171.799,
+          "end_time": 171.819
+        },
+        {
+          "text": "the",
+          "start_time": 171.819,
+          "end_time": 171.919
+        },
+        {
+          "text": " ",
+          "start_time": 171.919,
+          "end_time": 171.999
+        },
+        {
+          "text": "wolf",
+          "start_time": 171.999,
+          "end_time": 172.279
+        },
+        {
+          "text": " ",
+          "start_time": 172.279,
+          "end_time": 172.339
+        },
+        {
+          "text": "still",
+          "start_time": 172.339,
+          "end_time": 172.659
+        },
+        {
+          "text": " ",
+          "start_time": 172.659,
+          "end_time": 172.739
+        },
+        {
+          "text": "huffing.",
+          "start_time": 172.739,
+          "end_time": 173.239
+        },
+        {
+          "text": " ",
+          "start_time": 173.239,
+          "end_time": 173.619
+        },
+        {
+          "text": "They",
+          "start_time": 173.619,
+          "end_time": 173.819
+        },
+        {
+          "text": " ",
+          "start_time": 173.819,
+          "end_time": 173.839
+        },
+        {
+          "text": "sneak",
+          "start_time": 173.839,
+          "end_time": 174.159
+        }
+      ]
+    },
+    {
+      "text": "out the back door and race to Frank's",
+      "start_time": 174.199,
+      "end_time": 176.279,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "out",
+          "start_time": 174.199,
+          "end_time": 174.359
+        },
+        {
+          "text": " ",
+          "start_time": 174.359,
+          "end_time": 174.379
+        },
+        {
+          "text": "the",
+          "start_time": 174.379,
+          "end_time": 174.519
+        },
+        {
+          "text": " ",
+          "start_time": 174.519,
+          "end_time": 174.539
+        },
+        {
+          "text": "back",
+          "start_time": 174.539,
+          "end_time": 174.759
+        },
+        {
+          "text": " ",
+          "start_time": 174.759,
+          "end_time": 174.839
+        },
+        {
+          "text": "door",
+          "start_time": 174.839,
+          "end_time": 175.139
+        },
+        {
+          "text": " ",
+          "start_time": 175.139,
+          "end_time": 175.139
+        },
+        {
+          "text": "and",
+          "start_time": 175.139,
+          "end_time": 175.299
+        },
+        {
+          "text": " ",
+          "start_time": 175.299,
+          "end_time": 175.359
+        },
+        {
+          "text": "race",
+          "start_time": 175.359,
+          "end_time": 175.619
+        },
+        {
+          "text": " ",
+          "start_time": 175.619,
+          "end_time": 175.659
+        },
+        {
+          "text": "to",
+          "start_time": 175.659,
+          "end_time": 175.759
+        },
+        {
+          "text": " ",
+          "start_time": 175.759,
+          "end_time": 175.859
+        },
+        {
+          "text": "Frank's",
+          "start_time": 175.859,
+          "end_time": 176.279
+        }
+      ]
+    },
+    {
+      "text": "brick house.",
+      "start_time": 176.359,
+      "end_time": 177.159,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "brick",
+          "start_time": 176.359,
+          "end_time": 176.699
+        },
+        {
+          "text": " ",
+          "start_time": 176.699,
+          "end_time": 176.719
+        },
+        {
+          "text": "house.",
+          "start_time": 176.719,
+          "end_time": 177.159
+        }
+      ]
+    },
+    {
+      "text": "Three little pigs, let me in. I know",
+      "start_time": 177.659,
+      "end_time": 180.199,
+      "speaker": {
+        "id": "speaker_3",
+        "name": "Speaker 3"
+      },
+      "words": [
+        {
+          "text": "Three",
+          "start_time": 177.659,
+          "end_time": 177.899
+        },
+        {
+          "text": " ",
+          "start_time": 177.899,
+          "end_time": 177.959
+        },
+        {
+          "text": "little",
+          "start_time": 177.959,
+          "end_time": 178.259
+        },
+        {
+          "text": " ",
+          "start_time": 178.259,
+          "end_time": 178.279
+        },
+        {
+          "text": "pigs,",
+          "start_time": 178.279,
+          "end_time": 178.879
+        },
+        {
+          "text": " ",
+          "start_time": 178.879,
+          "end_time": 179.099
+        },
+        {
+          "text": "let",
+          "start_time": 179.099,
+          "end_time": 179.279
+        },
+        {
+          "text": " ",
+          "start_time": 179.279,
+          "end_time": 179.319
+        },
+        {
+          "text": "me",
+          "start_time": 179.319,
+          "end_time": 179.479
+        },
+        {
+          "text": " ",
+          "start_time": 179.479,
+          "end_time": 179.499
+        },
+        {
+          "text": "in.",
+          "start_time": 179.499,
+          "end_time": 179.839
+        },
+        {
+          "text": " ",
+          "start_time": 179.839,
+          "end_time": 179.919
+        },
+        {
+          "text": "I",
+          "start_time": 179.919,
+          "end_time": 180.019
+        },
+        {
+          "text": " ",
+          "start_time": 180.019,
+          "end_time": 180.079
+        },
+        {
+          "text": "know",
+          "start_time": 180.079,
+          "end_time": 180.199
+        }
+      ]
+    },
+    {
+      "text": "you're all in there now. Not a chance.",
+      "start_time": 180.219,
+      "end_time": 183.099,
+      "speaker": {
+        "id": "speaker_3",
+        "name": "Speaker 3"
+      },
+      "words": [
+        {
+          "text": "you're",
+          "start_time": 180.219,
+          "end_time": 180.399
+        },
+        {
+          "text": " ",
+          "start_time": 180.399,
+          "end_time": 180.419
+        },
+        {
+          "text": "all",
+          "start_time": 180.419,
+          "end_time": 180.639
+        },
+        {
+          "text": " ",
+          "start_time": 180.639,
+          "end_time": 180.659
+        },
+        {
+          "text": "in",
+          "start_time": 180.659,
+          "end_time": 180.799
+        },
+        {
+          "text": " ",
+          "start_time": 180.799,
+          "end_time": 180.799
+        },
+        {
+          "text": "there",
+          "start_time": 180.799,
+          "end_time": 181.119
+        },
+        {
+          "text": " ",
+          "start_time": 181.119,
+          "end_time": 181.139
+        },
+        {
+          "text": "now.",
+          "start_time": 181.139,
+          "end_time": 181.699
+        },
+        {
+          "text": " ",
+          "start_time": 181.699,
+          "end_time": 182.099
+        },
+        {
+          "text": "Not",
+          "start_time": 182.099,
+          "end_time": 182.279
+        },
+        {
+          "text": " ",
+          "start_time": 182.279,
+          "end_time": 182.299
+        },
+        {
+          "text": "a",
+          "start_time": 182.299,
+          "end_time": 182.359
+        },
+        {
+          "text": " ",
+          "start_time": 182.359,
+          "end_time": 182.459
+        },
+        {
+          "text": "chance.",
+          "start_time": 182.459,
+          "end_time": 183.099
+        }
+      ]
+    },
+    {
+      "text": "This house is made of bricks.",
+      "start_time": 183.499,
+      "end_time": 185.279,
+      "speaker": {
+        "id": "speaker_3",
+        "name": "Speaker 3"
+      },
+      "words": [
+        {
+          "text": "This",
+          "start_time": 183.499,
+          "end_time": 183.679
+        },
+        {
+          "text": " ",
+          "start_time": 183.679,
+          "end_time": 183.719
+        },
+        {
+          "text": "house",
+          "start_time": 183.719,
+          "end_time": 184.019
+        },
+        {
+          "text": " ",
+          "start_time": 184.019,
+          "end_time": 184.059
+        },
+        {
+          "text": "is",
+          "start_time": 184.059,
+          "end_time": 184.179
+        },
+        {
+          "text": " ",
+          "start_time": 184.179,
+          "end_time": 184.259
+        },
+        {
+          "text": "made",
+          "start_time": 184.259,
+          "end_time": 184.419
+        },
+        {
+          "text": " ",
+          "start_time": 184.419,
+          "end_time": 184.439
+        },
+        {
+          "text": "of",
+          "start_time": 184.439,
+          "end_time": 184.539
+        },
+        {
+          "text": " ",
+          "start_time": 184.539,
+          "end_time": 184.719
+        },
+        {
+          "text": "bricks.",
+          "start_time": 184.719,
+          "end_time": 185.279
+        }
+      ]
+    },
+    {
+      "text": "The wolf is very angry now. He takes the",
+      "start_time": 185.779,
+      "end_time": 188.499,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "The",
+          "start_time": 185.779,
+          "end_time": 185.899
+        },
+        {
+          "text": " ",
+          "start_time": 185.899,
+          "end_time": 185.979
+        },
+        {
+          "text": "wolf",
+          "start_time": 185.979,
+          "end_time": 186.279
+        },
+        {
+          "text": " ",
+          "start_time": 186.279,
+          "end_time": 186.319
+        },
+        {
+          "text": "is",
+          "start_time": 186.319,
+          "end_time": 186.439
+        },
+        {
+          "text": " ",
+          "start_time": 186.439,
+          "end_time": 186.539
+        },
+        {
+          "text": "very",
+          "start_time": 186.539,
+          "end_time": 186.859
+        },
+        {
+          "text": " ",
+          "start_time": 186.859,
+          "end_time": 186.899
+        },
+        {
+          "text": "angry",
+          "start_time": 186.899,
+          "end_time": 187.299
+        },
+        {
+          "text": " ",
+          "start_time": 187.299,
+          "end_time": 187.319
+        },
+        {
+          "text": "now.",
+          "start_time": 187.319,
+          "end_time": 187.719
+        },
+        {
+          "text": " ",
+          "start_time": 187.719,
+          "end_time": 187.919
+        },
+        {
+          "text": "He",
+          "start_time": 187.919,
+          "end_time": 188.059
+        },
+        {
+          "text": " ",
+          "start_time": 188.059,
+          "end_time": 188.079
+        },
+        {
+          "text": "takes",
+          "start_time": 188.079,
+          "end_time": 188.339
+        },
+        {
+          "text": " ",
+          "start_time": 188.339,
+          "end_time": 188.379
+        },
+        {
+          "text": "the",
+          "start_time": 188.379,
+          "end_time": 188.499
+        }
+      ]
+    },
+    {
+      "text": "biggest breath he can. He huffs and he",
+      "start_time": 188.579,
+      "end_time": 191.079,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "biggest",
+          "start_time": 188.579,
+          "end_time": 188.979
+        },
+        {
+          "text": " ",
+          "start_time": 188.979,
+          "end_time": 189.079
+        },
+        {
+          "text": "breath",
+          "start_time": 189.079,
+          "end_time": 189.399
+        },
+        {
+          "text": " ",
+          "start_time": 189.399,
+          "end_time": 189.419
+        },
+        {
+          "text": "he",
+          "start_time": 189.419,
+          "end_time": 189.599
+        },
+        {
+          "text": " ",
+          "start_time": 189.599,
+          "end_time": 189.619
+        },
+        {
+          "text": "can.",
+          "start_time": 189.619,
+          "end_time": 190.119
+        },
+        {
+          "text": " ",
+          "start_time": 190.119,
+          "end_time": 190.279
+        },
+        {
+          "text": "He",
+          "start_time": 190.279,
+          "end_time": 190.419
+        },
+        {
+          "text": " ",
+          "start_time": 190.419,
+          "end_time": 190.479
+        },
+        {
+          "text": "huffs",
+          "start_time": 190.479,
+          "end_time": 190.879
+        },
+        {
+          "text": " ",
+          "start_time": 190.879,
+          "end_time": 190.899
+        },
+        {
+          "text": "and",
+          "start_time": 190.899,
+          "end_time": 190.979
+        },
+        {
+          "text": " ",
+          "start_time": 190.979,
+          "end_time": 190.999
+        },
+        {
+          "text": "he",
+          "start_time": 190.999,
+          "end_time": 191.079
+        }
+      ]
+    },
+    {
+      "text": "puffs with all his might. He huffs and he",
+      "start_time": 191.239,
+      "end_time": 193.899,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "puffs",
+          "start_time": 191.239,
+          "end_time": 191.559
+        },
+        {
+          "text": " ",
+          "start_time": 191.559,
+          "end_time": 191.599
+        },
+        {
+          "text": "with",
+          "start_time": 191.599,
+          "end_time": 191.739
+        },
+        {
+          "text": " ",
+          "start_time": 191.739,
+          "end_time": 191.799
+        },
+        {
+          "text": "all",
+          "start_time": 191.799,
+          "end_time": 191.999
+        },
+        {
+          "text": " ",
+          "start_time": 191.999,
+          "end_time": 192.019
+        },
+        {
+          "text": "his",
+          "start_time": 192.019,
+          "end_time": 192.239
+        },
+        {
+          "text": " ",
+          "start_time": 192.239,
+          "end_time": 192.359
+        },
+        {
+          "text": "might.",
+          "start_time": 192.359,
+          "end_time": 192.739
+        },
+        {
+          "text": " ",
+          "start_time": 192.739,
+          "end_time": 192.959
+        },
+        {
+          "text": "He",
+          "start_time": 192.959,
+          "end_time": 193.099
+        },
+        {
+          "text": " ",
+          "start_time": 193.099,
+          "end_time": 193.159
+        },
+        {
+          "text": "huffs",
+          "start_time": 193.159,
+          "end_time": 193.539
+        },
+        {
+          "text": " ",
+          "start_time": 193.539,
+          "end_time": 193.559
+        },
+        {
+          "text": "and",
+          "start_time": 193.559,
+          "end_time": 193.679
+        },
+        {
+          "text": " ",
+          "start_time": 193.679,
+          "end_time": 193.679
+        },
+        {
+          "text": "he",
+          "start_time": 193.679,
+          "end_time": 193.899
+        }
+      ]
+    },
+    {
+      "text": "puffs again, pushes hard against the",
+      "start_time": 193.919,
+      "end_time": 196.219,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "puffs",
+          "start_time": 193.919,
+          "end_time": 194.199
+        },
+        {
+          "text": " ",
+          "start_time": 194.199,
+          "end_time": 194.259
+        },
+        {
+          "text": "again,",
+          "start_time": 194.259,
+          "end_time": 194.859
+        },
+        {
+          "text": " ",
+          "start_time": 194.859,
+          "end_time": 195.139
+        },
+        {
+          "text": "pushes",
+          "start_time": 195.139,
+          "end_time": 195.519
+        },
+        {
+          "text": " ",
+          "start_time": 195.519,
+          "end_time": 195.559
+        },
+        {
+          "text": "hard",
+          "start_time": 195.559,
+          "end_time": 195.839
+        },
+        {
+          "text": " ",
+          "start_time": 195.839,
+          "end_time": 195.859
+        },
+        {
+          "text": "against",
+          "start_time": 195.859,
+          "end_time": 196.139
+        },
+        {
+          "text": " ",
+          "start_time": 196.139,
+          "end_time": 196.139
+        },
+        {
+          "text": "the",
+          "start_time": 196.139,
+          "end_time": 196.219
+        }
+      ]
+    },
+    {
+      "text": "bricks.",
+      "start_time": 196.259,
+      "end_time": 196.679,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "bricks.",
+          "start_time": 196.259,
+          "end_time": 196.679
+        }
+      ]
+    },
+    {
+      "text": "The brick house does not move one bit.",
+      "start_time": 197.419,
+      "end_time": 199.239,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "The",
+          "start_time": 197.419,
+          "end_time": 197.479
+        },
+        {
+          "text": " ",
+          "start_time": 197.479,
+          "end_time": 197.499
+        },
+        {
+          "text": "brick",
+          "start_time": 197.499,
+          "end_time": 197.719
+        },
+        {
+          "text": " ",
+          "start_time": 197.719,
+          "end_time": 197.759
+        },
+        {
+          "text": "house",
+          "start_time": 197.759,
+          "end_time": 197.979
+        },
+        {
+          "text": " ",
+          "start_time": 197.979,
+          "end_time": 197.999
+        },
+        {
+          "text": "does",
+          "start_time": 197.999,
+          "end_time": 198.159
+        },
+        {
+          "text": " ",
+          "start_time": 198.159,
+          "end_time": 198.159
+        },
+        {
+          "text": "not",
+          "start_time": 198.159,
+          "end_time": 198.359
+        },
+        {
+          "text": " ",
+          "start_time": 198.359,
+          "end_time": 198.419
+        },
+        {
+          "text": "move",
+          "start_time": 198.419,
+          "end_time": 198.719
+        },
+        {
+          "text": " ",
+          "start_time": 198.719,
+          "end_time": 198.759
+        },
+        {
+          "text": "one",
+          "start_time": 198.759,
+          "end_time": 198.919
+        },
+        {
+          "text": " ",
+          "start_time": 198.919,
+          "end_time": 198.999
+        },
+        {
+          "text": "bit.",
+          "start_time": 198.999,
+          "end_time": 199.239
+        }
+      ]
+    },
+    {
+      "text": "The wolf tries and tries until he is red",
+      "start_time": 200.519,
+      "end_time": 202.939,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "The",
+          "start_time": 200.519,
+          "end_time": 200.619
+        },
+        {
+          "text": " ",
+          "start_time": 200.619,
+          "end_time": 200.679
+        },
+        {
+          "text": "wolf",
+          "start_time": 200.679,
+          "end_time": 200.939
+        },
+        {
+          "text": " ",
+          "start_time": 200.939,
+          "end_time": 200.959
+        },
+        {
+          "text": "tries",
+          "start_time": 200.959,
+          "end_time": 201.339
+        },
+        {
+          "text": " ",
+          "start_time": 201.339,
+          "end_time": 201.359
+        },
+        {
+          "text": "and",
+          "start_time": 201.359,
+          "end_time": 201.499
+        },
+        {
+          "text": " ",
+          "start_time": 201.499,
+          "end_time": 201.519
+        },
+        {
+          "text": "tries",
+          "start_time": 201.519,
+          "end_time": 201.999
+        },
+        {
+          "text": " ",
+          "start_time": 201.999,
+          "end_time": 202.179
+        },
+        {
+          "text": "until",
+          "start_time": 202.179,
+          "end_time": 202.439
+        },
+        {
+          "text": " ",
+          "start_time": 202.439,
+          "end_time": 202.479
+        },
+        {
+          "text": "he",
+          "start_time": 202.479,
+          "end_time": 202.539
+        },
+        {
+          "text": " ",
+          "start_time": 202.539,
+          "end_time": 202.559
+        },
+        {
+          "text": "is",
+          "start_time": 202.559,
+          "end_time": 202.739
+        },
+        {
+          "text": " ",
+          "start_time": 202.739,
+          "end_time": 202.739
+        },
+        {
+          "text": "red",
+          "start_time": 202.739,
+          "end_time": 202.939
+        }
+      ]
+    },
+    {
+      "text": "in the face.",
+      "start_time": 202.959,
+      "end_time": 203.679,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "in",
+          "start_time": 202.959,
+          "end_time": 203.039
+        },
+        {
+          "text": " ",
+          "start_time": 203.039,
+          "end_time": 203.059
+        },
+        {
+          "text": "the",
+          "start_time": 203.059,
+          "end_time": 203.179
+        },
+        {
+          "text": " ",
+          "start_time": 203.179,
+          "end_time": 203.199
+        },
+        {
+          "text": "face.",
+          "start_time": 203.199,
+          "end_time": 203.679
+        }
+      ]
+    },
+    {
+      "text": "He is very tired.",
+      "start_time": 204.519,
+      "end_time": 205.699,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "He",
+          "start_time": 204.519,
+          "end_time": 204.599
+        },
+        {
+          "text": " ",
+          "start_time": 204.599,
+          "end_time": 204.619
+        },
+        {
+          "text": "is",
+          "start_time": 204.619,
+          "end_time": 204.759
+        },
+        {
+          "text": " ",
+          "start_time": 204.759,
+          "end_time": 204.879
+        },
+        {
+          "text": "very",
+          "start_time": 204.879,
+          "end_time": 205.159
+        },
+        {
+          "text": " ",
+          "start_time": 205.159,
+          "end_time": 205.239
+        },
+        {
+          "text": "tired.",
+          "start_time": 205.239,
+          "end_time": 205.699
+        }
+      ]
+    },
+    {
+      "text": "He stomps his feet and grumbles. He turns",
+      "start_time": 206.639,
+      "end_time": 209.419,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "He",
+          "start_time": 206.639,
+          "end_time": 206.739
+        },
+        {
+          "text": " ",
+          "start_time": 206.739,
+          "end_time": 206.859
+        },
+        {
+          "text": "stomps",
+          "start_time": 206.859,
+          "end_time": 207.259
+        },
+        {
+          "text": " ",
+          "start_time": 207.259,
+          "end_time": 207.279
+        },
+        {
+          "text": "his",
+          "start_time": 207.279,
+          "end_time": 207.419
+        },
+        {
+          "text": " ",
+          "start_time": 207.419,
+          "end_time": 207.519
+        },
+        {
+          "text": "feet",
+          "start_time": 207.519,
+          "end_time": 207.719
+        },
+        {
+          "text": " ",
+          "start_time": 207.719,
+          "end_time": 207.739
+        },
+        {
+          "text": "and",
+          "start_time": 207.739,
+          "end_time": 207.879
+        },
+        {
+          "text": " ",
+          "start_time": 207.879,
+          "end_time": 207.899
+        },
+        {
+          "text": "grumbles.",
+          "start_time": 207.899,
+          "end_time": 208.459
+        },
+        {
+          "text": " ",
+          "start_time": 208.459,
+          "end_time": 208.959
+        },
+        {
+          "text": "He",
+          "start_time": 208.959,
+          "end_time": 209.119
+        },
+        {
+          "text": " ",
+          "start_time": 209.119,
+          "end_time": 209.139
+        },
+        {
+          "text": "turns",
+          "start_time": 209.139,
+          "end_time": 209.419
+        }
+      ]
+    },
+    {
+      "text": "around and walks away defeated.",
+      "start_time": 209.439,
+      "end_time": 212.039,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "around",
+          "start_time": 209.439,
+          "end_time": 210.179
+        },
+        {
+          "text": " ",
+          "start_time": 210.179,
+          "end_time": 210.219
+        },
+        {
+          "text": "and",
+          "start_time": 210.219,
+          "end_time": 210.339
+        },
+        {
+          "text": " ",
+          "start_time": 210.339,
+          "end_time": 210.419
+        },
+        {
+          "text": "walks",
+          "start_time": 210.419,
+          "end_time": 210.719
+        },
+        {
+          "text": " ",
+          "start_time": 210.719,
+          "end_time": 210.759
+        },
+        {
+          "text": "away",
+          "start_time": 210.759,
+          "end_time": 211.159
+        },
+        {
+          "text": " ",
+          "start_time": 211.159,
+          "end_time": 211.419
+        },
+        {
+          "text": "defeated.",
+          "start_time": 211.419,
+          "end_time": 212.039
+        }
+      ]
+    },
+    {
+      "text": "The three pigs cheer inside the strong",
+      "start_time": 213.219,
+      "end_time": 215.839,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "The",
+          "start_time": 213.219,
+          "end_time": 213.319
+        },
+        {
+          "text": " ",
+          "start_time": 213.319,
+          "end_time": 213.379
+        },
+        {
+          "text": "three",
+          "start_time": 213.379,
+          "end_time": 213.559
+        },
+        {
+          "text": " ",
+          "start_time": 213.559,
+          "end_time": 213.659
+        },
+        {
+          "text": "pigs",
+          "start_time": 213.659,
+          "end_time": 214.039
+        },
+        {
+          "text": " ",
+          "start_time": 214.039,
+          "end_time": 214.059
+        },
+        {
+          "text": "cheer",
+          "start_time": 214.059,
+          "end_time": 214.439
+        },
+        {
+          "text": " ",
+          "start_time": 214.439,
+          "end_time": 214.979
+        },
+        {
+          "text": "inside",
+          "start_time": 214.979,
+          "end_time": 215.379
+        },
+        {
+          "text": " ",
+          "start_time": 215.379,
+          "end_time": 215.419
+        },
+        {
+          "text": "the",
+          "start_time": 215.419,
+          "end_time": 215.459
+        },
+        {
+          "text": " ",
+          "start_time": 215.459,
+          "end_time": 215.499
+        },
+        {
+          "text": "strong",
+          "start_time": 215.499,
+          "end_time": 215.839
+        }
+      ]
+    },
+    {
+      "text": "brick house.",
+      "start_time": 215.879,
+      "end_time": 216.619,
+      "speaker": {
+        "id": "speaker_0",
+        "name": "Speaker 0"
+      },
+      "words": [
+        {
+          "text": "brick",
+          "start_time": 215.879,
+          "end_time": 216.079
+        },
+        {
+          "text": " ",
+          "start_time": 216.079,
+          "end_time": 216.119
+        },
+        {
+          "text": "house.",
+          "start_time": 216.119,
+          "end_time": 216.619
+        }
+      ]
+    }
+  ]
+}
