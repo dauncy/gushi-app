@@ -1,10 +1,13 @@
+import { Nullable } from "@/lib/types";
 import { zid, zodToConvex } from "convex-helpers/server/zod";
 import { defineTable } from "convex/server";
 import { z } from "zod";
+import { Id } from "../_generated/dataModel";
 
 export const images = defineTable(
 	zodToConvex(
 		z.object({
+			name: z.string(),
 			storageId: zid("_storage"),
 			createdAt: z.string().datetime(),
 			updatedAt: z.string().datetime(),
@@ -15,6 +18,7 @@ export const images = defineTable(
 export const audio = defineTable(
 	zodToConvex(
 		z.object({
+			name: z.string(),
 			storageId: zid("_storage"),
 			createdAt: z.string().datetime(),
 			updatedAt: z.string().datetime(),
@@ -48,7 +52,15 @@ const storiesSchema = z.object({
 });
 
 export type StoryPrivate = z.infer<typeof storiesSchema>;
-export type StoryPublic = Omit<StoryPrivate, "body" | "enabled" | "subscription_required" | "transcript">;
+export type StoryPublic = Omit<
+	StoryPrivate,
+	"body" | "enabled" | "subscription_required" | "transcript" | "imageId" | "audioId"
+> & { imageUrl: Nullable<string>; audioUrl: Nullable<string>; duration: number };
+
+export type StoryPreview = Omit<
+	StoryPrivate,
+	"body" | "enabled" | "subscription_required" | "transcript" | "imageId" | "audioId" | "createdAt"
+> & { imageUrl: Nullable<string>; audioUrl: Nullable<string>; duration: number; _id: Id<"stories"> };
 
 export const stories = defineTable(zodToConvex(storiesSchema))
 	.index("by_enabled", ["enabled"])

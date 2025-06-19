@@ -1,6 +1,9 @@
 import { NAV_THEME } from "@/lib/constants";
+import { convex, queryClient } from "@/lib/convex.client";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { DarkTheme, DefaultTheme, Theme, ThemeProvider } from "@react-navigation/native";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { ConvexProvider } from "convex/react";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -18,7 +21,7 @@ const DARK_THEME: Theme = {
 };
 
 export default function RootLayout() {
-	const { colorScheme, isDarkColorScheme } = useColorScheme();
+	const { isDarkColorScheme } = useColorScheme();
 	const [isColorSchemeLoaded, setIsColorSchemeLoaded] = useState(false);
 	const hasMounted = useRef(false);
 	const [loaded] = useFonts({
@@ -40,11 +43,15 @@ export default function RootLayout() {
 
 	return (
 		<ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-			<StatusBar style={isDarkColorScheme ? "light" : "dark"} />
-			<Stack>
-				<Stack.Screen name="index" options={{ headerShown: false }} />
-				<Stack.Screen name="+not-found" />
-			</Stack>
+			<ConvexProvider client={convex}>
+				<QueryClientProvider client={queryClient}>
+					<StatusBar style={isDarkColorScheme ? "light" : "dark"} />
+					<Stack>
+						<Stack.Screen name="index" options={{ headerShown: false }} />
+						<Stack.Screen name="+not-found" />
+					</Stack>
+				</QueryClientProvider>
+			</ConvexProvider>
 		</ThemeProvider>
 	);
 }
