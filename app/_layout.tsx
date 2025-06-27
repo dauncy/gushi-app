@@ -48,6 +48,21 @@ export default function RootLayout() {
 					<StatusBar style={isDarkColorScheme ? "light" : "dark"} />
 					<Stack>
 						<Stack.Screen name="index" options={{ headerShown: false }} />
+						<Stack.Screen
+							name="upgrade"
+							options={{
+								contentStyle: { height: "100%" },
+								fullScreenGestureEnabled: true,
+								sheetGrabberVisible: true,
+								sheetCornerRadius: 48,
+								headerShown: false,
+								headerLargeTitleShadowVisible: true,
+								presentation: "formSheet",
+								animation: "slide_from_bottom",
+								animationDuration: 300,
+								animationTypeForReplace: "push",
+							}}
+						/>
 						<Stack.Screen name="+not-found" />
 					</Stack>
 				</QueryClientProvider>

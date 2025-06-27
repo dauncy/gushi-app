@@ -16,3 +16,6 @@ export const NAV_THEME = {
 		text: "hsl(0 0% 98%)", // foreground
 	},
 };
+
+export const REVENUE_CAT_APPI_ID = "app120c6f5a99";
+export const APPLE_REVENUE_CAT_KEY = "appl_QRbmxuYpPHHPOOGlTFxNfOMQGmE";

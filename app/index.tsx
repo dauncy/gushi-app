@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { ChevronUp } from "@/components/ui/icons/chevron-up-icon";
 import { Clock } from "@/components/ui/icons/clock-icon";
 import { FileX } from "@/components/ui/icons/image-fail-icon";
 import { Play } from "@/components/ui/icons/play-icon";
@@ -7,11 +8,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/convex/_generated/api";
 import { StoryPreview } from "@/convex/schema/stories.schema";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Pressable, StatusBar, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const Logo = require("@/assets/images/logo.png");
+const Logo = require("@/assets/images/icon.png");
 
 export default function Home() {
 	return (
@@ -114,27 +116,16 @@ const StoryCardLoading = () => {
 };
 
 const UpgradeSection = () => {
+	const router = useRouter();
 	return (
-		<View className="flex  absolute bottom-0 right-0 left-0 h-1/4 border-t border-slate-800 bg-slate-900 p-4">
+		<Pressable
+			onPress={() => router.push("/upgrade")}
+			className="flex absolute bottom-0 right-0 left-0 border-t border-slate-800 bg-slate-900 p-4 h-20 flex-row items-start justify-between"
+		>
 			<View className="flex flex-col gap-y-2 flex-1">
 				<Text className="text-slate-200 font-semibold">Want to listen to more stories?</Text>
-				<View className="flex w-full flex-1 h-auto justify-center items-center">
-					<Pressable
-						style={{
-							shadowColor: "#fff",
-							shadowOffset: {
-								width: 3,
-								height: 2,
-							},
-							shadowOpacity: 0.25,
-							shadowRadius: 10,
-						}}
-						className="active:scale-95 active:opacity-80 bg-amber-600 p-4 rounded-xl flex items-center justify-center"
-					>
-						<Text className="text-white text-base font-medium">Upgrade to Premium</Text>
-					</Pressable>
-				</View>
 			</View>
-		</View>
+			<ChevronUp className="text-slate-200" size={24} />
+		</Pressable>
 	);
 };
