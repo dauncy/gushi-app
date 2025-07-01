@@ -2,6 +2,7 @@ import { Marquee } from "@/components/Marquee";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/icons/calendar-icon";
 import { Headphones } from "@/components/ui/icons/headphones-icon";
+import { LetterText } from "@/components/ui/icons/letters-text-icon";
 import { Pause } from "@/components/ui/icons/pause-icon";
 import { Play } from "@/components/ui/icons/play-icon";
 import { Share } from "@/components/ui/icons/share-icon";
@@ -13,6 +14,7 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { StoryExtended } from "@/convex/schema/stories.schema";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
+import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { AudioStatus, setAudioModeAsync, useAudioPlayer } from "expo-audio";
 import { useLocalSearchParams } from "expo-router";
@@ -46,6 +48,7 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 	const [currentTime, setCurrentTime] = useState(0);
 	const [duration, setDuration] = useState(0);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+	const [showClosedCaption, setShowClosedCaption] = useState(false);
 
 	const play = useCallback(() => {
 		audio.play();
@@ -174,6 +177,18 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 					)}
 				</Pressable>
 			</View>
+			<View className="flex w-full mt-12 flex-col items-start">
+				<Button
+					className={cn("bg-slate-800 rounded-xl border border-slate-600", showClosedCaption && "bg-slate-500")}
+					onPress={() => setShowClosedCaption(!showClosedCaption)}
+				>
+					<LetterText
+						className={cn("text-slate-500 size-6", showClosedCaption && "text-slate-900")}
+						strokeWidth={2}
+						size={20}
+					/>
+				</Button>
+			</View>
 		</View>
 	);
 };
@@ -250,6 +265,10 @@ const StoryLoading = () => {
 
 			<View className="flex w-full mt-12 flex-col items-center">
 				<Skeleton className="size-20 rounded-full bg-slate-800" />
+			</View>
+
+			<View className="flex w-full mt-12 flex-col ">
+				<Skeleton className="w-20 h-9 rounded-full bg-slate-800" />
 			</View>
 		</View>
 	);
