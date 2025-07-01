@@ -66,8 +66,12 @@ const StoryCard = ({ story }: { story: StoryPreview }) => {
 		const remainingSeconds = d % 60;
 		return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
 	};
+	const router = useRouter();
 	return (
-		<View className="flex w-full p-3 rounded-xl bg-slate-900 p-4 flex-row  w-full gap-4 border border-slate-800">
+		<Pressable
+			onPress={() => router.push(`/stories/${story._id}`)}
+			className="flex w-full p-3 rounded-xl bg-slate-900 p-4 flex-row  w-full gap-4 border border-slate-800"
+		>
 			<StoryImage imageUrl={story.imageUrl} />
 			<View className="flex flex-col gap-y-1 flex-1 mt-0.5">
 				<Text className="text-slate-300 text-lg font-semibold">{story.title}</Text>
@@ -82,7 +86,7 @@ const StoryCard = ({ story }: { story: StoryPreview }) => {
 					<Play className="text-white fill-white" size={20} />
 				</Button>
 			</View>
-		</View>
+		</Pressable>
 	);
 };
 

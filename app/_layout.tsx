@@ -63,6 +63,22 @@ export default function RootLayout() {
 								animationTypeForReplace: "push",
 							}}
 						/>
+						<Stack.Screen
+							name="stories"
+							options={{
+								fullScreenGestureEnabled: true,
+								sheetGrabberVisible: true,
+								sheetCornerRadius: 48,
+								headerLargeTitleShadowVisible: true,
+								presentation: "formSheet",
+								headerShown: false,
+
+								contentStyle: {
+									backgroundColor: "#0f172a",
+								},
+								gestureEnabled: true,
+							}}
+						/>
 						<Stack.Screen name="+not-found" />
 					</Stack>
 				</QueryClientProvider>
