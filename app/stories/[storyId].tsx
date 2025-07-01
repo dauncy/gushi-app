@@ -19,8 +19,15 @@ import { formatDistanceToNow } from "date-fns";
 import { AudioStatus, setAudioModeAsync, useAudioPlayer } from "expo-audio";
 import { useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Pressable, Text, View } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import { Pressable, Text, useWindowDimensions, View } from "react-native";
+import Animated, {
+	interpolate,
+	LinearTransition,
+	useAnimatedStyle,
+	useSharedValue,
+	withSpring,
+	withTiming,
+} from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const formatTime = (seconds: number) => {
@@ -115,7 +122,7 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 
 	return (
 		<View className="flex flex-1 flex-col items-center relative">
-			<StoryHeader story={story} isCollapsed={showClosedCaption} isPlaying={isPlaying} />
+			<StoryHeader2 story={story} isCollapsed={showClosedCaption} isPlaying={isPlaying} />
 			<View className="absolute bottom-0 left-0 right-0 w-full flex flex-col pt-12">
 				<View className="flex w-full flex-col">
 					<Progress
@@ -170,7 +177,7 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 	);
 };
 
-const StoryHeader = ({
+const StoryHeader2 = ({
 	story,
 	isCollapsed,
 	isPlaying,
@@ -179,51 +186,48 @@ const StoryHeader = ({
 	isCollapsed: boolean;
 	isPlaying: boolean;
 }) => {
-	const layoutTransition = useSharedValue(0);
+	/* 1️⃣ shared value just for numeric interpolation */
+	const progress = useSharedValue(isCollapsed ? 1 : 0);
 
+	/* keep it in sync when the prop changes */
 	useEffect(() => {
-		layoutTransition.value = withSpring(isCollapsed ? 1 : 0, {
-			damping: 5,
-			stiffness: 150,
-			overshootClamping: false,
-			mass: 0.2,
-		});
-	}, [isCollapsed, layoutTransition]);
+		progress.value = withTiming(isCollapsed ? 1 : 0, { duration: 250 });
+	}, [isCollapsed, progress]);
 
-	const containerStyle = useAnimatedStyle(() => {
-		return {
-			display: "flex",
-			flexDirection: layoutTransition.value === 1 ? "row" : "column",
-			alignItems: layoutTransition.value === 1 ? "center" : "center",
-			gap: layoutTransition.value === 1 ? 16 : 0,
-			width: "100%",
-		};
-	}, [isCollapsed]);
+	/* 2️⃣ numeric animation for image size */
+	const { width: screenW } = useWindowDimensions(); // full width of the screen
+	const imgStyle = useAnimatedStyle(() => {
+		// interpolate from “full width – 32px padding” ➜ 80
+		const size = interpolate(progress.value, [0, 1], [screenW - 48, 80]);
+		return { width: size, height: size };
+	});
 
-	const imageContainerStyle = useAnimatedStyle(() => {
+	/* 3️⃣ numeric animation for title margin / flex grow */
+	const titleStyle = useAnimatedStyle(() => {
 		return {
-			width: layoutTransition.value === 1 ? 80 : "100%",
-			height: layoutTransition.value === 1 ? 80 : "auto",
-			aspectRatio: layoutTransition.value === 1 ? 1 : undefined,
+			marginTop: interpolate(progress.value, [0, 1], [48, 0]),
+			flex: interpolate(progress.value, [0, 1], [1, 1]),
 		};
-	}, [isCollapsed]);
-
-	const titleSectionStyle = useAnimatedStyle(() => {
-		return {
-			marginTop: layoutTransition.value === 1 ? 0 : 48,
-			display: "flex",
-			flexDirection: "row",
-			flex: layoutTransition.value === 1 ? 1 : undefined,
-		};
-	}, [isCollapsed]);
+	});
 
 	return (
-		<Animated.View style={containerStyle}>
-			<Animated.View style={imageContainerStyle}>
+		<Animated.View
+			/* 🪄 this line animates the layout change of row/column, gap, etc. */
+			layout={LinearTransition.springify().duration(250).stiffness(150).damping(5)}
+			style={[
+				{
+					flexDirection: isCollapsed ? "row" : "column",
+					alignItems: "center",
+					width: "100%",
+					gap: isCollapsed ? 16 : 0,
+				},
+			]}
+		>
+			<Animated.View style={[imgStyle, { borderRadius: 16 }]}>
 				<StoryImage imageUrl={story.imageUrl} isPlaying={isPlaying} disableAnimation={isCollapsed} />
 			</Animated.View>
 
-			<Animated.View style={titleSectionStyle} className="">
+			<Animated.View style={[titleStyle, { width: "100%", flexDirection: "row" }]}>
 				<View className="flex w-full overflow-hidden flex-1 mr-8 flex-col">
 					<Marquee speed={0.5} spacing={48} style={{ maxWidth: 150 }}>
 						<Text className="text-slate-200 text-2xl font-bold">{story.title}</Text>
