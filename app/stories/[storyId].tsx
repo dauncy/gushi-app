@@ -179,7 +179,7 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 			</View>
 			<View className="flex w-full mt-12 flex-col items-start">
 				<Button
-					className={cn("bg-slate-800 rounded-xl border border-slate-600", showClosedCaption && "bg-slate-500")}
+					className={cn("bg-slate-900 rounded-xl border border-slate-900", showClosedCaption && "bg-slate-500")}
 					onPress={() => setShowClosedCaption(!showClosedCaption)}
 				>
 					<LetterText
