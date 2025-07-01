@@ -34,8 +34,8 @@ export default function StoryPage() {
 	const { data, isLoading } = useConvexQuery(api.stories.getStory, { storyId: storyId as Id<"stories"> });
 
 	return (
-		<SafeAreaView className="flex-1 bg-slate-900">
-			<View className="flex-1 flex-col py-12 px-8">
+		<SafeAreaView className="flex-1 bg-slate-900 flex">
+			<View className="flex-1 flex-col py-12 px-8 flex relative">
 				{isLoading || !data ? <StoryLoading /> : <StoryContent story={data} />}
 			</View>
 		</SafeAreaView>
@@ -114,15 +114,120 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 	}, [audio, duration, setCurrentTime, setDuration, isPlaying]);
 
 	return (
-		<View className="flex flex-1 flex-col items-center">
-			<StoryImage imageUrl={story.imageUrl} isPlaying={isPlaying} />
-			<View className="flex w-full mt-12 flex-row gap-x-8">
-				<View className="flex flex-col flex-1">
-					<View className="flex w-full overflow-hidden">
-						<Marquee speed={0.5} spacing={48} style={{ maxWidth: 150 }}>
-							<Text className="text-slate-200 text-2xl font-bold">{story.title}</Text>
-						</Marquee>
+		<View className="flex flex-1 flex-col items-center relative">
+			<StoryHeader story={story} isCollapsed={showClosedCaption} isPlaying={isPlaying} />
+			<View className="absolute bottom-0 left-0 right-0 w-full flex flex-col pt-12">
+				<View className="flex w-full flex-col">
+					<Progress
+						value={duration > 0 ? (currentTime / duration) * 100 : 0}
+						className="h-2 bg-slate-800 w-full"
+						indicatorClassName="bg-slate-500"
+						style={{
+							shadowColor: "#000",
+							shadowOffset: { width: 1, height: 4 },
+							shadowOpacity: 0.25,
+							shadowRadius: 16,
+						}}
+					/>
+					<View className="flex w-full flex-row justify-between mt-3">
+						<Text className="text-slate-400 text-xs">{formatTime(currentTime)}</Text>
+						<Text className="text-slate-400 text-xs">{formatTime(audio.duration ?? 0)}</Text>
 					</View>
+				</View>
+
+				<View className="flex w-full flex-col items-center">
+					<Pressable
+						onPress={() => {
+							if (isPlaying) {
+								pause();
+							} else {
+								play();
+							}
+						}}
+						className="size-20 active:bg-slate-800 rounded-full flex items-center justify-center"
+					>
+						{isPlaying ? (
+							<Pause className="text-white fill-white" size={36} />
+						) : (
+							<Play className="text-white fill-white" size={36} />
+						)}
+					</Pressable>
+				</View>
+				<View className="flex w-full flex-col items-start">
+					<Button
+						className={cn("bg-slate-900 rounded-xl border border-slate-900", showClosedCaption && "bg-slate-500")}
+						onPress={() => setShowClosedCaption(!showClosedCaption)}
+					>
+						<LetterText
+							className={cn("text-slate-500 size-6", showClosedCaption && "text-slate-900")}
+							strokeWidth={2}
+							size={20}
+						/>
+					</Button>
+				</View>
+			</View>
+		</View>
+	);
+};
+
+const StoryHeader = ({
+	story,
+	isCollapsed,
+	isPlaying,
+}: {
+	story: StoryExtended;
+	isCollapsed: boolean;
+	isPlaying: boolean;
+}) => {
+	const layoutTransition = useSharedValue(0);
+
+	useEffect(() => {
+		layoutTransition.value = withSpring(isCollapsed ? 1 : 0, {
+			damping: 5,
+			stiffness: 150,
+			overshootClamping: false,
+			mass: 0.2,
+		});
+	}, [isCollapsed, layoutTransition]);
+
+	const containerStyle = useAnimatedStyle(() => {
+		return {
+			display: "flex",
+			flexDirection: layoutTransition.value === 1 ? "row" : "column",
+			alignItems: layoutTransition.value === 1 ? "center" : "center",
+			gap: layoutTransition.value === 1 ? 16 : 0,
+			width: "100%",
+		};
+	}, [isCollapsed]);
+
+	const imageContainerStyle = useAnimatedStyle(() => {
+		return {
+			width: layoutTransition.value === 1 ? 80 : "100%",
+			height: layoutTransition.value === 1 ? 80 : "auto",
+			aspectRatio: layoutTransition.value === 1 ? 1 : undefined,
+		};
+	}, [isCollapsed]);
+
+	const titleSectionStyle = useAnimatedStyle(() => {
+		return {
+			marginTop: layoutTransition.value === 1 ? 0 : 48,
+			display: "flex",
+			flexDirection: "row",
+			flex: layoutTransition.value === 1 ? 1 : undefined,
+		};
+	}, [isCollapsed]);
+
+	return (
+		<Animated.View style={containerStyle}>
+			<Animated.View style={imageContainerStyle}>
+				<StoryImage imageUrl={story.imageUrl} isPlaying={isPlaying} disableAnimation={isCollapsed} />
+			</Animated.View>
+
+			<Animated.View style={titleSectionStyle} className="">
+				<View className="flex w-full overflow-hidden flex-1 mr-8 flex-col">
+					<Marquee speed={0.5} spacing={48} style={{ maxWidth: 150 }}>
+						<Text className="text-slate-200 text-2xl font-bold">{story.title}</Text>
+					</Marquee>
 					<View className="flex flex-row gap-x-2 items-center mt-2">
 						<Calendar className="text-slate-400 size-4" strokeWidth={1} />
 						<Text className="text-slate-400 text-sm font-medium">
@@ -139,61 +244,20 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 						<Share className="text-slate-500 size-6" strokeWidth={1.5} size={20} />
 					</Button>
 				</View>
-			</View>
-
-			<View className="flex w-full mt-12 flex-col">
-				<Progress
-					value={duration > 0 ? (currentTime / duration) * 100 : 0}
-					className="h-2 bg-slate-800 w-full"
-					indicatorClassName="bg-slate-500"
-					style={{
-						shadowColor: "#000",
-						shadowOffset: { width: 1, height: 4 },
-						shadowOpacity: 0.25,
-						shadowRadius: 16,
-					}}
-				/>
-				<View className="flex w-full flex-row justify-between mt-3">
-					<Text className="text-slate-400 text-xs">{formatTime(currentTime)}</Text>
-					<Text className="text-slate-400 text-xs">{formatTime(audio.duration ?? 0)}</Text>
-				</View>
-			</View>
-
-			<View className="flex w-full mt-12 flex-col items-center">
-				<Pressable
-					onPress={() => {
-						if (isPlaying) {
-							pause();
-						} else {
-							play();
-						}
-					}}
-					className="size-20 active:bg-slate-800 rounded-full flex items-center justify-center"
-				>
-					{isPlaying ? (
-						<Pause className="text-white fill-white" size={36} />
-					) : (
-						<Play className="text-white fill-white" size={36} />
-					)}
-				</Pressable>
-			</View>
-			<View className="flex w-full mt-12 flex-col items-start">
-				<Button
-					className={cn("bg-slate-900 rounded-xl border border-slate-900", showClosedCaption && "bg-slate-500")}
-					onPress={() => setShowClosedCaption(!showClosedCaption)}
-				>
-					<LetterText
-						className={cn("text-slate-500 size-6", showClosedCaption && "text-slate-900")}
-						strokeWidth={2}
-						size={20}
-					/>
-				</Button>
-			</View>
-		</View>
+			</Animated.View>
+		</Animated.View>
 	);
 };
 
-const StoryImage = ({ imageUrl, isPlaying }: { imageUrl: string | null; isPlaying: boolean }) => {
+const StoryImage = ({
+	imageUrl,
+	isPlaying,
+	disableAnimation,
+}: {
+	imageUrl: string | null;
+	isPlaying: boolean;
+	disableAnimation?: boolean;
+}) => {
 	const [error, setError] = useState(false);
 	const showFallback = error || !imageUrl;
 
@@ -217,7 +281,7 @@ const StoryImage = ({ imageUrl, isPlaying }: { imageUrl: string | null; isPlayin
 	if (showFallback) {
 		return (
 			<View className="aspect-square w-full rounded-xl bg-slate-800 rounded-md border border-zinc-700 flex items-center justify-center">
-				<Headphones className="text-zinc-700 size-12" strokeWidth={0.5} size={96} />
+				<Headphones className="text-zinc-700" strokeWidth={0.5} />
 			</View>
 		);
 	}
@@ -232,7 +296,7 @@ const StoryImage = ({ imageUrl, isPlaying }: { imageUrl: string | null; isPlayin
 						shadowOpacity: 0.25,
 						shadowRadius: 16,
 					},
-					animatedStyle,
+					!disableAnimation && animatedStyle,
 				]}
 			>
 				<Image source={{ uri: imageUrl }} className="w-full rounded-xl aspect-square" onError={() => setError(true)} />

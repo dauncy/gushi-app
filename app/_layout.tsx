@@ -75,6 +75,7 @@ export default function RootLayout() {
 
 								contentStyle: {
 									backgroundColor: "#0f172a",
+									height: "100%",
 								},
 								gestureEnabled: true,
 							}}
