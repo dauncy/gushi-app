@@ -11,41 +11,105 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { StoryPreview } from "@/convex/schema/stories.schema";
+import { StoryExtended } from "@/convex/schema/stories.schema";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
 import { formatDistanceToNow } from "date-fns";
+import { AudioStatus, setAudioModeAsync, useAudioPlayer } from "expo-audio";
 import { useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const formatTime = (seconds: number) => {
+	const minutes = Math.floor(seconds / 60);
+	const remainingSeconds = Math.floor(seconds % 60);
+	return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+};
+
 export default function StoryPage() {
 	const { storyId } = useLocalSearchParams();
 	const { data, isLoading } = useConvexQuery(api.stories.getStory, { storyId: storyId as Id<"stories"> });
-	const [isPlaying, setIsPlaying] = useState(true);
+
 	return (
 		<SafeAreaView className="flex-1 bg-slate-900">
 			<View className="flex-1 flex-col py-12 px-8">
-				{isLoading || !data ? (
-					<StoryLoading />
-				) : (
-					<StoryContent story={data} isPlaying={isPlaying} setIsPlaying={setIsPlaying} />
-				)}
+				{isLoading || !data ? <StoryLoading /> : <StoryContent story={data} />}
 			</View>
 		</SafeAreaView>
 	);
 }
 
-const StoryContent = ({
-	story,
-	isPlaying,
-	setIsPlaying,
-}: {
-	story: StoryPreview;
-	isPlaying: boolean;
-	setIsPlaying: (isPlaying: boolean) => void;
-}) => {
+const StoryContent = ({ story }: { story: StoryExtended }) => {
+	const [isPlaying, setIsPlaying] = useState(false);
+	const audio = useAudioPlayer(story.audioUrl);
+	const [currentTime, setCurrentTime] = useState(0);
+	const [duration, setDuration] = useState(0);
+	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+	const play = useCallback(() => {
+		audio.play();
+		setIsPlaying(true);
+	}, [audio, setIsPlaying]);
+
+	const pause = useCallback(() => {
+		audio.pause();
+		setIsPlaying(false);
+	}, [audio, setIsPlaying]);
+
+	const statusCallback = useCallback(
+		(status: AudioStatus) => {
+			if (status.playing) {
+				setIsPlaying(true);
+			} else {
+				setIsPlaying(false);
+			}
+		},
+		[setIsPlaying],
+	);
+
+	useEffect(() => {
+		const listener = (event: AudioStatus) => {
+			statusCallback(event);
+		};
+		audio.addListener("playbackStatusUpdate", listener);
+		return () => {
+			audio.removeListener("playbackStatusUpdate", listener);
+		};
+	}, [statusCallback, audio]);
+
+	useEffect(() => {
+		setAudioModeAsync({
+			playsInSilentMode: true,
+			shouldPlayInBackground: true,
+		});
+		audio.play();
+
+		setIsPlaying(true);
+	}, [audio]);
+
+	useEffect(() => {
+		if (intervalRef.current) {
+			clearInterval(intervalRef.current);
+		}
+		intervalRef.current = setInterval(() => {
+			if (duration === 0) {
+				setDuration(audio.duration);
+			}
+
+			if (!isPlaying) {
+				return;
+			}
+			setCurrentTime(audio.currentTime);
+		}, 1000);
+
+		return () => {
+			if (intervalRef.current) {
+				clearInterval(intervalRef.current);
+			}
+		};
+	}, [audio, duration, setCurrentTime, setDuration, isPlaying]);
+
 	return (
 		<View className="flex flex-1 flex-col items-center">
 			<StoryImage imageUrl={story.imageUrl} isPlaying={isPlaying} />
@@ -75,16 +139,32 @@ const StoryContent = ({
 			</View>
 
 			<View className="flex w-full mt-12 flex-col">
-				<Progress value={78} max={186} className="h-2 bg-slate-800 w-full" indicatorClassName="bg-slate-500" />
+				<Progress
+					value={duration > 0 ? (currentTime / duration) * 100 : 0}
+					className="h-2 bg-slate-800 w-full"
+					indicatorClassName="bg-slate-500"
+					style={{
+						shadowColor: "#000",
+						shadowOffset: { width: 1, height: 4 },
+						shadowOpacity: 0.25,
+						shadowRadius: 16,
+					}}
+				/>
 				<View className="flex w-full flex-row justify-between mt-3">
-					<Text className="text-slate-400 text-xs">1:18</Text>
-					<Text className="text-slate-400 text-xs">3:06</Text>
+					<Text className="text-slate-400 text-xs">{formatTime(currentTime)}</Text>
+					<Text className="text-slate-400 text-xs">{formatTime(audio.duration ?? 0)}</Text>
 				</View>
 			</View>
 
 			<View className="flex w-full mt-12 flex-col items-center">
 				<Pressable
-					onPress={() => setIsPlaying(!isPlaying)}
+					onPress={() => {
+						if (isPlaying) {
+							pause();
+						} else {
+							play();
+						}
+					}}
 					className="size-20 active:bg-slate-800 rounded-full flex items-center justify-center"
 				>
 					{isPlaying ? (

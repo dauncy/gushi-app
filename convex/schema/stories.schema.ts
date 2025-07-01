@@ -62,6 +62,11 @@ export type StoryPreview = Omit<
 	"body" | "enabled" | "subscription_required" | "transcript" | "imageId" | "audioId" | "createdAt"
 > & { imageUrl: Nullable<string>; audioUrl: Nullable<string>; duration: number; _id: Id<"stories"> };
 
+export type StoryExtended = Omit<
+	StoryPrivate,
+	"enabled" | "subscription_required" | "imageId" | "audioId" | "createdAt"
+> & { imageUrl: Nullable<string>; audioUrl: Nullable<string>; _id: Id<"stories"> };
+
 export const stories = defineTable(zodToConvex(storiesSchema))
 	.index("by_enabled", ["enabled"])
 	.index("by_subscription_required", ["subscription_required"]);

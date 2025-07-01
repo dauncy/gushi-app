@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { api } from "./_generated/api";
 import { query } from "./_generated/server";
-import { StoryPreview } from "./schema/stories.schema";
+import { StoryExtended, StoryPreview } from "./schema/stories.schema";
 
 export const getImageUrl = query({
 	args: {
@@ -61,7 +61,7 @@ export const getStory = query({
 	args: {
 		storyId: v.id("stories"),
 	},
-	handler: async (ctx, { storyId }): Promise<StoryPreview | null> => {
+	handler: async (ctx, { storyId }): Promise<StoryExtended | null> => {
 		const maybeStory = await ctx.db.get(storyId);
 		if (!maybeStory) {
 			return null;
@@ -78,7 +78,8 @@ export const getStory = query({
 			title: maybeStory.title,
 			imageUrl,
 			audioUrl,
-			duration: maybeStory.transcript[maybeStory.transcript.length - 1].end_time,
+			transcript: maybeStory.transcript,
+			body: maybeStory.body,
 			updatedAt: maybeStory.updatedAt,
 		};
 	},

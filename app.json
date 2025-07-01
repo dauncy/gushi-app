@@ -10,7 +10,12 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.danielwilderdev.dreamdrop"
+      "bundleIdentifier": "com.danielwilderdev.dreamdrop",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio"
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -35,6 +40,9 @@
           "resizeMode": "contain",
           "backgroundColor": "#0f172a"
         }
+      ],
+      [
+        "expo-audio"
       ]
     ],
     "experiments": {
