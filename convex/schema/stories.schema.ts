@@ -67,6 +67,8 @@ export type StoryExtended = Omit<
 	"enabled" | "subscription_required" | "imageId" | "audioId" | "createdAt"
 > & { imageUrl: Nullable<string>; audioUrl: Nullable<string>; _id: Id<"stories"> };
 
+export type SegmentTranscript = z.infer<typeof segmentTranscriptSchema>;
+
 export const stories = defineTable(zodToConvex(storiesSchema))
 	.index("by_enabled", ["enabled"])
 	.index("by_subscription_required", ["subscription_required"]);

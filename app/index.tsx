@@ -5,6 +5,7 @@ import { FileX } from "@/components/ui/icons/image-fail-icon";
 import { Play } from "@/components/ui/icons/play-icon";
 import { Image } from "@/components/ui/image";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAudio } from "@/context/AudioContext";
 import { api } from "@/convex/_generated/api";
 import { StoryPreview } from "@/convex/schema/stories.schema";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
@@ -60,6 +61,7 @@ const StoryList = () => {
 };
 
 const StoryCard = ({ story }: { story: StoryPreview }) => {
+	const { play, setStory } = useAudio();
 	const secondsToMinuteString = (seconds: number) => {
 		const d = Math.round(seconds);
 		const minutes = Math.floor(d / 60);
@@ -69,7 +71,13 @@ const StoryCard = ({ story }: { story: StoryPreview }) => {
 	const router = useRouter();
 	return (
 		<Pressable
-			onPress={() => router.push(`/stories/${story._id}`)}
+			onPress={() => {
+				if (story.audioUrl) {
+					setStory(story.audioUrl);
+					play();
+					router.push(`/stories/${story._id}`);
+				}
+			}}
 			className="flex w-full p-3 rounded-xl bg-slate-900 p-4 flex-row  w-full gap-4 border border-slate-800"
 		>
 			<StoryImage imageUrl={story.imageUrl} />

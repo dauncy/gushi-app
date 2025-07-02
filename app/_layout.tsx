@@ -1,3 +1,4 @@
+import { AudioProvider } from "@/context/AudioContext";
 import { NAV_THEME } from "@/lib/constants";
 import { convex, queryClient } from "@/lib/convex.client";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -45,43 +46,45 @@ export default function RootLayout() {
 		<ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
 			<ConvexProvider client={convex}>
 				<QueryClientProvider client={queryClient}>
-					<StatusBar style={isDarkColorScheme ? "light" : "dark"} />
-					<Stack>
-						<Stack.Screen name="index" options={{ headerShown: false }} />
-						<Stack.Screen
-							name="upgrade"
-							options={{
-								contentStyle: { height: "100%" },
-								fullScreenGestureEnabled: true,
-								sheetGrabberVisible: true,
-								sheetCornerRadius: 48,
-								headerShown: false,
-								headerLargeTitleShadowVisible: true,
-								presentation: "formSheet",
-								animation: "slide_from_bottom",
-								animationDuration: 300,
-								animationTypeForReplace: "push",
-							}}
-						/>
-						<Stack.Screen
-							name="stories"
-							options={{
-								fullScreenGestureEnabled: true,
-								sheetGrabberVisible: true,
-								sheetCornerRadius: 48,
-								headerLargeTitleShadowVisible: true,
-								presentation: "formSheet",
-								headerShown: false,
+					<AudioProvider>
+						<StatusBar style={isDarkColorScheme ? "light" : "dark"} />
+						<Stack>
+							<Stack.Screen name="index" options={{ headerShown: false }} />
+							<Stack.Screen
+								name="upgrade"
+								options={{
+									contentStyle: { height: "100%" },
+									fullScreenGestureEnabled: true,
+									sheetGrabberVisible: true,
+									sheetCornerRadius: 48,
+									headerShown: false,
+									headerLargeTitleShadowVisible: true,
+									presentation: "formSheet",
+									animation: "slide_from_bottom",
+									animationDuration: 300,
+									animationTypeForReplace: "push",
+								}}
+							/>
+							<Stack.Screen
+								name="stories"
+								options={{
+									fullScreenGestureEnabled: true,
+									sheetGrabberVisible: true,
+									sheetCornerRadius: 48,
+									headerLargeTitleShadowVisible: true,
+									presentation: "formSheet",
+									headerShown: false,
 
-								contentStyle: {
-									backgroundColor: "#0f172a",
-									height: "100%",
-								},
-								gestureEnabled: true,
-							}}
-						/>
-						<Stack.Screen name="+not-found" />
-					</Stack>
+									contentStyle: {
+										backgroundColor: "#0f172a",
+										height: "100%",
+									},
+									gestureEnabled: true,
+								}}
+							/>
+							<Stack.Screen name="+not-found" />
+						</Stack>
+					</AudioProvider>
 				</QueryClientProvider>
 			</ConvexProvider>
 		</ThemeProvider>

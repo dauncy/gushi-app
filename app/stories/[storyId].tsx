@@ -10,16 +10,17 @@ import { Star } from "@/components/ui/icons/star-icon";
 import { Image } from "@/components/ui/image";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAudio } from "@/context/AudioContext";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { StoryExtended } from "@/convex/schema/stories.schema";
+import { SegmentTranscript, StoryExtended } from "@/convex/schema/stories.schema";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
-import { AudioStatus, setAudioModeAsync, useAudioPlayer } from "expo-audio";
+import { BlurView } from "expo-blur";
 import { useLocalSearchParams } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Pressable, Text, useWindowDimensions, View } from "react-native";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Pressable, ScrollView, Text, useWindowDimensions, View } from "react-native";
 import Animated, {
 	interpolate,
 	LinearTransition,
@@ -50,81 +51,14 @@ export default function StoryPage() {
 }
 
 const StoryContent = ({ story }: { story: StoryExtended }) => {
-	const [isPlaying, setIsPlaying] = useState(false);
-	const audio = useAudioPlayer(story.audioUrl);
-	const [currentTime, setCurrentTime] = useState(0);
-	const [duration, setDuration] = useState(0);
-	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const [showClosedCaption, setShowClosedCaption] = useState(false);
-
-	const play = useCallback(() => {
-		audio.play();
-		setIsPlaying(true);
-	}, [audio, setIsPlaying]);
-
-	const pause = useCallback(() => {
-		audio.pause();
-		setIsPlaying(false);
-	}, [audio, setIsPlaying]);
-
-	const statusCallback = useCallback(
-		(status: AudioStatus) => {
-			if (status.playing) {
-				setIsPlaying(true);
-			} else {
-				setIsPlaying(false);
-			}
-		},
-		[setIsPlaying],
-	);
-
-	useEffect(() => {
-		const listener = (event: AudioStatus) => {
-			statusCallback(event);
-		};
-		audio.addListener("playbackStatusUpdate", listener);
-		return () => {
-			audio.removeListener("playbackStatusUpdate", listener);
-		};
-	}, [statusCallback, audio]);
-
-	useEffect(() => {
-		setAudioModeAsync({
-			playsInSilentMode: true,
-			shouldPlayInBackground: true,
-		});
-		audio.play();
-
-		setIsPlaying(true);
-	}, [audio]);
-
-	useEffect(() => {
-		if (intervalRef.current) {
-			clearInterval(intervalRef.current);
-		}
-		intervalRef.current = setInterval(() => {
-			if (duration === 0) {
-				setDuration(audio.duration);
-			}
-
-			if (!isPlaying) {
-				return;
-			}
-			setCurrentTime(audio.currentTime);
-		}, 1000);
-
-		return () => {
-			if (intervalRef.current) {
-				clearInterval(intervalRef.current);
-			}
-		};
-	}, [audio, duration, setCurrentTime, setDuration, isPlaying]);
-
+	const { pause, play, isPlaying, currentTime, duration } = useAudio();
 	return (
 		<View className="flex flex-1 flex-col items-center relative">
-			<StoryHeader2 story={story} isCollapsed={showClosedCaption} isPlaying={isPlaying} />
-			<View className="absolute bottom-0 left-0 right-0 w-full flex flex-col pt-12">
-				<View className="flex w-full flex-col">
+			<StoryHeader story={story} isCollapsed={showClosedCaption} />
+			{showClosedCaption && <ClosedCaption transcript={story.transcript} />}
+			<View className="absolute bottom-0 left-0 right-0 w-full flex flex-col  bg-slate-900" style={{ zIndex: 1000 }}>
+				<View className="flex w-full flex-col bg-slate-900">
 					<Progress
 						value={duration > 0 ? (currentTime / duration) * 100 : 0}
 						className="h-2 bg-slate-800 w-full"
@@ -138,7 +72,7 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 					/>
 					<View className="flex w-full flex-row justify-between mt-3">
 						<Text className="text-slate-400 text-xs">{formatTime(currentTime)}</Text>
-						<Text className="text-slate-400 text-xs">{formatTime(audio.duration ?? 0)}</Text>
+						<Text className="text-slate-400 text-xs">{formatTime(duration)}</Text>
 					</View>
 				</View>
 
@@ -177,42 +111,176 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 	);
 };
 
-const StoryHeader2 = ({
-	story,
-	isCollapsed,
-	isPlaying,
-}: {
-	story: StoryExtended;
-	isCollapsed: boolean;
-	isPlaying: boolean;
-}) => {
-	/* 1️⃣ shared value just for numeric interpolation */
+const ClosedCaption = ({ transcript }: { transcript: SegmentTranscript[] }) => {
+	const { currentTime } = useAudio();
+	const scrollViewRef = useRef<ScrollView>(null);
+	const segmentRefs = useRef<{ [key: number]: View | null }>({});
+	const lastKnownSegmentRef = useRef<number>(-1);
+
+	const currentSegmentIndex = useMemo(() => {
+		const index = transcript.findIndex((segment) => {
+			return segment.start_time <= currentTime && segment.end_time >= currentTime;
+		});
+
+		if (index >= 0) {
+			lastKnownSegmentRef.current = index;
+			return index;
+		} else if (lastKnownSegmentRef.current >= 0) {
+			// Check if we're past the last known segment (in a gap)
+			const lastSegment = transcript[lastKnownSegmentRef.current];
+			if (lastSegment && currentTime > lastSegment.end_time) {
+				return lastKnownSegmentRef.current;
+			}
+		}
+
+		return index;
+	}, [transcript, currentTime]);
+
+	// Auto-scroll to current segment
+	useEffect(() => {
+		if (currentSegmentIndex >= 0 && segmentRefs.current[currentSegmentIndex]) {
+			const segmentView = segmentRefs.current[currentSegmentIndex];
+			if (segmentView) {
+				segmentView.measure((x, y, width, height) => {
+					scrollViewRef.current?.scrollTo({
+						y: y - 75, // Offset to center the segment
+						animated: true,
+					});
+				});
+			}
+		}
+	}, [currentSegmentIndex]);
+
+	const getSegmentStatus = (segmentIndex: number) => {
+		if (segmentIndex < currentSegmentIndex) return "completed";
+		if (segmentIndex === currentSegmentIndex) return "current";
+		return "upcoming";
+	};
+
+	const renderSegment = (segment: SegmentTranscript, segmentIndex: number) => {
+		const status = getSegmentStatus(segmentIndex);
+		const isInGap =
+			currentSegmentIndex === segmentIndex && !(currentTime >= segment.start_time && currentTime <= segment.end_time);
+
+		return (
+			<View
+				key={segment.start_time}
+				ref={(ref) => {
+					segmentRefs.current[segmentIndex] = ref;
+				}}
+				className={cn(
+					"w-full px-6 my-2 rounded-2xl transition-all duration-300",
+					status === "upcoming" && "bg-transparent",
+				)}
+			>
+				<View className="flex flex-row flex-wrap">
+					{segment.words.map((word, wordIndex) => {
+						let textColor = "text-slate-600"; // Default for upcoming segments
+						let fontWeight = "font-normal";
+						let textShadow = false;
+
+						if (status === "completed") {
+							textColor = "text-slate-400";
+						} else if (status === "current") {
+							const isPreviousWord = currentTime > word.end_time;
+							const isCurrentWord =
+								currentTime >= word.start_time && currentTime <= word.end_time && word.text.trim() !== "";
+							if (isCurrentWord) {
+								textColor = "text-white text-xl";
+								fontWeight = "font-bold";
+								textShadow = true;
+							} else if (isPreviousWord || isInGap) {
+								textColor = "text-slate-200";
+								fontWeight = "font-medium";
+							} else {
+								textColor = "text-slate-500";
+							}
+						}
+
+						return (
+							<Animated.Text
+								key={`${segment.start_time}-${wordIndex}`}
+								className={cn("text-lg text-left", textColor, fontWeight)}
+								style={{
+									textShadowColor: textShadow ? "rgba(255, 255, 255, 0.4)" : "transparent",
+									textShadowOffset: { width: 0, height: 1 },
+									textShadowRadius: 3,
+								}}
+							>
+								{word.text}
+							</Animated.Text>
+						);
+					})}
+				</View>
+			</View>
+		);
+	};
+
+	return (
+		<View className="flex-1 w-full pt-8 flex relative">
+			<ScrollView
+				ref={scrollViewRef}
+				className="flex-1 w-full"
+				contentContainerStyle={{
+					paddingVertical: 40,
+					paddingHorizontal: 8,
+				}}
+				showsVerticalScrollIndicator={false}
+				scrollEventThrottle={16}
+			>
+				{transcript.map((segment, index) => renderSegment(segment, index))}
+
+				{/* Bottom padding for better scrolling experience */}
+				<View style={{ height: 306 }} />
+			</ScrollView>
+
+			<BlurView
+				intensity={25}
+				tint="dark"
+				className="absolute top-0 left-0 right-0 "
+				style={{ zIndex: 1000, height: 98 }}
+			/>
+			<BlurView
+				intensity={12}
+				tint="dark"
+				className="absolute bottom-40 left-0 right-0 "
+				style={{
+					zIndex: 1000,
+					height: 180,
+				}}
+			/>
+			<BlurView
+				intensity={12}
+				tint="dark"
+				className="absolute bottom-40 left-0 right-0 "
+				style={{ zIndex: 1000, height: 180 }}
+			/>
+		</View>
+	);
+};
+
+const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed: boolean }) => {
 	const progress = useSharedValue(isCollapsed ? 1 : 0);
 
-	/* keep it in sync when the prop changes */
 	useEffect(() => {
 		progress.value = withTiming(isCollapsed ? 1 : 0, { duration: 250 });
 	}, [isCollapsed, progress]);
 
-	/* 2️⃣ numeric animation for image size */
-	const { width: screenW } = useWindowDimensions(); // full width of the screen
+	const { width: screenW } = useWindowDimensions();
 	const imgStyle = useAnimatedStyle(() => {
-		// interpolate from “full width – 32px padding” ➜ 80
 		const size = interpolate(progress.value, [0, 1], [screenW - 48, 80]);
 		return { width: size, height: size };
 	});
 
-	/* 3️⃣ numeric animation for title margin / flex grow */
 	const titleStyle = useAnimatedStyle(() => {
 		return {
 			marginTop: interpolate(progress.value, [0, 1], [48, 0]),
-			flex: isCollapsed ? interpolate(progress.value, [1, 1], [1, 1]) : undefined,
+			flex: isCollapsed ? interpolate(progress.value, [0, 1], [1, 1]) : undefined,
 		};
 	});
 
 	return (
 		<Animated.View
-			/* 🪄 this line animates the layout change of row/column, gap, etc. */
 			layout={LinearTransition.springify().duration(250).stiffness(150).damping(5)}
 			style={[
 				{
@@ -224,7 +292,7 @@ const StoryHeader2 = ({
 			]}
 		>
 			<Animated.View style={[imgStyle, { borderRadius: 16 }]}>
-				<StoryImage imageUrl={story.imageUrl} isPlaying={isPlaying} disableAnimation={isCollapsed} />
+				<StoryImage imageUrl={story.imageUrl} disableAnimation={isCollapsed} />
 			</Animated.View>
 
 			<Animated.View style={[titleStyle, { width: "100%", flexDirection: "row" }]}>
@@ -253,17 +321,10 @@ const StoryHeader2 = ({
 	);
 };
 
-const StoryImage = ({
-	imageUrl,
-	isPlaying,
-	disableAnimation,
-}: {
-	imageUrl: string | null;
-	isPlaying: boolean;
-	disableAnimation?: boolean;
-}) => {
+const StoryImage = ({ imageUrl, disableAnimation }: { imageUrl: string | null; disableAnimation?: boolean }) => {
 	const [error, setError] = useState(false);
 	const showFallback = error || !imageUrl;
+	const { isPlaying } = useAudio();
 
 	const scale = useSharedValue(1);
 
