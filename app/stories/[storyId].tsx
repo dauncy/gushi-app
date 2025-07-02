@@ -206,7 +206,7 @@ const StoryHeader2 = ({
 	const titleStyle = useAnimatedStyle(() => {
 		return {
 			marginTop: interpolate(progress.value, [0, 1], [48, 0]),
-			flex: interpolate(progress.value, [0, 1], [1, 1]),
+			flex: isCollapsed ? interpolate(progress.value, [1, 1], [1, 1]) : undefined,
 		};
 	});
 
