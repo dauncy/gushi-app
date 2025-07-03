@@ -1,3 +1,4 @@
+import { Id } from "@/convex/_generated/dataModel";
 import { AudioStatus, setAudioModeAsync, useAudioPlayer } from "expo-audio";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from "react";
 
@@ -5,16 +6,18 @@ interface AudioState {
 	currentTime: number;
 	duration: number;
 	isPlaying: boolean;
+	storyId: Id<"stories"> | null;
 }
 
 interface AudioContextDTO {
-	setStory: (storyUrl: string) => void;
+	setStory: ({ storyUrl, storyId }: { storyUrl: string; storyId: Id<"stories"> }) => void;
 	play: () => void;
 	pause: () => void;
 	stop: () => void;
 	currentTime: number;
 	duration: number;
 	isPlaying: boolean;
+	storyId: Id<"stories"> | null;
 }
 
 const AudioContext = createContext<AudioContextDTO>({
@@ -25,6 +28,7 @@ const AudioContext = createContext<AudioContextDTO>({
 	currentTime: 0,
 	duration: 0,
 	isPlaying: false,
+	storyId: null,
 });
 
 export const AudioProvider = ({ children }: { children: ReactNode }) => {
@@ -36,6 +40,7 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 		currentTime: 0,
 		duration: 0,
 		isPlaying: false,
+		storyId: null,
 	});
 
 	const statusCallback = useCallback(
@@ -134,10 +139,14 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 	}, [audio]);
 
 	const setStory = useCallback(
-		(storyUrl: string) => {
+		({ storyUrl, storyId }: { storyUrl: string; storyId: Id<"stories"> }) => {
 			audio.replace(storyUrl);
+			setAudioState((prev) => ({
+				...prev,
+				storyId,
+			}));
 		},
-		[audio],
+		[audio, setAudioState],
 	);
 
 	const stop = useCallback(() => {
@@ -146,6 +155,7 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 		setAudioState((prev) => ({
 			...prev,
 			isPlaying: false,
+			storyId: null,
 		}));
 	}, [audio]);
 

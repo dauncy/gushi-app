@@ -1,33 +1,23 @@
 import { v } from "convex/values";
-import { api } from "./_generated/api";
-import { query } from "./_generated/server";
+import { Id } from "./_generated/dataModel";
+import { query, QueryCtx } from "./_generated/server";
 import { StoryExtended, StoryPreview } from "./schema/stories.schema";
 
-export const getImageUrl = query({
-	args: {
-		imageId: v.id("images"),
-	},
-	handler: async (ctx, { imageId }) => {
-		const image = await ctx.db.get(imageId);
-		if (!image) {
-			return null;
-		}
-		return await ctx.storage.getUrl(image.storageId);
-	},
-});
+export const getImageUrl = async (ctx: QueryCtx, imageId: Id<"images">) => {
+	const image = await ctx.db.get(imageId);
+	if (!image) {
+		return null;
+	}
+	return await ctx.storage.getUrl(image.storageId);
+};
 
-export const getAudioUrl = query({
-	args: {
-		audioId: v.id("audio"),
-	},
-	handler: async (ctx, { audioId }) => {
-		const audio = await ctx.db.get(audioId);
-		if (!audio) {
-			return null;
-		}
-		return await ctx.storage.getUrl(audio.storageId);
-	},
-});
+export const getAudioUrl = async (ctx: QueryCtx, audioId: Id<"audio">) => {
+	const audio = await ctx.db.get(audioId);
+	if (!audio) {
+		return null;
+	}
+	return await ctx.storage.getUrl(audio.storageId);
+};
 
 export const getFreeStories = query({
 	handler: async (ctx): Promise<StoryPreview[]> => {
@@ -40,8 +30,8 @@ export const getFreeStories = query({
 		return await Promise.all(
 			stories.map(async (story) => {
 				const [imageUrl, audioUrl] = await Promise.all([
-					ctx.runQuery(api.stories.getImageUrl, { imageId: story.imageId }),
-					ctx.runQuery(api.stories.getAudioUrl, { audioId: story.audioId }),
+					getImageUrl(ctx, story.imageId),
+					getAudioUrl(ctx, story.audioId),
 				]);
 				const duration = story.transcript[story.transcript.length - 1].end_time;
 				return {
@@ -67,8 +57,8 @@ export const getStory = query({
 			return null;
 		}
 		const [imageUrl, audioUrl] = await Promise.all([
-			ctx.runQuery(api.stories.getImageUrl, { imageId: maybeStory.imageId }),
-			ctx.runQuery(api.stories.getAudioUrl, { audioId: maybeStory.audioId }),
+			getImageUrl(ctx, maybeStory.imageId),
+			getAudioUrl(ctx, maybeStory.audioId),
 		]);
 		if (!imageUrl || !audioUrl) {
 			return null;

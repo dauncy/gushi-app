@@ -2,7 +2,9 @@ import { Button } from "@/components/ui/button";
 import { ChevronUp } from "@/components/ui/icons/chevron-up-icon";
 import { Clock } from "@/components/ui/icons/clock-icon";
 import { FileX } from "@/components/ui/icons/image-fail-icon";
+import { Pause } from "@/components/ui/icons/pause-icon";
 import { Play } from "@/components/ui/icons/play-icon";
+import { Stop } from "@/components/ui/icons/stop-icon";
 import { Image } from "@/components/ui/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAudio } from "@/context/AudioContext";
@@ -12,18 +14,21 @@ import { useConvexQuery } from "@/hooks/use-convexQuery";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Pressable, StatusBar, Text, View } from "react-native";
+import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Logo = require("@/assets/images/icon.png");
 
 export default function Home() {
+	const [currentStory, setCurrentStory] = useState<StoryPreview | null>(null);
 	return (
 		<SafeAreaView className="bg-slate-900 flex-1" edges={["top"]} mode="padding">
 			<StatusBar barStyle={"light-content"} />
 			<View style={{ flex: 1 }} className="relative bg-neutral-950 px-2">
 				<Header />
-				<StoryList />
+				<StoryList setCurrentStory={setCurrentStory} />
 				<UpgradeSection />
+				{currentStory && <AudioPreviewPlayer story={currentStory} setCurrentStory={setCurrentStory} />}
 			</View>
 		</SafeAreaView>
 	);
@@ -43,7 +48,7 @@ const Header = () => {
 	);
 };
 
-const StoryList = () => {
+const StoryList = ({ setCurrentStory }: { setCurrentStory: (story: StoryPreview) => void }) => {
 	const { isLoading, data } = useConvexQuery(api.stories.getFreeStories, {});
 	return (
 		<View className="flex flex-col gap-y-3 mt-16">
@@ -54,13 +59,19 @@ const StoryList = () => {
 					<StoryCardLoading />
 				</>
 			) : (
-				<>{data?.map((story) => <StoryCard key={story._id} story={story} />)}</>
+				<>{data?.map((story) => <StoryCard key={story._id} story={story} setCurrentStory={setCurrentStory} />)}</>
 			)}
 		</View>
 	);
 };
 
-const StoryCard = ({ story }: { story: StoryPreview }) => {
+const StoryCard = ({
+	story,
+	setCurrentStory,
+}: {
+	story: StoryPreview;
+	setCurrentStory: (story: StoryPreview) => void;
+}) => {
 	const { play, setStory } = useAudio();
 	const secondsToMinuteString = (seconds: number) => {
 		const d = Math.round(seconds);
@@ -73,7 +84,7 @@ const StoryCard = ({ story }: { story: StoryPreview }) => {
 		<Pressable
 			onPress={() => {
 				if (story.audioUrl) {
-					setStory(story.audioUrl);
+					setStory({ storyUrl: story.audioUrl, storyId: story._id });
 					play();
 					router.push(`/stories/${story._id}`);
 				}
@@ -90,7 +101,14 @@ const StoryCard = ({ story }: { story: StoryPreview }) => {
 			</View>
 
 			<View className="flex items-center justify-center">
-				<Button size="icon" className="bg-teal-500 border-teal-100 border rounded-full p-1">
+				<Button
+					size="icon"
+					className="bg-teal-500 border-teal-100 border rounded-full p-1"
+					onPress={(e) => {
+						e.stopPropagation();
+						setCurrentStory(story);
+					}}
+				>
 					<Play className="text-white fill-white" size={20} />
 				</Button>
 			</View>
@@ -139,5 +157,60 @@ const UpgradeSection = () => {
 			</View>
 			<ChevronUp className="text-slate-200" size={24} />
 		</Pressable>
+	);
+};
+
+const AudioPreviewPlayer = ({
+	story,
+	setCurrentStory,
+}: {
+	story: StoryPreview;
+	setCurrentStory: (story: StoryPreview | null) => void;
+}) => {
+	const { isPlaying, play, pause, stop } = useAudio();
+
+	return (
+		<Animated.View
+			entering={FadeInDown.delay(50).duration(50).springify()}
+			exiting={FadeOutDown.delay(50).duration(150).springify()}
+			style={{
+				shadowColor: "#f8fafc",
+				shadowOffset: {
+					width: 0.5,
+					height: 1.5,
+				},
+				shadowOpacity: 0.25,
+				shadowRadius: 4,
+			}}
+			className="flex w-full p-3 rounded-xl bg-slate-900 p-4 flex-row  w-full gap-4 border border-slate-800 absolute bottom-24 left-0 right-0 ml-2"
+		>
+			<StoryImage imageUrl={story.imageUrl} />
+			<View className="flex flex-col gap-y-1 flex-1 mt-0.5">
+				<Text className="text-slate-300 text-lg font-semibold" numberOfLines={1} ellipsizeMode="tail">
+					{story.title}
+				</Text>
+			</View>
+			<View className="flex items-center justify-center flex-row gap-2">
+				<Pressable
+					className="size-10 rounded-full flex items-center justify-center p-2 active:bg-slate-800"
+					onPress={() => {}}
+				>
+					{isPlaying ? (
+						<Pause className="text-slate-200 fill-slate-200" size={20} />
+					) : (
+						<Play className="text-slate-200 fill-slate-200" size={20} />
+					)}
+				</Pressable>
+
+				<Pressable
+					className="size-10 rounded-full flex items-center justify-center p-2 active:bg-slate-800"
+					onPress={() => {
+						setCurrentStory(null);
+					}}
+				>
+					<Stop className="text-slate-200 fill-slate-200" size={20} />
+				</Pressable>
+			</View>
+		</Animated.View>
 	);
 };
