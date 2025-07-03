@@ -20,7 +20,7 @@ import { formatDistanceToNow } from "date-fns";
 import { BlurView } from "expo-blur";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, ScrollView, Text, useWindowDimensions, View } from "react-native";
+import { Pressable, Share as RNShare, ScrollView, Text, useWindowDimensions, View } from "react-native";
 import Animated, {
 	interpolate,
 	LinearTransition,
@@ -279,6 +279,21 @@ const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed
 		};
 	});
 
+	const handleShare = async () => {
+		try {
+			await RNShare.share(
+				{
+					message: `Check out this story: ${story.title}`,
+					url: `https://getdreamdrop.com/stories/${story._id}`,
+					title: `Share ${story.title}`,
+				},
+				{ dialogTitle: `Share ${story.title}` },
+			);
+		} catch (e) {
+			console.warn("[StoryHeader] Error sharing story", e);
+		}
+	};
+
 	return (
 		<Animated.View
 			layout={LinearTransition.springify().duration(250).stiffness(150).damping(5)}
@@ -312,7 +327,12 @@ const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed
 						<Star className="text-slate-500 size-6" strokeWidth={1.5} size={20} />
 					</Button>
 
-					<Button size="icon" variant="ghost" className="bg-slate-800 rounded-full border border-slate-600">
+					<Button
+						onPress={handleShare}
+						size="icon"
+						variant="ghost"
+						className="bg-slate-800 rounded-full border border-slate-600"
+					>
 						<Share className="text-slate-500 size-6" strokeWidth={1.5} size={20} />
 					</Button>
 				</View>
