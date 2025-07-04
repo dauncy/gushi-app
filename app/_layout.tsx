@@ -11,7 +11,7 @@ import * as Font from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { View } from "react-native";
 import "react-native-reanimated";
 import "../global.css";
@@ -46,6 +46,7 @@ export default function RootLayout() {
 	const [appReady, setAppReady] = useState(false);
 	const [subscription, setSubscription] = useState<Subscription | null>(null);
 
+	const rootScreen = useMemo(() => {}, []);
 	useLayoutEffect(() => {
 		async function prepare() {
 			if (hasMounted.current) {

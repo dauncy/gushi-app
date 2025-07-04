@@ -1,3 +1,4 @@
+import { useSubscription } from "@/context/SubscriptionContext";
 import { Redirect, Route } from "expo-router";
 import { ReactNode } from "react";
 
@@ -10,9 +11,9 @@ export const VerifyAccess = ({
 	fallback?: ReactNode;
 	redirect?: Route;
 }) => {
-	const hasAccess = process.env.EXPO_PUBLIC_HAS_SUBSCRIPTION === "true";
+	const { hasSubscription } = useSubscription();
 
-	if (hasAccess) {
+	if (hasSubscription) {
 		return <>{children}</>;
 	}
 
