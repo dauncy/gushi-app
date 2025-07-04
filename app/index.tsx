@@ -18,6 +18,13 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, RefreshControl, StatusBar, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const secondsToMinuteString = (seconds: number) => {
+	const d = Math.round(seconds);
+	const minutes = Math.floor(d / 60);
+	const remainingSeconds = d % 60;
+	return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+};
+
 const Logo = require("@/assets/images/icon.png");
 
 export default function Home() {
@@ -110,13 +117,7 @@ const StoryCard = ({ story }: { story: StoryPreview }) => {
 	const { hasSubscription } = useSubscription();
 	const { play, setStory } = useAudio();
 	const linkPressable = useRef<boolean>(true);
-
-	const secondsToMinuteString = (seconds: number) => {
-		const d = Math.round(seconds);
-		const minutes = Math.floor(d / 60);
-		const remainingSeconds = d % 60;
-		return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-	};
+	const router = useRouter();
 
 	const locked = useMemo(() => {
 		if (!story.subscription_required) {
@@ -124,8 +125,6 @@ const StoryCard = ({ story }: { story: StoryPreview }) => {
 		}
 		return !hasSubscription;
 	}, [hasSubscription, story.subscription_required]);
-
-	const router = useRouter();
 
 	if (locked) {
 		return (
@@ -163,6 +162,7 @@ const StoryCard = ({ story }: { story: StoryPreview }) => {
 			</Link>
 		);
 	}
+
 	return (
 		<Pressable
 			onPress={() => {
