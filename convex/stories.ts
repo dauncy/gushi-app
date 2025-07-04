@@ -1,5 +1,5 @@
+import { zid, zodToConvex } from "convex-helpers/server/zod";
 import { paginationOptsValidator, PaginationResult } from "convex/server";
-import { v } from "convex/values";
 import { Id } from "./_generated/dataModel";
 import { query, QueryCtx } from "./_generated/server";
 import { StoryExtended, StoryPreview } from "./schema/stories.schema";
@@ -65,9 +65,12 @@ export const getStories = query({
 
 export const getStory = query({
 	args: {
-		storyId: v.id("stories"),
+		storyId: zodToConvex(zid("stories").nullable()),
 	},
 	handler: async (ctx, { storyId }): Promise<StoryExtended | null> => {
+		if (!storyId) {
+			return null;
+		}
 		const maybeStory = await ctx.db.get(storyId);
 		if (!maybeStory) {
 			return null;

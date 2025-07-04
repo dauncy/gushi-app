@@ -3,15 +3,21 @@ import { Header } from "@/components/nav/Header";
 import { StoryCard, StoryCardLoading } from "@/components/stories/story-card";
 import { ChevronUp } from "@/components/ui/icons/chevron-up-icon";
 import { useAudio } from "@/context/AudioContext";
+import { useSubscription } from "@/context/SubscriptionContext";
 import { api } from "@/convex/_generated/api";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { FlashList } from "@shopify/flash-list";
-import { useRouter } from "expo-router";
+import { Redirect, useRouter } from "expo-router";
 import { useCallback } from "react";
 import { ActivityIndicator, Pressable, RefreshControl, StatusBar, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
+	const { hasSubscription } = useSubscription();
+	if (hasSubscription) {
+		return <Redirect href="/(protected)/stories" withAnchor />;
+	}
+
 	return (
 		<SafeAreaView className="bg-slate-900 flex-1" edges={["top"]} mode="padding">
 			<StatusBar barStyle={"light-content"} />

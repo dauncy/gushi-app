@@ -1,23 +1,23 @@
-import { Link, usePathname, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { Text, TouchableOpacity, View } from "react-native";
 
 export default function NotFound() {
 	const router = useRouter();
-	const path = usePathname();
 	return (
-		<View className="flex-1 bg-[#0a0a0a] justify-center items-center p-4">
-			<Text className="text-center text-[#22C55E] text-5xl font-bold mb-4">Wrong Turn?</Text>
-			<Text className="text-center text-[#A1A1AA] text-lg mb-8">This screen doesn&apos;t exist.</Text>
-			<Text className="text-center text-[#A1A1AA] text-lg mb-8">Route: {path} </Text>
-			<Link href="/_sitemap">
-				<Text className="text-[#22C55E] text-lg font-bold">Sitemap</Text>
-			</Link>
+		<View className="flex-1 bg-slate-800 justify-center items-center p-4">
+			<StatusBar style="light" />
+			<Text className="text-center text-slate-200 text-5xl font-bold mb-4">Wrong Turn?</Text>
+			<Text className="text-center text-slate-400 text-lg mb-8">
+				This screen doesn&apos;t exist. Or you don&apos;t have access to it.
+			</Text>
+
 			<TouchableOpacity
-				className="bg-[#22C55E] rounded-xl px-12 py-4"
+				className="bg-violet-500 rounded-xl px-12 py-4"
 				onPress={() => router.replace("/")}
 				activeOpacity={0.8}
 			>
-				<Text className="text-[#0a0a0a] text-lg font-bold">Go Home</Text>
+				<Text className="text-white text-lg font-bold">Go Home</Text>
 			</TouchableOpacity>
 		</View>
 	);

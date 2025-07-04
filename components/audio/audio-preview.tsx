@@ -5,12 +5,19 @@ import { useAudio } from "@/context/AudioContext";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
+import { cn } from "@/lib/utils";
 import { useCallback } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 import { StoryImagePreview } from "../stories/story-image";
 
-export const AudioPreviewPlayer = ({ onCardPress }: { onCardPress?: () => void }) => {
+export const AudioPreviewPlayer = ({
+	onCardPress,
+	className = "",
+}: {
+	onCardPress?: (storyId: Id<"stories">) => void;
+	className?: string;
+}) => {
 	const { isPlaying, play, pause, stop, storyId } = useAudio();
 
 	const { data: story } = useConvexQuery(
@@ -25,8 +32,10 @@ export const AudioPreviewPlayer = ({ onCardPress }: { onCardPress?: () => void }
 		if (!onCardPress) {
 			return;
 		}
-		onCardPress();
-	}, [onCardPress]);
+		if (storyId) {
+			onCardPress(storyId);
+		}
+	}, [onCardPress, storyId]);
 
 	if (!storyId || !story) {
 		return null;
@@ -49,7 +58,10 @@ export const AudioPreviewPlayer = ({ onCardPress }: { onCardPress?: () => void }
 					shadowOpacity: 0.25,
 					shadowRadius: 4,
 				}}
-				className="items-center flex  p-3 rounded-xl bg-slate-900  flex-row  gap-4 border border-slate-800 absolute bottom-24 inset-x-0 mx-2"
+				className={cn(
+					"items-center flex  p-3 rounded-xl bg-slate-900  flex-row  gap-4 border border-slate-800 absolute bottom-24 inset-x-0 mx-2",
+					className,
+				)}
 			>
 				<StoryImagePreview imageUrl={story.imageUrl} size="sm" />
 				<View className="flex flex-col">

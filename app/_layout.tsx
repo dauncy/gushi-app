@@ -11,7 +11,7 @@ import * as Font from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import "react-native-reanimated";
 import "../global.css";
@@ -36,7 +36,7 @@ SplashScreen.setOptions({
 
 const fetchSubscription = async () => {
 	await new Promise((resolve) => setTimeout(resolve, 1000));
-	const subscription = null;
+	const subscription = null; //{ id: "test", name: "Test Subscription" };
 	return subscription;
 };
 
@@ -46,7 +46,6 @@ export default function RootLayout() {
 	const [appReady, setAppReady] = useState(false);
 	const [subscription, setSubscription] = useState<Subscription | null>(null);
 
-	const rootScreen = useMemo(() => {}, []);
 	useLayoutEffect(() => {
 		async function prepare() {
 			if (hasMounted.current) {
@@ -102,6 +101,10 @@ export default function RootLayout() {
 							>
 								<Stack.Screen name="index" options={{ headerShown: false }} />
 								<Stack.Screen
+									name="(protected)"
+									options={{ headerShown: false, contentStyle: { backgroundColor: "#0a0a0a" } }}
+								/>
+								<Stack.Screen
 									name="upgrade"
 									options={{
 										contentStyle: { height: "100%" },
@@ -116,12 +119,7 @@ export default function RootLayout() {
 										animationTypeForReplace: "push",
 									}}
 								/>
-								<Stack.Screen
-									name="(protected)"
-									options={{ headerShown: false, contentStyle: { backgroundColor: "#0a0a0a" } }}
-								/>
-
-								<Stack.Screen name="+not-found" />
+								<Stack.Screen name="+not-found" options={{ headerShown: false }} />
 							</Stack>
 						</AudioProvider>
 					</QueryClientProvider>

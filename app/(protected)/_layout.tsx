@@ -9,7 +9,7 @@ import { SafeAreaView } from "react-native";
 
 export default function ProtectedLayout() {
 	return (
-		<VerifyAccess redirect="/upgrade">
+		<VerifyAccess redirect="/">
 			<SafeAreaView style={{ flex: 1, backgroundColor: "#0f172a", padding: 0 }}>
 				<StatusBar style={"light"} />
 				<Tabs

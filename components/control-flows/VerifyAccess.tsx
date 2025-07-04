@@ -18,7 +18,7 @@ export const VerifyAccess = ({
 	}
 
 	if (redirect) {
-		return <Redirect href={redirect} />;
+		return <Redirect href={redirect} withAnchor />;
 	}
 
 	return <>{fallback}</>;

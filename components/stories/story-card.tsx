@@ -39,11 +39,14 @@ export const StoryCard = ({ story, onCardPress }: { story: StoryPreview; onCardP
 	}, [storyId, story._id]);
 
 	const locked = useMemo(() => {
+		if (!story.audioUrl) {
+			return true;
+		}
 		if (!story.subscription_required) {
 			return false;
 		}
 		return !hasSubscription;
-	}, [hasSubscription, story.subscription_required]);
+	}, [hasSubscription, story.subscription_required, story.audioUrl]);
 
 	if (locked) {
 		return (
