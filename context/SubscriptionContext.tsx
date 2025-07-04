@@ -21,5 +21,6 @@ export const SubscriptionProvider = ({
 
 export const useSubscription = () => {
 	const { subscription } = useContext(SubscriptionContext);
-	return { subscription };
+	const hasSubscription = !!subscription;
+	return { subscription, hasSubscription };
 };

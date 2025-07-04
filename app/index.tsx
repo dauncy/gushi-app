@@ -2,16 +2,19 @@ import { Button } from "@/components/ui/button";
 import { ChevronUp } from "@/components/ui/icons/chevron-up-icon";
 import { Clock } from "@/components/ui/icons/clock-icon";
 import { FileX } from "@/components/ui/icons/image-fail-icon";
+import { LockKeyhole } from "@/components/ui/icons/lock-icon";
 import { Play } from "@/components/ui/icons/play-icon";
 import { Image } from "@/components/ui/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAudio } from "@/context/AudioContext";
+import { useSubscription } from "@/context/SubscriptionContext";
 import { api } from "@/convex/_generated/api";
 import { StoryPreview } from "@/convex/schema/stories.schema";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { FlashList } from "@shopify/flash-list";
-import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { BlurView } from "expo-blur";
+import { Link, useRouter } from "expo-router";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, RefreshControl, StatusBar, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -104,22 +107,79 @@ const StoryList = () => {
 };
 
 const StoryCard = ({ story }: { story: StoryPreview }) => {
+	const { hasSubscription } = useSubscription();
 	const { play, setStory } = useAudio();
+	const linkPressable = useRef<boolean>(true);
+
 	const secondsToMinuteString = (seconds: number) => {
 		const d = Math.round(seconds);
 		const minutes = Math.floor(d / 60);
 		const remainingSeconds = d % 60;
 		return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
 	};
+
+	const locked = useMemo(() => {
+		if (!story.subscription_required) {
+			return false;
+		}
+		return !hasSubscription;
+	}, [hasSubscription, story.subscription_required]);
+
 	const router = useRouter();
+
+	if (locked) {
+		return (
+			<Link href="/upgrade">
+				<View className="flex w-full p-3 rounded-xl bg-slate-900 p-4 flex-row  w-full gap-4 border border-slate-800 relative">
+					<StoryImage imageUrl={story.imageUrl} />
+					<View className="flex flex-col gap-y-1 flex-1 mt-0.5">
+						<Text className="text-slate-300 text-lg font-semibold">{story.title}</Text>
+						<View className="flex flex-row items-center gap-x-2">
+							<Clock className="size-4 text-slate-400" size={16} />
+							<Text className="text-slate-400 text-sm font-medium">{secondsToMinuteString(story.duration)}</Text>
+						</View>
+					</View>
+
+					<View className="flex items-center justify-center"></View>
+					<View className="absolute inset-0 rounded-xl bg-black opacity-40" style={{ zIndex: 1 }}></View>
+					<View className="absolute inset-0 items-center justify-center" style={{ zIndex: 3 }}>
+						<View
+							style={{
+								shadowColor: "#f8fafc",
+								shadowOffset: {
+									width: 0.5,
+									height: 1.5,
+								},
+								shadowOpacity: 0.25,
+								shadowRadius: 4,
+							}}
+							className="flex flex-row items-center justify-center size-12 rounded-full bg-slate-800 p-1"
+						>
+							<LockKeyhole className="text-slate-200" size={24} />
+						</View>
+					</View>
+					<BlurView intensity={5} tint="dark" className="absolute inset-0 rounded-xl bg-black " style={{ zIndex: 2 }} />
+				</View>
+			</Link>
+		);
+	}
 	return (
 		<Pressable
 			onPress={() => {
+				if (!linkPressable.current) {
+					return;
+				}
+				linkPressable.current = false;
 				if (story.audioUrl) {
 					setStory({ storyUrl: story.audioUrl, storyId: story._id });
 					play();
-					router.push(`/stories/${story._id}`);
+					if (hasSubscription) {
+						router.push(`/stories/${story._id}`);
+					}
 				}
+				setTimeout(() => {
+					linkPressable.current = true;
+				}, 300);
 			}}
 			className="flex w-full p-3 rounded-xl bg-slate-900 p-4 flex-row  w-full gap-4 border border-slate-800"
 		>
