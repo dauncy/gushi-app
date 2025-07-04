@@ -1,3 +1,4 @@
+import { AudioPreviewPlayer } from "@/components/audio/audio-preview";
 import { Header } from "@/components/nav/Header";
 import { StoryCard, StoryCardLoading } from "@/components/stories/story-card";
 import { ChevronUp } from "@/components/ui/icons/chevron-up-icon";
@@ -18,6 +19,7 @@ export default function Home() {
 				<Header />
 				<StoryList />
 				<UpgradeSection />
+				<AudioPreviewPlayer />
 			</View>
 		</SafeAreaView>
 	);
@@ -107,58 +109,3 @@ const UpgradeSection = () => {
 		</Pressable>
 	);
 };
-
-// const AudioPreviewPlayer = ({
-// 	story,
-// 	setCurrentStory,
-// }: {
-// 	story: StoryPreview;
-// 	setCurrentStory: (story: StoryPreview | null) => void;
-// }) => {
-// 	const { isPlaying, play, pause, stop } = useAudio();
-
-// 	return (
-// 		<Animated.View
-// 			entering={FadeInDown.delay(50).duration(50).springify()}
-// 			exiting={FadeOutDown.delay(50).duration(150).springify()}
-// 			style={{
-// 				shadowColor: "#f8fafc",
-// 				shadowOffset: {
-// 					width: 0.5,
-// 					height: 1.5,
-// 				},
-// 				shadowOpacity: 0.25,
-// 				shadowRadius: 4,
-// 			}}
-// 			className="flex w-full p-3 rounded-xl bg-slate-900 p-4 flex-row  w-full gap-4 border border-slate-800 absolute bottom-24 left-0 right-0 ml-2"
-// 		>
-// 			<StoryImage imageUrl={story.imageUrl} />
-// 			<View className="flex flex-col gap-y-1 flex-1 mt-0.5">
-// 				<Text className="text-slate-300 text-lg font-semibold" numberOfLines={1} ellipsizeMode="tail">
-// 					{story.title}
-// 				</Text>
-// 			</View>
-// 			<View className="flex items-center justify-center flex-row gap-2">
-// 				<Pressable
-// 					className="size-10 rounded-full flex items-center justify-center p-2 active:bg-slate-800"
-// 					onPress={() => {}}
-// 				>
-// 					{isPlaying ? (
-// 						<Pause className="text-slate-200 fill-slate-200" size={20} />
-// 					) : (
-// 						<Play className="text-slate-200 fill-slate-200" size={20} />
-// 					)}
-// 				</Pressable>
-
-// 				<Pressable
-// 					className="size-10 rounded-full flex items-center justify-center p-2 active:bg-slate-800"
-// 					onPress={() => {
-// 						setCurrentStory(null);
-// 					}}
-// 				>
-// 					<Stop className="text-slate-200 fill-slate-200" size={20} />
-// 				</Pressable>
-// 			</View>
-// 		</Animated.View>
-// 	);
-// };

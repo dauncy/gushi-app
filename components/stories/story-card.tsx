@@ -96,7 +96,7 @@ export const StoryCard = ({ story, onCardPress }: { story: StoryPreview; onCardP
 			}}
 			className="flex w-full p-3 rounded-xl bg-slate-900 p-4 flex-row  w-full gap-4 border border-slate-800"
 		>
-			<StoryImagePreview imageUrl={story.imageUrl} active={isPlaying && isCurrentStory} />
+			<StoryImagePreview imageUrl={story.imageUrl} active={isCurrentStory} />
 			<View className="flex flex-col gap-y-1 flex-1 mt-0.5">
 				<Text className="text-slate-300 text-lg font-semibold">{story.title}</Text>
 				<View className="flex flex-row items-center gap-x-2">
@@ -115,6 +115,16 @@ export const StoryCard = ({ story, onCardPress }: { story: StoryPreview; onCardP
 						className="bg-transparent border-transparent active:bg-slate-800"
 					>
 						<Stop className="text-slate-400 fill-slate-400" size={20} />
+					</Button>
+				) : isCurrentStory ? (
+					<Button
+						onPress={() => {
+							play();
+						}}
+						size="icon"
+						className="bg-transparent border-transparent active:bg-slate-800"
+					>
+						<Play className="text-slate-400 fill-slate-400" size={20} />
 					</Button>
 				) : (
 					<Button
