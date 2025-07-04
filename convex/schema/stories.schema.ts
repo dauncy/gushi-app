@@ -59,7 +59,7 @@ export type StoryPublic = Omit<
 
 export type StoryPreview = Omit<
 	StoryPrivate,
-	"body" | "enabled" | "subscription_required" | "transcript" | "imageId" | "audioId" | "createdAt"
+	"body" | "enabled" | "transcript" | "imageId" | "audioId" | "createdAt"
 > & { imageUrl: Nullable<string>; audioUrl: Nullable<string>; duration: number; _id: Id<"stories"> };
 
 export type StoryExtended = Omit<
