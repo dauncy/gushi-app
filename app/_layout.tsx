@@ -116,22 +116,10 @@ export default function RootLayout() {
 									}}
 								/>
 								<Stack.Screen
-									name="stories"
-									options={{
-										fullScreenGestureEnabled: true,
-										sheetGrabberVisible: true,
-										sheetCornerRadius: 48,
-										headerLargeTitleShadowVisible: true,
-										presentation: "formSheet",
-										headerShown: false,
-
-										contentStyle: {
-											backgroundColor: "#0f172a",
-											height: "100%",
-										},
-										gestureEnabled: true,
-									}}
+									name="(protected)"
+									options={{ headerShown: false, contentStyle: { backgroundColor: "#0a0a0a" } }}
 								/>
+
 								<Stack.Screen name="+not-found" />
 							</Stack>
 						</AudioProvider>

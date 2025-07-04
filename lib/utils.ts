@@ -19,3 +19,10 @@ export const getConvexURL = () => {
 	}
 	return process.env.EXPO_PUBLIC_CONVEX_URL ?? "";
 };
+
+export const secondsToMinuteString = (seconds: number) => {
+	const d = Math.round(seconds);
+	const minutes = Math.floor(d / 60);
+	const remainingSeconds = d % 60;
+	return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+};
