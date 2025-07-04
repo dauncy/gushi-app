@@ -1,38 +1,31 @@
 import { AudioPreviewPlayer } from "@/components/audio/audio-preview";
-import { Header } from "@/components/nav/Header";
 import { StoryCard, StoryCardLoading } from "@/components/stories/story-card";
-import { ChevronUp } from "@/components/ui/icons/chevron-up-icon";
 import { useAudio } from "@/context/AudioContext";
-import { useSubscription } from "@/context/SubscriptionContext";
 import { api } from "@/convex/_generated/api";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { FlashList } from "@shopify/flash-list";
-import { Redirect, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useCallback } from "react";
-import { ActivityIndicator, Pressable, RefreshControl, StatusBar, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { ActivityIndicator, RefreshControl, Text, View } from "react-native";
 
-export default function Home() {
-	const { hasSubscription } = useSubscription();
-	if (hasSubscription) {
-		return <Redirect href="/(protected)/stories" withAnchor />;
-	}
-
+export default function StoriesListPage() {
+	const router = useRouter();
 	return (
-		<SafeAreaView className="bg-slate-900 flex-1" edges={["top"]} mode="padding">
-			<StatusBar barStyle={"light-content"} />
-			<View style={{ flex: 1 }} className="relative bg-neutral-950 px-2">
-				<Header />
-				<StoryList />
-				<UpgradeSection />
-				<AudioPreviewPlayer />
-			</View>
-		</SafeAreaView>
+		<View style={{ flex: 1 }} className="relative px-2">
+			<StoryList />
+			<AudioPreviewPlayer
+				className="bottom-2"
+				onCardPress={(id) => {
+					router.push(`/stories/${id}`);
+				}}
+			/>
+		</View>
 	);
 }
 
 const StoryList = () => {
-	const { play, setStory } = useAudio();
+	const router = useRouter();
+	const { play, setStory, storyId, isPlaying } = useAudio();
 	const { isLoading, refreshing, refresh, loadMore, results, status } = useConvexPaginatedQuery(
 		api.stories.getStories,
 		{},
@@ -52,7 +45,7 @@ const StoryList = () => {
 			<FlashList
 				refreshControl={<RefreshControl tintColor="#8b5cf6" refreshing={refreshing} onRefresh={refresh} />}
 				onEndReached={onEndReached}
-				extraData={{ isLoading, refreshing, status }}
+				extraData={{ isLoading, refreshing, status, storyId, isPlaying }}
 				data={results}
 				keyExtractor={(item) => item._id}
 				renderItem={({ item }) => (
@@ -60,8 +53,16 @@ const StoryList = () => {
 						story={item}
 						onCardPress={() => {
 							if (item.audioUrl) {
-								setStory({ storyUrl: item.audioUrl, storyId: item._id });
-								play();
+								if (storyId !== item._id) {
+									setStory({ storyUrl: item.audioUrl, storyId: item._id });
+									play();
+									router.push(`/stories/${item._id}`);
+								} else {
+									if (!isPlaying) {
+										play();
+									}
+									router.push(`/stories/${item._id}`);
+								}
 							}
 						}}
 					/>
@@ -98,20 +99,5 @@ const StoryList = () => {
 				}
 			/>
 		</View>
-	);
-};
-
-const UpgradeSection = () => {
-	const router = useRouter();
-	return (
-		<Pressable
-			onPress={() => router.push("/upgrade")}
-			className="flex absolute bottom-0 right-0 left-0 border-t border-slate-800 bg-slate-900 p-4 h-20 flex-row items-start justify-between"
-		>
-			<View className="flex flex-col gap-y-2 flex-1">
-				<Text className="text-slate-200 font-semibold">Want to listen to more stories?</Text>
-			</View>
-			<ChevronUp className="text-slate-200" size={24} />
-		</Pressable>
 	);
 };
