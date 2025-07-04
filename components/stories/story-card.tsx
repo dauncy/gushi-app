@@ -112,7 +112,7 @@ export const StoryCard = ({ story, onCardPress }: { story: StoryPreview; onCardP
 							stop();
 						}}
 						size="icon"
-						className="bg-transparent border-transparent active:bg-slate-800"
+						className="bg-transparent border-transparent active:bg-slate-800 rounded-full"
 					>
 						<Stop className="text-slate-400 fill-slate-400" size={20} />
 					</Button>
@@ -122,7 +122,7 @@ export const StoryCard = ({ story, onCardPress }: { story: StoryPreview; onCardP
 							play();
 						}}
 						size="icon"
-						className="bg-transparent border-transparent active:bg-slate-800"
+						className="bg-transparent border-transparent active:bg-slate-800 rounded-full"
 					>
 						<Play className="text-slate-400 fill-slate-400" size={20} />
 					</Button>
