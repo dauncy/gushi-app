@@ -350,11 +350,14 @@ const StoryImage = ({ imageUrl, disableAnimation }: { imageUrl: string | null; d
 
 	// Update scale based on playing state
 	useEffect(() => {
+		if (disableAnimation) {
+			return;
+		}
 		scale.value = withSpring(isPlaying ? 1 : 0.75, {
 			damping: 15,
 			stiffness: 150,
 		});
-	}, [isPlaying, scale]);
+	}, [isPlaying, scale, disableAnimation]);
 
 	// Animated style for the image container
 	const animatedStyle = useAnimatedStyle(() => {

@@ -36,7 +36,7 @@ SplashScreen.setOptions({
 
 const fetchSubscription = async () => {
 	await new Promise((resolve) => setTimeout(resolve, 1000));
-	const subscription = null; //{ id: "test", name: "Test Subscription" };
+	const subscription = { id: "test", name: "Test Subscription" };
 	return subscription;
 };
 
