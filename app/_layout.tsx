@@ -1,8 +1,8 @@
 import { AudioProvider } from "@/context/AudioContext";
+import { AuthProvider, ConvexProviderWithCustomAuth } from "@/context/AuthContext";
 import { SubscriptionProvider } from "@/context/SubscriptionContext";
 import { NAV_THEME } from "@/lib/constants";
 import { convex, queryClient } from "@/lib/convex.client";
-import { Subscription } from "@/lib/types";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { DarkTheme, DefaultTheme, Theme, ThemeProvider } from "@react-navigation/native";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -13,6 +13,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { View } from "react-native";
+import Purchases, { CustomerInfo } from "react-native-purchases";
 import "react-native-reanimated";
 import "../global.css";
 
@@ -34,17 +35,23 @@ SplashScreen.setOptions({
 	fade: true,
 });
 
-const fetchSubscription = async () => {
-	await new Promise((resolve) => setTimeout(resolve, 1000));
-	const subscription = { id: "test", name: "Test Subscription" };
-	return subscription;
+const initRevenueCat = async () => {
+	const appleKey = process.env.EXPO_PUBLIC_REVENUE_PUBLIC_KEY;
+	if (!appleKey) {
+		throw new Error("EXPO_PUBLIC_REVENUE_PUBLIC_KEY is not set");
+	}
+	Purchases.configure({ apiKey: appleKey });
+	const customerInfo = await Purchases.getCustomerInfo();
+	return {
+		customerInfo,
+	};
 };
 
 export default function RootLayout() {
 	const { isDarkColorScheme } = useColorScheme();
 	const hasMounted = useRef(false);
 	const [appReady, setAppReady] = useState(false);
-	const [subscription, setSubscription] = useState<Subscription | null>(null);
+	const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
 
 	useLayoutEffect(() => {
 		async function prepare() {
@@ -57,9 +64,9 @@ export default function RootLayout() {
 				await Font.loadAsync({
 					SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
 				});
-				const subscription = await fetchSubscription();
-				console.log("subscription => ", subscription);
-				setSubscription(subscription);
+				const { customerInfo } = await initRevenueCat();
+				console.log("customerInfo => ", customerInfo);
+				setCustomerInfo(customerInfo);
 			} catch (e) {
 				console.warn(e);
 			} finally {
@@ -87,43 +94,47 @@ export default function RootLayout() {
 
 	return (
 		<ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-			<SubscriptionProvider subscription={subscription}>
-				<ConvexProvider client={convex}>
-					<QueryClientProvider client={queryClient}>
-						<AudioProvider>
-							<StatusBar style={isDarkColorScheme ? "light" : "dark"} />
-							<Stack
-								layout={({ children }) => (
-									<View onLayout={onLayoutRootView} className="flex-1">
-										{children}
-									</View>
-								)}
-							>
-								<Stack.Screen name="index" options={{ headerShown: false }} />
-								<Stack.Screen
-									name="(protected)"
-									options={{ headerShown: false, contentStyle: { backgroundColor: "#0a0a0a" } }}
-								/>
-								<Stack.Screen
-									name="upgrade"
-									options={{
-										contentStyle: { height: "100%" },
-										fullScreenGestureEnabled: true,
-										sheetGrabberVisible: true,
-										sheetCornerRadius: 48,
-										headerShown: false,
-										headerLargeTitleShadowVisible: true,
-										presentation: "formSheet",
-										animation: "slide_from_bottom",
-										animationDuration: 300,
-										animationTypeForReplace: "push",
-									}}
-								/>
-								<Stack.Screen name="+not-found" options={{ headerShown: false }} />
-							</Stack>
-						</AudioProvider>
-					</QueryClientProvider>
-				</ConvexProvider>
+			<SubscriptionProvider customerInfo={customerInfo}>
+				<AuthProvider>
+					<ConvexProviderWithCustomAuth client={convex}>
+						<ConvexProvider client={convex}>
+							<QueryClientProvider client={queryClient}>
+								<AudioProvider>
+									<StatusBar style={isDarkColorScheme ? "light" : "dark"} />
+									<Stack
+										layout={({ children }) => (
+											<View onLayout={onLayoutRootView} className="flex-1">
+												{children}
+											</View>
+										)}
+									>
+										<Stack.Screen name="index" options={{ headerShown: false }} />
+										<Stack.Screen
+											name="(protected)"
+											options={{ headerShown: false, contentStyle: { backgroundColor: "#0a0a0a" } }}
+										/>
+										<Stack.Screen
+											name="upgrade"
+											options={{
+												contentStyle: { height: "100%" },
+												fullScreenGestureEnabled: true,
+												sheetGrabberVisible: true,
+												sheetCornerRadius: 48,
+												headerShown: false,
+												headerLargeTitleShadowVisible: true,
+												presentation: "formSheet",
+												animation: "slide_from_bottom",
+												animationDuration: 300,
+												animationTypeForReplace: "push",
+											}}
+										/>
+										<Stack.Screen name="+not-found" options={{ headerShown: false }} />
+									</Stack>
+								</AudioProvider>
+							</QueryClientProvider>
+						</ConvexProvider>
+					</ConvexProviderWithCustomAuth>
+				</AuthProvider>
 			</SubscriptionProvider>
 		</ThemeProvider>
 	);

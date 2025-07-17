@@ -1,0 +1,20 @@
+import { REVENUE_CAT_API_BASE_URL, REVENUE_CAT_PROJECT_ID } from "@/lib/constants";
+
+// https://api.revenuecat.com/v2/projects/{project_id}/customers/{customer_id}
+export const getCustomer = async (customerId: string) => {
+	if (!process.env.REVENUE_CAT_API_KEY) {
+		throw new Error("REVENUE_CAT_API_KEY is not set");
+	}
+	const url = `${REVENUE_CAT_API_BASE_URL}/projects/${REVENUE_CAT_PROJECT_ID}/customers/${customerId}`;
+	const res = await fetch(url, {
+		headers: {
+			Authorization: `Bearer ${process.env.REVENUE_CAT_API_KEY}`,
+		},
+	});
+	if (!res.ok) {
+		throw new Error("Failed to fetch customer");
+	}
+
+	const data = await res.json();
+	return data;
+};

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "DreamDrop",
-    "slug": "dreamdrop",
+    "name": "TuckedIn",
+    "slug": "tuckedin",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/thumbnail.png",
@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.danielwilderdev.dreamdrop",
+      "bundleIdentifier": "com.danielwilderdev.storydrops",
       "infoPlist": {
         "UIBackgroundModes": [
           "audio"
@@ -23,7 +23,11 @@
         "backgroundColor": "#0f172a"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.danielwilderdev.dreamdrop"
+      "package": "com.danielwilderdev.tuckedin",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -51,8 +55,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "e995357c-64b1-46fb-9395-0ee992307d2d"
+        "projectId": "0a0a5fe2-c714-410c-9bf1-a991a6adb40a"
       }
-    }
+    },
+    "owner": "danielwilderdev"
   }
 }

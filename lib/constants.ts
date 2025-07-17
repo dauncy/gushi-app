@@ -17,5 +17,5 @@ export const NAV_THEME = {
 	},
 };
 
-export const REVENUE_CAT_APPI_ID = "app120c6f5a99";
-export const APPLE_REVENUE_CAT_KEY = "appl_QRbmxuYpPHHPOOGlTFxNfOMQGmE";
+export const REVENUE_CAT_API_BASE_URL = "https://api.revenuecat.com/v2";
+export const REVENUE_CAT_PROJECT_ID = "projaad37f1f";

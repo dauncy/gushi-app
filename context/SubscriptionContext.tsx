@@ -1,26 +1,26 @@
-import { Subscription } from "@/lib/types";
 import { createContext, ReactNode, useContext } from "react";
+import { CustomerInfo } from "react-native-purchases";
 
 interface SubscriptionContextType {
-	subscription: Subscription | null;
+	customerInfo: CustomerInfo | null;
 }
 
 export const SubscriptionContext = createContext<SubscriptionContextType>({
-	subscription: null,
+	customerInfo: null,
 });
 
 export const SubscriptionProvider = ({
 	children,
-	subscription,
+	customerInfo,
 }: {
 	children: ReactNode;
-	subscription: Subscription | null;
+	customerInfo: CustomerInfo | null;
 }) => {
-	return <SubscriptionContext.Provider value={{ subscription }}>{children}</SubscriptionContext.Provider>;
+	return <SubscriptionContext.Provider value={{ customerInfo }}>{children}</SubscriptionContext.Provider>;
 };
 
 export const useSubscription = () => {
-	const { subscription } = useContext(SubscriptionContext);
-	const hasSubscription = !!subscription;
-	return { subscription, hasSubscription };
+	const { customerInfo } = useContext(SubscriptionContext);
+	const hasSubscription = (customerInfo?.activeSubscriptions?.length ?? 0) > 0;
+	return { customerInfo, hasSubscription };
 };
