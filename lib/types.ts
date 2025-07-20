@@ -1,3 +1,4 @@
+import { ActionCtx, MutationCtx, QueryCtx } from "@/convex/_generated/server";
 import { GenericActionCtx, GenericDataModel, GenericMutationCtx, GenericQueryCtx } from "convex/server";
 
 export type Nullable<T> = T | null;
@@ -32,3 +33,5 @@ type RunQueryCtx = {
 };
 
 export type CacheCtx = RunQueryCtx & RunMutationCtx & RunActionCtx;
+
+export type GenericCtx = QueryCtx | ActionCtx | MutationCtx;

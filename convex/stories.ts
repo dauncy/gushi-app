@@ -2,6 +2,7 @@ import { zid, zodToConvex } from "convex-helpers/server/zod";
 import { paginationOptsValidator, PaginationResult } from "convex/server";
 import { Id } from "./_generated/dataModel";
 import { query, QueryCtx } from "./_generated/server";
+import { verifyAccess } from "./common";
 import { StoryExtended, StoryPreview } from "./schema/stories.schema";
 
 const HAS_SUBSCRIPTION = false;
@@ -25,8 +26,7 @@ export const getAudioUrl = async (ctx: QueryCtx, audioId: Id<"audio">) => {
 export const getStories = query({
 	args: { paginationOpts: paginationOptsValidator },
 	handler: async (ctx, { paginationOpts }): Promise<PaginationResult<StoryPreview>> => {
-		const userIdentity = await ctx.auth.getUserIdentity();
-		console.log("--- GET STORIES ---", userIdentity);
+		const { dbUser, customer } = await verifyAccess(ctx, { validateSubscription: false });
 		const storiesPage = await ctx.db
 			.query("stories")
 			.withIndex("by_enabled", (q) => q.eq("enabled", true))

@@ -15,6 +15,8 @@ import type * as auth_mutations from "../auth/mutations.js";
 import type * as auth_queries from "../auth/queries.js";
 import type * as auth_types from "../auth/types.js";
 import type * as auth_utils from "../auth/utils.js";
+import type * as common_index from "../common/index.js";
+import type * as common_utils from "../common/utils.js";
 import type * as http from "../http.js";
 import type * as stories from "../stories.js";
 import type * as subscriptions_actions from "../subscriptions/actions.js";
@@ -47,6 +49,8 @@ declare const fullApi: ApiFromModules<{
   "auth/queries": typeof auth_queries;
   "auth/types": typeof auth_types;
   "auth/utils": typeof auth_utils;
+  "common/index": typeof common_index;
+  "common/utils": typeof common_utils;
   http: typeof http;
   stories: typeof stories;
   "subscriptions/actions": typeof subscriptions_actions;
