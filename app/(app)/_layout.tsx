@@ -47,7 +47,6 @@ export default function AppLayout() {
 
 const RenderLayout = ({ children }: { children: ReactNode }) => {
 	const { isAuthenticated, isLoading } = useConvexAuth();
-	console.log("RenderLayout: props => ", { isAuthenticated, isLoading });
 	if (isLoading && !isAuthenticated) {
 		return (
 			<View className="flex-1 items-center justify-center bg-slate-900">
