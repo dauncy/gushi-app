@@ -40,7 +40,7 @@ export default function Upgrade() {
 	const router = useRouter();
 	const [selected, setSelected] = useState<Plan>("monthly");
 	const onSubscribe = (plan: Plan) => {
-		console.log("onSubscribe", plan);
+		// TODO
 	};
 	return (
 		<LinearGradient colors={["#0d1b2a", "#000"]} className="flex  mt-12 px-4" style={{ flex: 1, display: "flex" }}>

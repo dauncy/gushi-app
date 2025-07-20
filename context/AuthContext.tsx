@@ -30,26 +30,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const [dbUser, setDbUser] = useState<Doc<"users"> | null>(null);
 	const { customerInfo } = useSubscription();
 
+	const customerId = useMemo(() => {
+		return customerInfo?.originalAppUserId;
+	}, [customerInfo]);
+
 	useEffect(() => {
 		const handleLogin = async () => {
 			setLoading(true);
 			try {
 				const url = `${getConvexSiteURL()}/auth/login`;
-				const revenuecatUserId = customerInfo?.originalAppUserId;
-				if (!revenuecatUserId) {
+				if (!customerId) {
 					return null;
 				}
 				const res = await fetch(url, {
 					method: "POST",
 					body: JSON.stringify({
-						revenuecat_user_id: revenuecatUserId,
+						revenuecat_user_id: customerId,
 					}),
 				});
 				if (!res.ok) {
 					return null;
 				}
 				const data = await res.json();
-				console.log("AuthContextInit: data => ", data);
 				setJwtClaims(data.claims);
 				setDbUser(data.dbUser);
 				return null;
@@ -62,7 +64,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		};
 
 		handleLogin();
-	}, [customerInfo, setJwtClaims, setLoading]);
+	}, [customerId, setJwtClaims, setLoading]);
 
 	return (
 		<AuthContext.Provider
@@ -106,14 +108,16 @@ export const ConvexProviderWithCustomAuth = ({
 
 const useCustomAuth = () => {
 	// Only use state here, not actions - prevents unnecessary re-renders
-	const { jwtClaims, loading, setDbUser, setJwtClaims } = useAuth();
+	const { loading, dbUser } = useAuth();
 	const { customerInfo } = useSubscription();
+	const customerId = useMemo(() => {
+		return customerInfo?.originalAppUserId;
+	}, [customerInfo]);
 
 	const fetchAccessToken = useCallback(
 		async ({ forceRefreshToken }: { forceRefreshToken: boolean }) => {
 			const url = `${getConvexSiteURL()}/auth/refresh`;
-			const revenuecatUserId = customerInfo?.originalAppUserId;
-			if (!revenuecatUserId) {
+			if (!customerId || !dbUser) {
 				return null;
 			}
 
@@ -123,7 +127,7 @@ const useCustomAuth = () => {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					revenuecat_user_id: revenuecatUserId,
+					revenuecat_user_id: customerId,
 					force_refresh: forceRefreshToken,
 				}),
 			});
@@ -131,18 +135,16 @@ const useCustomAuth = () => {
 				return null;
 			}
 			const data = await res.json();
-			setDbUser(data.dbUser);
-			setJwtClaims(data.claims);
 			return data.token;
 		},
-		[customerInfo, setDbUser, setJwtClaims],
+		[customerId, dbUser],
 	);
 
 	return useMemo(() => {
 		return {
 			isLoading: loading,
-			isAuthenticated: !!jwtClaims,
+			isAuthenticated: !!dbUser,
 			fetchAccessToken,
 		};
-	}, [loading, jwtClaims, fetchAccessToken]);
+	}, [loading, dbUser, fetchAccessToken]);
 };

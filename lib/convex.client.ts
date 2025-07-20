@@ -5,6 +5,7 @@ import { getConvexURL } from "./utils";
 
 export const convex = new ConvexReactClient(getConvexURL(), {
 	unsavedChangesWarning: false,
+	verbose: true,
 });
 
 export const convexQueryClient = new ConvexQueryClient(convex);

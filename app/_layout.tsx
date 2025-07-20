@@ -1,4 +1,3 @@
-import { AudioProvider } from "@/context/AudioContext";
 import { AuthProvider, ConvexProviderWithCustomAuth } from "@/context/AuthContext";
 import { SubscriptionProvider } from "@/context/SubscriptionContext";
 import { NAV_THEME } from "@/lib/constants";
@@ -6,13 +5,11 @@ import { convex, queryClient } from "@/lib/convex.client";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { DarkTheme, DefaultTheme, Theme, ThemeProvider } from "@react-navigation/native";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { ConvexProvider } from "convex/react";
 import * as Font from "expo-font";
-import { Stack } from "expo-router";
+import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { StatusBar } from "expo-status-bar";
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
-import { View } from "react-native";
+import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Purchases, { CustomerInfo } from "react-native-purchases";
 import "react-native-reanimated";
 import "../global.css";
@@ -60,12 +57,10 @@ export default function RootLayout() {
 			}
 			hasMounted.current = true;
 			try {
-				console.log("prepare => ");
 				await Font.loadAsync({
 					SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
 				});
 				const { customerInfo } = await initRevenueCat();
-				console.log("customerInfo => ", customerInfo);
 				setCustomerInfo(customerInfo);
 			} catch (e) {
 				console.warn(e);
@@ -77,13 +72,7 @@ export default function RootLayout() {
 	}, []);
 
 	const onLayoutRootView = useCallback(() => {
-		console.log("onLayoutRootView => ", appReady);
 		if (appReady) {
-			// This tells the splash screen to hide immediately! If we call this after
-			// `setAppIsReady`, then we may see a blank screen while the app is
-			// loading its initial state and rendering its first pixels. So instead,
-			// we hide the splash screen once we know the root view has already
-			// performed layout.
 			SplashScreen.hide();
 		}
 	}, [appReady]);
@@ -97,42 +86,11 @@ export default function RootLayout() {
 			<SubscriptionProvider customerInfo={customerInfo}>
 				<AuthProvider>
 					<ConvexProviderWithCustomAuth client={convex}>
-						<ConvexProvider client={convex}>
-							<QueryClientProvider client={queryClient}>
-								<AudioProvider>
-									<StatusBar style={isDarkColorScheme ? "light" : "dark"} />
-									<Stack
-										layout={({ children }) => (
-											<View onLayout={onLayoutRootView} className="flex-1">
-												{children}
-											</View>
-										)}
-									>
-										<Stack.Screen name="index" options={{ headerShown: false }} />
-										<Stack.Screen
-											name="(protected)"
-											options={{ headerShown: false, contentStyle: { backgroundColor: "#0a0a0a" } }}
-										/>
-										<Stack.Screen
-											name="upgrade"
-											options={{
-												contentStyle: { height: "100%" },
-												fullScreenGestureEnabled: true,
-												sheetGrabberVisible: true,
-												sheetCornerRadius: 48,
-												headerShown: false,
-												headerLargeTitleShadowVisible: true,
-												presentation: "formSheet",
-												animation: "slide_from_bottom",
-												animationDuration: 300,
-												animationTypeForReplace: "push",
-											}}
-										/>
-										<Stack.Screen name="+not-found" options={{ headerShown: false }} />
-									</Stack>
-								</AudioProvider>
-							</QueryClientProvider>
-						</ConvexProvider>
+						<QueryClientProvider client={queryClient}>
+							<GestureHandlerRootView onLayout={onLayoutRootView} style={{ flex: 1, backgroundColor: "#0f172a" }}>
+								<Slot />
+							</GestureHandlerRootView>
+						</QueryClientProvider>
 					</ConvexProviderWithCustomAuth>
 				</AuthProvider>
 			</SubscriptionProvider>

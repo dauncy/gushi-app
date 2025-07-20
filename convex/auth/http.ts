@@ -1,6 +1,6 @@
 import { internal } from "@/convex/_generated/api";
 import { httpAction } from "@/convex/_generated/server";
-import { getCustomer } from "@/convex/subscriptions/utils";
+import { getCustomerCached } from "../subscriptions/actions";
 import { signJWT, verifyJWT } from "./utils";
 
 export const getWellKnownJWKsHttp = httpAction(async (ctx) => {
@@ -8,9 +8,7 @@ export const getWellKnownJWKsHttp = httpAction(async (ctx) => {
 
 	if (!activeKey) {
 		// Create a new key pair if none exists
-		console.log("Creating a new key pair");
 		const newKey = await ctx.runAction(internal.auth.actions.createJWTKeyPair, {});
-		console.log("New key", newKey);
 
 		const jwk = {
 			kty: "RSA",
@@ -21,11 +19,8 @@ export const getWellKnownJWKsHttp = httpAction(async (ctx) => {
 			e: newKey.exponent,
 		};
 
-		return new Response(JSON.stringify({ keys: [jwk] }), {
-			headers: { "Content-Type": "application/json" },
-		});
+		return Response.json({ keys: [jwk] }, { status: 200 });
 	}
-	console.log("Active key", activeKey);
 	const jwk = {
 		kty: "RSA",
 		use: "sig",
@@ -35,9 +30,7 @@ export const getWellKnownJWKsHttp = httpAction(async (ctx) => {
 		e: activeKey.exponent,
 	};
 
-	return new Response(JSON.stringify({ keys: [jwk] }), {
-		headers: { "Content-Type": "application/json" },
-	});
+	return Response.json({ keys: [jwk] }, { status: 200 });
 });
 
 export const loginHttp = httpAction(async (ctx, req) => {
@@ -45,7 +38,8 @@ export const loginHttp = httpAction(async (ctx, req) => {
 	if (!revenuecat_user_id) {
 		return new Response("Revenuecat user ID is required", { status: 401 });
 	}
-	const customer = await getCustomer(revenuecat_user_id);
+	const customer = await getCustomerCached(ctx, { revenuecatUserId: revenuecat_user_id });
+
 	if (!customer) {
 		return new Response("Customer not found", { status: 404 });
 	}
@@ -54,8 +48,7 @@ export const loginHttp = httpAction(async (ctx, req) => {
 	if (!activeKey) {
 		return new Response("Internal Server Error", { status: 500 });
 	}
-
-	const dbUser = await ctx.runQuery(internal.users.queries.getUserByRevenuecatUserId, {
+	const dbUser = await ctx.runMutation(internal.users.mutations.upsertUser, {
 		revenuecatUserId: revenuecat_user_id,
 	});
 	if (!dbUser) {
@@ -67,6 +60,7 @@ export const loginHttp = httpAction(async (ctx, req) => {
 			revenuecat_user_id: customer.id,
 		},
 		activeKey.privateKey,
+		activeKey.keyId,
 	);
 
 	const verified = await verifyJWT(token, activeKey.publicKey);
@@ -98,7 +92,8 @@ export const refreshHttp = httpAction(async (ctx, req) => {
 				headers: { "Content-Type": "application/json" },
 			});
 		}
-		const customer = await getCustomer(revenuecat_user_id);
+		const customer = await getCustomerCached(ctx, { revenuecatUserId: revenuecat_user_id });
+
 		if (!customer) {
 			return new Response(JSON.stringify({ error: "Customer not found" }), {
 				status: 404,
@@ -125,6 +120,7 @@ export const refreshHttp = httpAction(async (ctx, req) => {
 				revenuecat_user_id: customer.id,
 			},
 			activeKey.privateKey,
+			activeKey.keyId,
 		);
 
 		const verified = await verifyJWT(token, activeKey.publicKey);

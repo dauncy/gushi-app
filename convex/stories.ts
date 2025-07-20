@@ -25,6 +25,8 @@ export const getAudioUrl = async (ctx: QueryCtx, audioId: Id<"audio">) => {
 export const getStories = query({
 	args: { paginationOpts: paginationOptsValidator },
 	handler: async (ctx, { paginationOpts }): Promise<PaginationResult<StoryPreview>> => {
+		const userIdentity = await ctx.auth.getUserIdentity();
+		console.log("--- GET STORIES ---", userIdentity);
 		const storiesPage = await ctx.db
 			.query("stories")
 			.withIndex("by_enabled", (q) => q.eq("enabled", true))

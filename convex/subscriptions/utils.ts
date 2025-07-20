@@ -1,7 +1,8 @@
 import { REVENUE_CAT_API_BASE_URL, REVENUE_CAT_PROJECT_ID } from "@/lib/constants";
+import { RevenueCatCustomer } from "@/lib/types";
 
 // https://api.revenuecat.com/v2/projects/{project_id}/customers/{customer_id}
-export const getCustomer = async (customerId: string) => {
+export const getCustomer = async (customerId: string): Promise<RevenueCatCustomer> => {
 	if (!process.env.REVENUE_CAT_API_KEY) {
 		throw new Error("REVENUE_CAT_API_KEY is not set");
 	}

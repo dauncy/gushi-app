@@ -1,24 +1,5 @@
-import { jwtVerify } from "jose";
+import { jwtVerify, SignJWT } from "jose";
 import { JWTPayload } from "./types";
-
-function base64URLEncode(str: ArrayBuffer): string {
-	const base64 = btoa(String.fromCharCode(...new Uint8Array(str)));
-	return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function base64URLDecode(str: string): ArrayBuffer {
-	str = str.replace(/-/g, "+").replace(/_/g, "/");
-	while (str.length % 4) {
-		str += "=";
-	}
-	const binary = atob(str);
-	const bytes = new Uint8Array(binary.length);
-	for (let i = 0; i < binary.length; i++) {
-		bytes[i] = binary.charCodeAt(i);
-	}
-	return bytes.buffer;
-}
 
 async function pemToCryptoKey(pem: string, type: "private" | "public"): Promise<CryptoKey> {
 	const pemContents = pem
@@ -103,35 +84,22 @@ export async function generateKeyPair(): Promise<{
 export async function signJWT(
 	payload: Omit<JWTPayload, "iss" | "aud" | "sub" | "exp" | "iat">,
 	privateKeyPem: string,
+	kid: string,
 ): Promise<string> {
 	if (!process.env.CONVEX_SITE_URL) {
 		throw new Error("CONVEX_SITE_URL is not set");
 	}
 
-	const header = {
-		alg: "RS256",
-		typ: "JWT",
-	};
-
-	const now = Math.floor(Date.now() / 1000);
-	const fullPayload: JWTPayload = {
-		...payload,
-		iss: process.env.CONVEX_SITE_URL,
-		aud: "api.tuckedin.app",
-		sub: payload.revenuecat_user_id,
-		exp: now + 60 * 60, // 1 hour
-		iat: now,
-	};
-
-	const encodedHeader = base64URLEncode(new TextEncoder().encode(JSON.stringify(header)));
-	const encodedPayload = base64URLEncode(new TextEncoder().encode(JSON.stringify(fullPayload)));
-	const data = `${encodedHeader}.${encodedPayload}`;
-
+	let jwtBuilder = new SignJWT(payload);
+	jwtBuilder.setIssuer(process.env.CONVEX_SITE_URL);
+	jwtBuilder.setAudience("api.tuckedin.app");
+	jwtBuilder.setSubject(payload.revenuecat_user_id);
+	jwtBuilder.setIssuedAt();
+	jwtBuilder.setExpirationTime("1 hour");
+	jwtBuilder.setProtectedHeader({ alg: "RS256", typ: "JWT", kid });
 	const privateKey = await pemToCryptoKey(privateKeyPem, "private");
-	const signature = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", privateKey, new TextEncoder().encode(data));
-
-	const encodedSignature = base64URLEncode(signature);
-	return `${data}.${encodedSignature}`;
+	const signedJwt = await jwtBuilder.sign(privateKey);
+	return signedJwt;
 }
 
 export function createJWKFromStoredKey(

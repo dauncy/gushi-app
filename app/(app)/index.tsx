@@ -15,7 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function Home() {
 	const { hasSubscription } = useSubscription();
 	if (hasSubscription) {
-		return <Redirect href="/(protected)/stories" withAnchor />;
+		return <Redirect href="/(app)/(protected)/stories" withAnchor />;
 	}
 
 	return (
