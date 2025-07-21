@@ -65,7 +65,15 @@ export type StoryPreview = Omit<
 export type StoryExtended = Omit<
 	StoryPrivate,
 	"enabled" | "subscription_required" | "imageId" | "audioId" | "createdAt"
-> & { imageUrl: Nullable<string>; audioUrl: Nullable<string>; _id: Id<"stories"> };
+> & {
+	imageUrl: Nullable<string>;
+	audioUrl: Nullable<string>;
+	_id: Id<"stories">;
+	favorite: null | {
+		_id: Id<"favorites">;
+		_createdAt: string;
+	};
+};
 
 export type SegmentTranscript = z.infer<typeof segmentTranscriptSchema>;
 

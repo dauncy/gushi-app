@@ -68,7 +68,7 @@ export const getStory = query({
 		storyId: zodToConvex(zid("stories").nullable()),
 	},
 	handler: async (ctx, { storyId }): Promise<StoryExtended | null> => {
-		const { hasSubscription } = await verifyAccess(ctx, { validateSubscription: false });
+		const { hasSubscription, dbUser } = await verifyAccess(ctx, { validateSubscription: false });
 		if (!storyId) {
 			return null;
 		}
@@ -88,6 +88,12 @@ export const getStory = query({
 		if (!imageUrl || !audioUrl) {
 			return null;
 		}
+
+		const favorite = await ctx.db
+			.query("favorites")
+			.withIndex("by_user_story", (q) => q.eq("userId", dbUser._id).eq("storyId", maybeStory._id))
+			.first();
+
 		return {
 			_id: maybeStory._id,
 			title: maybeStory.title,
@@ -96,6 +102,12 @@ export const getStory = query({
 			transcript: maybeStory.transcript,
 			body: maybeStory.body,
 			updatedAt: maybeStory.updatedAt,
+			favorite: favorite
+				? {
+						_id: favorite._id,
+						_createdAt: favorite.createdAt,
+					}
+				: null,
 		};
 	},
 });

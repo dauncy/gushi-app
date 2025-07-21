@@ -16,6 +16,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { SegmentTranscript, StoryExtended } from "@/convex/stories/schema";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
 import { cn, sanitizeStorageUrl } from "@/lib/utils";
+import { useMutation } from "convex/react";
 import { formatDistanceToNow } from "date-fns";
 import { BlurView } from "expo-blur";
 import { useLocalSearchParams } from "expo-router";
@@ -261,6 +262,7 @@ const ClosedCaption = ({ transcript }: { transcript: SegmentTranscript[] }) => {
 
 const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed: boolean }) => {
 	const progress = useSharedValue(isCollapsed ? 1 : 0);
+	const toggleFavorite = useMutation(api.favorites.mutations.toggleFavorite);
 
 	useEffect(() => {
 		progress.value = withTiming(isCollapsed ? 1 : 0, { duration: 250 });
@@ -284,7 +286,7 @@ const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed
 			await RNShare.share(
 				{
 					message: `Check out this story: ${story.title}`,
-					url: `https://getdreamdrop.com/stories/${story._id}`,
+					url: `${process.env.EXPO_PUBLIC_APP_URL}/stories/${story._id}`,
 					title: `Share ${story.title}`,
 				},
 				{ dialogTitle: `Share ${story.title}` },
@@ -292,6 +294,10 @@ const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed
 		} catch (e) {
 			console.warn("[StoryHeader] Error sharing story", e);
 		}
+	};
+
+	const handleToggleFavorite = async () => {
+		await toggleFavorite({ storyId: story._id });
 	};
 
 	return (
@@ -323,8 +329,17 @@ const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed
 					</View>
 				</View>
 				<View className="flex flex-row gap-x-4 items-center">
-					<Button size="icon" variant="ghost" className="bg-slate-800 rounded-full border border-slate-600">
-						<Star className="text-slate-500 size-6" strokeWidth={1.5} size={20} />
+					<Button
+						size="icon"
+						variant="ghost"
+						className={cn("bg-slate-800 rounded-full border border-slate-600", story.favorite && "bg-slate-500")}
+						onPress={handleToggleFavorite}
+					>
+						<Star
+							className={cn("text-slate-500 size-6", story.favorite && "text-amber-500 fill-amber-500")}
+							strokeWidth={1.5}
+							size={20}
+						/>
 					</Button>
 
 					<Button

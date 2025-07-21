@@ -34,17 +34,14 @@ const initRevenueCat = async (onUpdate: (customerInfo: CustomerInfo) => void) =>
 	}
 	Purchases.configure({ apiKey: appleKey });
 	Purchases.addCustomerInfoUpdateListener((customerInfo) => {
-		console.log("[RootLayout.tsx]: customerInfo => ", customerInfo);
+		console.log("[RootLayout.tsx]: onUpdate() =>  customerInfo  ", customerInfo);
 		onUpdate(customerInfo);
 	});
-	const customerInfo = await Purchases.getCustomerInfo();
-	return {
-		customerInfo,
-	};
 };
 
 export default function RootLayout() {
 	const hasMounted = useRef(false);
+	const initialCustomerRef = useRef(false);
 	const [appReady, setAppReady] = useState(false);
 	const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
 
@@ -58,18 +55,17 @@ export default function RootLayout() {
 				await Font.loadAsync({
 					SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
 				});
-				const { customerInfo } = await initRevenueCat((updates) => {
-					console.log("[RootLayout.tsx]: updates to customerInfo => ", updates);
+				await initRevenueCat((updates) => {
 					setCustomerInfo(updates);
+					if (!initialCustomerRef.current) {
+						initialCustomerRef.current = true;
+						setTimeout(() => {
+							setAppReady(true);
+						}, 500);
+					}
 				});
-				console.log("[RootLayout.tsx]: customerInfo => ", customerInfo.entitlements.active);
-				setCustomerInfo(customerInfo);
 			} catch (e) {
 				console.warn(e);
-			} finally {
-				setTimeout(() => {
-					setAppReady(true);
-				}, 500);
 			}
 		}
 		prepare();
