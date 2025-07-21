@@ -5,8 +5,6 @@ import { query, QueryCtx } from "./_generated/server";
 import { verifyAccess } from "./common";
 import { StoryExtended, StoryPreview } from "./schema/stories.schema";
 
-const HAS_SUBSCRIPTION = false;
-
 export const getImageUrl = async (ctx: QueryCtx, imageId: Id<"images">) => {
 	const image = await ctx.db.get(imageId);
 	if (!image) {
@@ -26,7 +24,7 @@ export const getAudioUrl = async (ctx: QueryCtx, audioId: Id<"audio">) => {
 export const getStories = query({
 	args: { paginationOpts: paginationOptsValidator },
 	handler: async (ctx, { paginationOpts }): Promise<PaginationResult<StoryPreview>> => {
-		const { dbUser, customer } = await verifyAccess(ctx, { validateSubscription: false });
+		const { hasSubscription } = await verifyAccess(ctx, { validateSubscription: false });
 		const storiesPage = await ctx.db
 			.query("stories")
 			.withIndex("by_enabled", (q) => q.eq("enabled", true))
@@ -36,7 +34,7 @@ export const getStories = query({
 			storiesPage.page.map(async (story) => {
 				const promises: Promise<string | null>[] = [getImageUrl(ctx, story.imageId)];
 				if (story.subscription_required) {
-					if (HAS_SUBSCRIPTION) {
+					if (hasSubscription) {
 						promises.push(getAudioUrl(ctx, story.audioId));
 					} else {
 						promises.push(Promise.resolve(null));
@@ -70,6 +68,7 @@ export const getStory = query({
 		storyId: zodToConvex(zid("stories").nullable()),
 	},
 	handler: async (ctx, { storyId }): Promise<StoryExtended | null> => {
+		const { hasSubscription } = await verifyAccess(ctx, { validateSubscription: false });
 		if (!storyId) {
 			return null;
 		}
@@ -78,7 +77,7 @@ export const getStory = query({
 			return null;
 		}
 
-		if (maybeStory.subscription_required && !HAS_SUBSCRIPTION) {
+		if (maybeStory.subscription_required && !hasSubscription) {
 			return null;
 		}
 

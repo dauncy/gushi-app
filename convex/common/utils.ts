@@ -10,6 +10,7 @@ export const verifyAccess = async (
 ) => {
 	const userIdentity = await ctx.auth.getUserIdentity();
 	const revenueCatUserId: string | undefined = userIdentity?.revenuecat_user_id as string | undefined;
+	let hasSubscription = false;
 
 	if (!revenueCatUserId) {
 		throw new ConvexError("Unauthorized");
@@ -25,8 +26,16 @@ export const verifyAccess = async (
 	}
 
 	if (validateSubscription) {
-		// TODO
+		const hasEntitlement = customer.active_entitlements.items.pop();
+		if (!hasEntitlement) {
+			throw new ConvexError("Unauthorized");
+		}
+
+		if (hasEntitlement.expires_at && new Date(hasEntitlement.expires_at).toISOString() < new Date().toISOString()) {
+			throw new ConvexError("Subscription expired");
+		}
+		hasSubscription = true;
 	}
 
-	return { customer, dbUser };
+	return { customer, dbUser, hasSubscription };
 };

@@ -5,7 +5,11 @@ export type Nullable<T> = T | null;
 
 export type RevenueCatCustomer = {
 	active_entitlements: {
-		items: unknown[];
+		items: {
+			entitlement_id: string;
+			expires_at: number | null | string;
+			object: string;
+		}[];
 		next_page: null;
 		object: "list";
 		url: string;

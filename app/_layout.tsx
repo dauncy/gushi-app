@@ -2,8 +2,7 @@ import { AuthProvider, ConvexProviderWithCustomAuth } from "@/context/AuthContex
 import { SubscriptionProvider } from "@/context/SubscriptionContext";
 import { NAV_THEME } from "@/lib/constants";
 import { convex, queryClient } from "@/lib/convex.client";
-import { useColorScheme } from "@/lib/useColorScheme";
-import { DarkTheme, DefaultTheme, Theme, ThemeProvider } from "@react-navigation/native";
+import { DarkTheme, Theme, ThemeProvider } from "@react-navigation/native";
 import { QueryClientProvider } from "@tanstack/react-query";
 import * as Font from "expo-font";
 import { Slot } from "expo-router";
@@ -14,10 +13,6 @@ import Purchases, { CustomerInfo } from "react-native-purchases";
 import "react-native-reanimated";
 import "../global.css";
 
-const LIGHT_THEME: Theme = {
-	...DefaultTheme,
-	colors: NAV_THEME.light,
-};
 const DARK_THEME: Theme = {
 	...DarkTheme,
 	colors: NAV_THEME.dark,
@@ -32,12 +27,16 @@ SplashScreen.setOptions({
 	fade: true,
 });
 
-const initRevenueCat = async () => {
+const initRevenueCat = async (onUpdate: (customerInfo: CustomerInfo) => void) => {
 	const appleKey = process.env.EXPO_PUBLIC_REVENUE_PUBLIC_KEY;
 	if (!appleKey) {
 		throw new Error("EXPO_PUBLIC_REVENUE_PUBLIC_KEY is not set");
 	}
 	Purchases.configure({ apiKey: appleKey });
+	Purchases.addCustomerInfoUpdateListener((customerInfo) => {
+		console.log("[RootLayout.tsx]: customerInfo => ", customerInfo);
+		onUpdate(customerInfo);
+	});
 	const customerInfo = await Purchases.getCustomerInfo();
 	return {
 		customerInfo,
@@ -45,7 +44,6 @@ const initRevenueCat = async () => {
 };
 
 export default function RootLayout() {
-	const { isDarkColorScheme } = useColorScheme();
 	const hasMounted = useRef(false);
 	const [appReady, setAppReady] = useState(false);
 	const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
@@ -60,12 +58,18 @@ export default function RootLayout() {
 				await Font.loadAsync({
 					SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
 				});
-				const { customerInfo } = await initRevenueCat();
+				const { customerInfo } = await initRevenueCat((updates) => {
+					console.log("[RootLayout.tsx]: updates to customerInfo => ", updates);
+					setCustomerInfo(updates);
+				});
+				console.log("[RootLayout.tsx]: customerInfo => ", customerInfo.entitlements.active);
 				setCustomerInfo(customerInfo);
 			} catch (e) {
 				console.warn(e);
 			} finally {
-				setAppReady(true);
+				setTimeout(() => {
+					setAppReady(true);
+				}, 500);
 			}
 		}
 		prepare();
@@ -82,7 +86,7 @@ export default function RootLayout() {
 	}
 
 	return (
-		<ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
+		<ThemeProvider value={DARK_THEME}>
 			<SubscriptionProvider customerInfo={customerInfo}>
 				<AuthProvider>
 					<ConvexProviderWithCustomAuth client={convex}>

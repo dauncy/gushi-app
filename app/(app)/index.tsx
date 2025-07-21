@@ -6,8 +6,9 @@ import { useAudio } from "@/context/AudioContext";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { api } from "@/convex/_generated/api";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
+import { presentPaywall } from "@/lib/revenue-cat";
 import { FlashList } from "@shopify/flash-list";
-import { Redirect, useRouter } from "expo-router";
+import { Redirect } from "expo-router";
 import { useCallback } from "react";
 import { ActivityIndicator, Pressable, RefreshControl, StatusBar, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,7 +20,7 @@ export default function Home() {
 	}
 
 	return (
-		<SafeAreaView className="bg-slate-900 flex-1" edges={["top"]} mode="padding">
+		<SafeAreaView className="bg-slate-900 flex-1" edges={["top", "bottom"]} mode="padding">
 			<StatusBar barStyle={"light-content"} />
 			<View style={{ flex: 1 }} className="relative bg-neutral-950 px-2">
 				<Header />
@@ -102,10 +103,9 @@ const StoryList = () => {
 };
 
 const UpgradeSection = () => {
-	const router = useRouter();
 	return (
 		<Pressable
-			onPress={() => router.push("/upgrade")}
+			onPress={presentPaywall}
 			className="flex absolute bottom-0 right-0 left-0 border-t border-slate-800 bg-slate-900 p-4 h-20 flex-row items-start justify-between"
 		>
 			<View className="flex flex-col gap-y-2 flex-1">

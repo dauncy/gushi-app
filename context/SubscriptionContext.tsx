@@ -21,6 +21,15 @@ export const SubscriptionProvider = ({
 
 export const useSubscription = () => {
 	const { customerInfo } = useContext(SubscriptionContext);
-	const hasSubscription = (customerInfo?.activeSubscriptions?.length ?? 0) > 0;
-	return { customerInfo, hasSubscription };
+	const activeEntitlements = customerInfo?.entitlements?.active;
+	if (!activeEntitlements) {
+		return { customerInfo, hasSubscription: false, subscriptionType: null };
+	}
+	if (activeEntitlements["Pro - Lifetime"]) {
+		return { customerInfo, hasSubscription: true, subscriptionType: "lifetime" };
+	}
+	if (activeEntitlements["Pro - Recurring"]) {
+		return { customerInfo, hasSubscription: true, subscriptionType: "recurring" };
+	}
+	return { customerInfo, hasSubscription: false, subscriptionType: null };
 };

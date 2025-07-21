@@ -5,11 +5,17 @@ import { Settings } from "@/components/ui/icons/settings-icon";
 import { Star } from "@/components/ui/icons/star-icon";
 import { Tabs } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { SafeAreaView } from "react-native";
+import { SafeAreaView, Text, View } from "react-native";
 
 export default function ProtectedLayout() {
 	return (
-		<VerifyAccess redirect="/">
+		<VerifyAccess
+			fallback={
+				<View className="flex-1 flex items-center justify-center">
+					<Text>No subscription</Text>
+				</View>
+			}
+		>
 			<SafeAreaView style={{ flex: 1, backgroundColor: "#0f172a", padding: 0 }}>
 				<StatusBar style={"light"} />
 				<Tabs

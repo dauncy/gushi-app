@@ -6,11 +6,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAudio } from "@/context/AudioContext";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { StoryPreview } from "@/convex/schema/stories.schema";
+import { presentPaywall } from "@/lib/revenue-cat";
 import { secondsToMinuteString } from "@/lib/utils";
 import { BlurView } from "expo-blur";
-import { Link } from "expo-router";
 import { useMemo, useRef } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, TouchableOpacity, View } from "react-native";
 import { Stop } from "../ui/icons/stop-icon";
 import { StoryImagePreview } from "./story-image";
 
@@ -50,7 +50,7 @@ export const StoryCard = ({ story, onCardPress }: { story: StoryPreview; onCardP
 
 	if (locked) {
 		return (
-			<Link href="/upgrade">
+			<TouchableOpacity activeOpacity={0.8} onPress={presentPaywall}>
 				<View className="flex w-full p-3 rounded-xl bg-slate-900 p-4 flex-row  w-full gap-4 border border-slate-800 relative">
 					<StoryImagePreview imageUrl={story.imageUrl} />
 					<View className="flex flex-col gap-y-1 flex-1 mt-0.5">
@@ -81,7 +81,7 @@ export const StoryCard = ({ story, onCardPress }: { story: StoryPreview; onCardP
 					</View>
 					<BlurView intensity={5} tint="dark" className="absolute inset-0 rounded-xl bg-black " style={{ zIndex: 2 }} />
 				</View>
-			</Link>
+			</TouchableOpacity>
 		);
 	}
 

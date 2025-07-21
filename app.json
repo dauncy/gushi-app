@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/thumbnail.png",
-    "scheme": "dreamdrop",
+    "scheme": "tuckedin",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -15,7 +15,8 @@
         "UIBackgroundModes": [
           "audio"
         ]
-      }
+      },
+      "appleTeamId": "X2HJ883WPZ"
     },
     "android": {
       "adaptiveIcon": {

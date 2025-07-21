@@ -11,7 +11,8 @@
     "lint": "eslint . --fix",
     "prepare": "husky",
     "typecheck": "bunx tsc --noEmit",
-    "convex:dev": "bunx convex dev"
+    "convex:dev": "bunx convex dev",
+    "convex:ios": "ngrok start --all --config=./ngrok.yaml"
   },
   "dependencies": {
     "@convex-dev/action-cache": "^0.2.10",
@@ -51,7 +52,8 @@
     "react-dom": "19.0.0",
     "react-native": "0.79.3",
     "react-native-gesture-handler": "~2.24.0",
-    "react-native-purchases": "^8.11.6",
+    "react-native-purchases": "^9.0.0",
+    "react-native-purchases-ui": "^9.0.0",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",

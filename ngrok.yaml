@@ -1,0 +1,10 @@
+version: 3
+agent:
+  authtoken: 1li98PnHgKNlmZ6LvjgTrVhMrHI_6bzZ6Co7RibukytSb1PoR
+tunnels:
+  actions:
+    addr: 3211
+    proto: http
+  client:
+    addr: 3210
+    proto: http

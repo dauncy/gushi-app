@@ -29,3 +29,8 @@ export const getCustomerCached = async (
 	const customer = await customerCache.fetch(ctx, { revenuecatUserId: args.revenuecatUserId });
 	return customer;
 };
+
+export const revalidateCustomer = async (ctx: CacheCtx, args: { revenuecatUserId: string }) => {
+	await customerCache.remove(ctx, { revenuecatUserId: args.revenuecatUserId });
+	return await customerCache.fetch(ctx, { revenuecatUserId: args.revenuecatUserId });
+};
