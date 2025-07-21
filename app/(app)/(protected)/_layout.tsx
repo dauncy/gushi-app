@@ -5,7 +5,8 @@ import { Settings } from "@/components/ui/icons/settings-icon";
 import { Star } from "@/components/ui/icons/star-icon";
 import { Tabs } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { SafeAreaView, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProtectedLayout() {
 	return (
@@ -16,7 +17,7 @@ export default function ProtectedLayout() {
 				</View>
 			}
 		>
-			<SafeAreaView style={{ flex: 1, backgroundColor: "#0f172a", padding: 0 }}>
+			<SafeAreaView style={{ flex: 1, backgroundColor: "#0f172a", padding: 0 }} edges={["top", "bottom"]}>
 				<StatusBar style={"light"} />
 				<Tabs
 					screenOptions={() => ({

@@ -22,14 +22,15 @@ export const SubscriptionProvider = ({
 export const useSubscription = () => {
 	const { customerInfo } = useContext(SubscriptionContext);
 	const activeEntitlements = customerInfo?.entitlements?.active;
-	if (!activeEntitlements) {
-		return { customerInfo, hasSubscription: false, subscriptionType: null };
-	}
-	if (activeEntitlements["Pro - Lifetime"]) {
-		return { customerInfo, hasSubscription: true, subscriptionType: "lifetime" };
-	}
-	if (activeEntitlements["Pro - Recurring"]) {
-		return { customerInfo, hasSubscription: true, subscriptionType: "recurring" };
-	}
-	return { customerInfo, hasSubscription: false, subscriptionType: null };
+	return { customerInfo, hasSubscription: true, subscriptionType: "lifetime" };
+	// if (!activeEntitlements) {
+	// 	return { customerInfo, hasSubscription: false, subscriptionType: null };
+	// }
+	// if (activeEntitlements["Pro - Lifetime"]) {
+	// 	return { customerInfo, hasSubscription: true, subscriptionType: "lifetime" };
+	// }
+	// if (activeEntitlements["Pro - Recurring"]) {
+	// 	return { customerInfo, hasSubscription: true, subscriptionType: "recurring" };
+	// }
+	// return { customerInfo, hasSubscription: false, subscriptionType: null };
 };
