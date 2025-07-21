@@ -1,7 +1,7 @@
 import { AudioLines } from "@/components/ui/icons/audio-lines-icon";
 import { FileX } from "@/components/ui/icons/image-fail-icon";
 import { Image } from "@/components/ui/image";
-import { cn } from "@/lib/utils";
+import { cn, sanitizeStorageUrl } from "@/lib/utils";
 import { cva } from "class-variance-authority";
 import { useState } from "react";
 import { View } from "react-native";
@@ -39,7 +39,11 @@ export const StoryImagePreview = ({
 	}
 	return (
 		<View className={cn(imageVariants({ size }), "relative")}>
-			<Image source={{ uri: imageUrl }} className={cn(imageVariants({ size }))} onError={() => setError(true)} />
+			<Image
+				source={{ uri: sanitizeStorageUrl(imageUrl) }}
+				className={cn(imageVariants({ size }))}
+				onError={() => setError(true)}
+			/>
 			{active && (
 				<View className="absolute inset-0 bg-black/50 rounded-md flex items-center justify-center">
 					<AudioLines className="text-slate-300" size={size === "default" ? 20 : 16} />

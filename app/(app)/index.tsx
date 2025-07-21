@@ -7,6 +7,7 @@ import { useSubscription } from "@/context/SubscriptionContext";
 import { api } from "@/convex/_generated/api";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { presentPaywall } from "@/lib/revenue-cat";
+import { sanitizeStorageUrl } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
 import { Redirect } from "expo-router";
 import { useCallback } from "react";
@@ -35,7 +36,7 @@ export default function Home() {
 const StoryList = () => {
 	const { play, setStory } = useAudio();
 	const { isLoading, refreshing, refresh, loadMore, results, status } = useConvexPaginatedQuery(
-		api.stories.getStories,
+		api.stories.queries.getStories,
 		{},
 		{
 			initialNumItems: 10,
@@ -61,7 +62,10 @@ const StoryList = () => {
 						story={item}
 						onCardPress={() => {
 							if (item.audioUrl) {
-								setStory({ storyUrl: item.audioUrl, storyId: item._id });
+								setStory({
+									storyUrl: sanitizeStorageUrl(item.audioUrl),
+									storyId: item._id,
+								});
 								play();
 							}
 						}}

@@ -25,16 +25,18 @@ export const verifyAccess = async (
 		throw new ConvexError("Unauthorized");
 	}
 
-	if (validateSubscription) {
-		const hasEntitlement = customer.active_entitlements.items.pop();
-		if (!hasEntitlement) {
-			throw new ConvexError("Unauthorized");
-		}
-
-		if (hasEntitlement.expires_at && new Date(hasEntitlement.expires_at).toISOString() < new Date().toISOString()) {
-			throw new ConvexError("Subscription expired");
-		}
+	const maybeEntitlement = customer.active_entitlements.items.pop();
+	if (
+		(maybeEntitlement && maybeEntitlement.expires_at === null) ||
+		(maybeEntitlement?.expires_at && new Date(maybeEntitlement?.expires_at).toISOString() >= new Date().toISOString())
+	) {
 		hasSubscription = true;
+	}
+
+	if (validateSubscription) {
+		if (!hasSubscription) {
+			throw new ConvexError("No Subscription");
+		}
 	}
 
 	return { customer, dbUser, hasSubscription };

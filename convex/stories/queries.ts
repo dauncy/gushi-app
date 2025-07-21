@@ -1,9 +1,9 @@
+import { Id } from "@/convex/_generated/dataModel";
+import { query, QueryCtx } from "@/convex/_generated/server";
+import { verifyAccess } from "@/convex/common";
+import { StoryExtended, StoryPreview } from "@/convex/stories/schema";
 import { zid, zodToConvex } from "convex-helpers/server/zod";
 import { paginationOptsValidator, PaginationResult } from "convex/server";
-import { Id } from "./_generated/dataModel";
-import { query, QueryCtx } from "./_generated/server";
-import { verifyAccess } from "./common";
-import { StoryExtended, StoryPreview } from "./schema/stories.schema";
 
 export const getImageUrl = async (ctx: QueryCtx, imageId: Id<"images">) => {
 	const image = await ctx.db.get(imageId);

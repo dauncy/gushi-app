@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import * as Device from "expo-device";
 import { Platform } from "react-native";
 import { twMerge } from "tailwind-merge";
 
@@ -25,4 +26,20 @@ export const secondsToMinuteString = (seconds: number) => {
 	const minutes = Math.floor(d / 60);
 	const remainingSeconds = d % 60;
 	return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+};
+
+export const sanitizeStorageUrl = (url: string) => {
+	if (!__DEV__) {
+		return url;
+	}
+
+	if (!Device.isDevice) {
+		return url;
+	}
+
+	if (Platform.OS !== "ios") {
+		return url;
+	}
+
+	return url.replace("http://127.0.0.1:3210", process.env.EXPO_PUBLIC_CONVEX_URL ?? "");
 };

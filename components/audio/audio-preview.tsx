@@ -21,7 +21,7 @@ export const AudioPreviewPlayer = ({
 	const { isPlaying, play, pause, stop, storyId } = useAudio();
 
 	const { data: story } = useConvexQuery(
-		api.stories.getStory,
+		api.stories.queries.getStory,
 		{
 			storyId: storyId as Id<"stories">,
 		},

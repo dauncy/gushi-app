@@ -1,6 +1,6 @@
 import { defineSchema } from "convex/server";
 import { jwtKeys } from "./auth";
-import { audio, images, stories } from "./schema/stories.schema";
+import { audio, images, stories } from "./stories";
 import { users } from "./users";
 
 const schema = defineSchema({

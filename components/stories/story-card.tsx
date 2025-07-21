@@ -5,9 +5,9 @@ import { Play } from "@/components/ui/icons/play-icon";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAudio } from "@/context/AudioContext";
 import { useSubscription } from "@/context/SubscriptionContext";
-import { StoryPreview } from "@/convex/schema/stories.schema";
+import { StoryPreview } from "@/convex/stories/schema";
 import { presentPaywall } from "@/lib/revenue-cat";
-import { secondsToMinuteString } from "@/lib/utils";
+import { sanitizeStorageUrl, secondsToMinuteString } from "@/lib/utils";
 import { BlurView } from "expo-blur";
 import { useMemo, useRef } from "react";
 import { Pressable, Text, TouchableOpacity, View } from "react-native";
@@ -142,7 +142,7 @@ export const StoryCard = ({ story, onCardPress }: { story: StoryPreview; onCardP
 								return;
 							}
 							pressableRef.current = false;
-							setStory({ storyUrl: story.audioUrl, storyId: story._id });
+							setStory({ storyUrl: sanitizeStorageUrl(story.audioUrl), storyId: story._id });
 							play();
 							setTimeout(() => {
 								pressableRef.current = true;

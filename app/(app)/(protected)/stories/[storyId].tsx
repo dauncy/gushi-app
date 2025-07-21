@@ -13,9 +13,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAudio } from "@/context/AudioContext";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { SegmentTranscript, StoryExtended } from "@/convex/schema/stories.schema";
+import { SegmentTranscript, StoryExtended } from "@/convex/stories/schema";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
-import { cn } from "@/lib/utils";
+import { cn, sanitizeStorageUrl } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { BlurView } from "expo-blur";
 import { useLocalSearchParams } from "expo-router";
@@ -39,7 +39,7 @@ const formatTime = (seconds: number) => {
 
 export default function StoryPage() {
 	const { storyId } = useLocalSearchParams();
-	const { data, isLoading } = useConvexQuery(api.stories.getStory, { storyId: storyId as Id<"stories"> });
+	const { data, isLoading } = useConvexQuery(api.stories.queries.getStory, { storyId: storyId as Id<"stories"> });
 
 	return (
 		<SafeAreaView className="flex-1 bg-slate-900 flex">
@@ -387,7 +387,11 @@ const StoryImage = ({ imageUrl, disableAnimation }: { imageUrl: string | null; d
 					!disableAnimation && animatedStyle,
 				]}
 			>
-				<Image source={{ uri: imageUrl }} className="w-full rounded-xl aspect-square" onError={() => setError(true)} />
+				<Image
+					source={{ uri: sanitizeStorageUrl(imageUrl) }}
+					className="w-full rounded-xl aspect-square"
+					onError={() => setError(true)}
+				/>
 			</Animated.View>
 		</View>
 	);

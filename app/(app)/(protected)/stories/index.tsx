@@ -3,6 +3,7 @@ import { StoryCard, StoryCardLoading } from "@/components/stories/story-card";
 import { useAudio } from "@/context/AudioContext";
 import { api } from "@/convex/_generated/api";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
+import { sanitizeStorageUrl } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { useCallback } from "react";
@@ -27,7 +28,7 @@ const StoryList = () => {
 	const router = useRouter();
 	const { play, setStory, storyId, isPlaying } = useAudio();
 	const { isLoading, refreshing, refresh, loadMore, results, status } = useConvexPaginatedQuery(
-		api.stories.getStories,
+		api.stories.queries.getStories,
 		{},
 		{
 			initialNumItems: 10,
@@ -54,7 +55,7 @@ const StoryList = () => {
 						onCardPress={() => {
 							if (item.audioUrl) {
 								if (storyId !== item._id) {
-									setStory({ storyUrl: item.audioUrl, storyId: item._id });
+									setStory({ storyUrl: sanitizeStorageUrl(item.audioUrl), storyId: item._id });
 									play();
 									router.push(`/stories/${item._id}`);
 								} else {

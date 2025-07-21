@@ -1,8 +1,8 @@
+import { Id } from "@/convex/_generated/dataModel";
 import { Nullable } from "@/lib/types";
 import { zid, zodToConvex } from "convex-helpers/server/zod";
 import { defineTable } from "convex/server";
 import { z } from "zod";
-import { Id } from "../_generated/dataModel";
 
 export const images = defineTable(
 	zodToConvex(
