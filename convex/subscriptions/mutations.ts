@@ -1,16 +1,12 @@
+import { internal } from "@/convex/_generated/api";
 import { mutation } from "@/convex/_generated/server";
 import { verifyAccess } from "@/convex/common/utils";
-import { zodToConvex } from "convex-helpers/server/zod";
-import { ConvexError } from "convex/values";
-import { z } from "zod";
-import { internal } from "../_generated/api";
+import { ConvexError, v } from "convex/values";
 
 export const bustSubscriptionCache = mutation({
-	args: zodToConvex(
-		z.object({
-			revenueCatId: z.string(),
-		}),
-	),
+	args: {
+		revenueCatId: v.string(),
+	},
 	handler: async (ctx, args) => {
 		const { dbUser } = await verifyAccess(ctx, { validateSubscription: false });
 		const { revenueCatId } = args;

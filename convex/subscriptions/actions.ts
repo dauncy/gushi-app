@@ -30,16 +30,12 @@ export const getCustomerCached = async (
 	return customer;
 };
 
-export const revalidateCustomer = async (ctx: CacheCtx, args: { revenuecatUserId: string }) => {
-	await customerCache.remove(ctx, { revenuecatUserId: args.revenuecatUserId });
-	return await customerCache.fetch(ctx, { revenuecatUserId: args.revenuecatUserId });
-};
-
 export const bustCustomerCache = internalAction({
 	args: {
 		revenuecatUserId: v.string(),
 	},
 	handler: async (ctx, args): Promise<RevenueCatCustomer> => {
-		return await revalidateCustomer(ctx, { revenuecatUserId: args.revenuecatUserId });
+		await customerCache.remove(ctx, { revenuecatUserId: args.revenuecatUserId });
+		return await customerCache.fetch(ctx, { revenuecatUserId: args.revenuecatUserId });
 	},
 });

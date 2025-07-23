@@ -10,7 +10,8 @@ export const verifyAccess = async (
 ) => {
 	const userIdentity = await ctx.auth.getUserIdentity();
 	const revenueCatUserId: string | undefined = userIdentity?.revenuecat_user_id as string | undefined;
-	let hasSubscription = true;
+	let hasSubscription = false;
+
 	if (!revenueCatUserId) {
 		throw new ConvexError("Unauthorized");
 	}

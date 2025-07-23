@@ -68,7 +68,7 @@ export const getStory = query({
 		storyId: zodToConvex(zid("stories").nullable()),
 	},
 	handler: async (ctx, { storyId }): Promise<StoryExtended | null> => {
-		const { hasSubscription, dbUser } = await verifyAccess(ctx, { validateSubscription: false });
+		const { hasSubscription, dbUser } = await verifyAccess(ctx, { validateSubscription: true });
 		if (!storyId) {
 			return null;
 		}
