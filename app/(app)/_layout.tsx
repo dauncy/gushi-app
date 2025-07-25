@@ -26,6 +26,12 @@ export default function AppLayout() {
 			<StatusBar style={isDarkColorScheme ? "light" : "dark"} />
 
 			<Stack
+				screenOptions={{
+					headerShown: false,
+					contentStyle: {
+						backgroundColor: "#0f172a",
+					},
+				}}
 				layout={({ children }) => (
 					<View className="flex-1">
 						<RenderLayout>{children}</RenderLayout>
@@ -33,6 +39,22 @@ export default function AppLayout() {
 				)}
 			>
 				{RenderRoot}
+				<Stack.Screen
+					name="upgrade"
+					options={{
+						headerShown: false,
+						presentation: "modal",
+						sheetCornerRadius: 48,
+						gestureEnabled: true,
+						animation: "slide_from_bottom",
+						animationDuration: 300,
+						sheetGrabberVisible: true,
+						contentStyle: {
+							backgroundColor: "#0f172a",
+							height: "100%",
+						},
+					}}
+				/>
 				<Stack.Screen name="+not-found" options={{ headerShown: false }} />
 			</Stack>
 		</AudioProvider>

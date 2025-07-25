@@ -1,5 +1,6 @@
 import { internal } from "@/convex/_generated/api";
 import { httpAction } from "@/convex/_generated/server";
+import { getaSubscriptionType } from "../subscriptions";
 import { getCustomerCached } from "../subscriptions/actions";
 import { signJWT, verifyJWT } from "./utils";
 
@@ -48,9 +49,14 @@ export const loginHttp = httpAction(async (ctx, req) => {
 	if (!activeKey) {
 		return new Response("Internal Server Error", { status: 500 });
 	}
+
+	const subscriptionType = getaSubscriptionType(customer);
+
 	const dbUser = await ctx.runMutation(internal.users.mutations.upsertUser, {
 		revenuecatUserId: revenuecat_user_id,
+		subscriptionType,
 	});
+
 	if (!dbUser) {
 		return new Response("failed to find user", { status: 404 });
 	}
@@ -100,12 +106,14 @@ export const refreshHttp = httpAction(async (ctx, req) => {
 				headers: { "Content-Type": "application/json" },
 			});
 		}
+		const subscriptionType = getaSubscriptionType(customer);
 		let dbUser = await ctx.runQuery(internal.users.queries.getUserByRevenuecatUserId, {
-			revenuecatUserId: revenuecat_user_id,
+			revenuecatUserId: customer.id,
 		});
 		if (force_refresh) {
 			dbUser = await ctx.runMutation(internal.users.mutations.upsertUser, {
-				revenuecatUserId: revenuecat_user_id,
+				revenuecatUserId: customer.id,
+				subscriptionType,
 			});
 			if (!dbUser) {
 				return new Response(JSON.stringify({ error: "Failed to refresh user" }), {
@@ -114,6 +122,7 @@ export const refreshHttp = httpAction(async (ctx, req) => {
 				});
 			}
 		}
+
 		// Generate new JWT
 		const token = await signJWT(
 			{

@@ -8,7 +8,7 @@ import { useMutation } from "convex/react";
 import { useGlobalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { z } from "zod";
 
@@ -77,92 +77,102 @@ export default function FeedbackPage() {
 
 	return (
 		<SafeAreaView className="flex-1 flex flex-col gap-y-12" edges={["top", "bottom", "left", "right"]}>
-			<View className="w-full flex flex-col items-center">
-				<View className="w-full flex flex-col gap-y-2 p-4 pt-6 items-center">
-					<Text className="text-slate-300 text-xl font-medium">
-						{type === "feature" ? "Request a Feature" : "Report a Bug"}
-					</Text>
-					<Text className="text-slate-400 text-base w-2/3 text-center">
-						Help us improve the app! We want to hear from you.
-					</Text>
-				</View>
-				<View className="w-full h-[1px] bg-zinc-600" />
-			</View>
-			<View className="w-full flex flex-col gap-y-4 px-2 flex-1">
-				<Form {...form}>
-					<FormField
-						control={form.control}
-						name="title"
-						render={({ field }) => (
-							<FormItem className="w-full mt-5">
-								<FormInput
-									disabled={pending}
-									label="Title"
-									{...field}
-									description="Something short..."
-									placeholder="Enter a title"
-									className={cn("w-full rounded-xl items-center", pending && "opacity-50")}
-								/>
-							</FormItem>
-						)}
-					/>
+			<KeyboardAvoidingView className="flex-1" behavior={"padding"} keyboardVerticalOffset={0}>
+				<ScrollView
+					className="flex-1"
+					keyboardShouldPersistTaps="handled"
+					alwaysBounceVertical={false}
+					showsVerticalScrollIndicator={false}
+				>
+					<View className="w-full flex flex-col items-center">
+						<View className="w-full flex flex-col gap-y-2 p-4 pt-8 items-center">
+							<Text className="text-slate-300 text-xl font-medium">
+								{type === "feature" ? "Request a Feature" : "Report a Bug"}
+							</Text>
+							<Text className="text-slate-400 text-base w-2/3 text-center">
+								Help us improve the app! We want to hear from you.
+							</Text>
+						</View>
+						<View className="w-full h-[1px] bg-zinc-600" />
+					</View>
+					<View className="w-full flex flex-col gap-y-4 px-4 flex-1">
+						<Form {...form}>
+							<FormField
+								control={form.control}
+								name="title"
+								render={({ field }) => (
+									<FormItem className="w-full mt-5">
+										<FormInput
+											disabled={pending}
+											label="Title"
+											{...field}
+											description="Something short..."
+											placeholder="Enter a title"
+											className={cn("w-full rounded-xl items-center", pending && "opacity-50")}
+										/>
+									</FormItem>
+								)}
+							/>
 
-					<FormField
-						control={form.control}
-						name="email"
-						render={({ field }) => (
-							<FormItem className="w-full mt-5">
-								<FormInput
-									disabled={pending}
-									label="Email"
-									description="Optional"
-									{...field}
-									value={field.value ?? ""}
-									placeholder="your email"
-									className={cn("w-full rounded-xl", pending && "opacity-50")}
-								/>
-							</FormItem>
-						)}
-					/>
+							<FormField
+								control={form.control}
+								name="email"
+								render={({ field }) => (
+									<FormItem className="w-full mt-5">
+										<FormInput
+											disabled={pending}
+											label="Email"
+											description="Optional"
+											{...field}
+											keyboardType={"email-address"}
+											autoCapitalize={"none"}
+											value={field.value ?? ""}
+											placeholder="your email"
+											className={cn("w-full rounded-xl", pending && "opacity-50")}
+										/>
+									</FormItem>
+								)}
+							/>
 
-					<FormField
-						control={form.control}
-						name="body"
-						render={({ field }) => (
-							<FormItem className="w-full mt-5">
-								<FormLabel nativeID="message-label" disabled={pending}>
-									Message
-								</FormLabel>
-								<Textarea
-									onChangeText={(text) => {
-										form.setValue("body", text);
-									}}
-									value={field.value ?? ""}
-									placeholder={type === "feature" ? "What would you like to see?" : "What went wrong?"}
-									className={cn("w-full rounded-xl", pending && "opacity-50")}
-								/>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</Form>
-				<View className="w-full flex py-6  mt-auto ">
-					<Button
-						disabled={pending}
-						className="w-full bg-teal-500 border-teal-100 border rounded-xl flex items-center justify-center"
-						onPress={() => {
-							console.log("onPress", form.getValues());
-							form.handleSubmit(onSubmit)();
-						}}
-					>
-						{pending ? (
-							<ActivityIndicator size="small" color="#e2e8f0" />
-						) : (
-							<Text className="text-slate-200 text-lg font-medium">{"Submit"}</Text>
-						)}
-					</Button>
-				</View>
-			</View>
+							<FormField
+								control={form.control}
+								name="body"
+								render={({ field }) => (
+									<FormItem className="w-full mt-5">
+										<FormLabel nativeID="message-label" disabled={pending}>
+											Message
+										</FormLabel>
+										<Textarea
+											onChangeText={(text) => {
+												form.setValue("body", text);
+											}}
+											value={field.value ?? ""}
+											placeholder={type === "feature" ? "What would you like to see?" : "What went wrong?"}
+											className={cn("w-full rounded-xl h-36", pending && "opacity-50")}
+										/>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</Form>
+						<View className="w-full flex py-6  mt-auto ">
+							<Button
+								disabled={pending}
+								className="w-full bg-teal-500 border-teal-100 border rounded-xl flex items-center justify-center"
+								onPress={() => {
+									form.handleSubmit(onSubmit)();
+								}}
+							>
+								{pending ? (
+									<ActivityIndicator size="small" color="#e2e8f0" />
+								) : (
+									<Text className="text-slate-200 text-lg font-medium">{"Submit"}</Text>
+								)}
+							</Button>
+						</View>
+					</View>
+				</ScrollView>
+			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);
 }

@@ -1,8 +1,16 @@
+import { zodToConvex } from "convex-helpers/server/zod";
 import { defineTable } from "convex/server";
-import { v } from "convex/values";
+import { z } from "zod";
 
-export const users = defineTable({
-	createdAt: v.number(),
-	updatedAt: v.number(),
-	revenuecatUserId: v.string(),
-}).index("by_revenuecat_user_id", ["revenuecatUserId"]);
+export const SubscriptionType = z.enum(["monthly", "lifetime"]);
+
+export const users = defineTable(
+	zodToConvex(
+		z.object({
+			createdAt: z.string().datetime(),
+			updatedAt: z.string().datetime(),
+			revenuecatUserId: z.string(),
+			subscriptionType: z.enum(["monthly", "lifetime"]).optional().nullable(),
+		}),
+	),
+).index("by_revenuecat_user_id", ["revenuecatUserId"]);

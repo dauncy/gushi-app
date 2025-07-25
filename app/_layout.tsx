@@ -1,3 +1,4 @@
+import { toastConfig } from "@/components/ui/toast";
 import { AuthProvider, ConvexProviderWithCustomAuth } from "@/context/AuthContext";
 import { SubscriptionProvider } from "@/context/SubscriptionContext";
 import { NAV_THEME } from "@/lib/constants";
@@ -11,6 +12,7 @@ import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Purchases, { CustomerInfo } from "react-native-purchases";
 import "react-native-reanimated";
+import Toast from "react-native-toast-message";
 import "../global.css";
 
 const DARK_THEME: Theme = {
@@ -33,10 +35,14 @@ const initRevenueCat = async (onUpdate: (customerInfo: CustomerInfo) => void) =>
 		throw new Error("EXPO_PUBLIC_REVENUE_PUBLIC_KEY is not set");
 	}
 	Purchases.configure({ apiKey: appleKey });
-	Purchases.addCustomerInfoUpdateListener((customerInfo) => {
-		console.log("[RootLayout.tsx]: onUpdate() =>  customerInfo  ", customerInfo);
-		onUpdate(customerInfo);
+	const customerInfo = await new Promise<CustomerInfo>((resolve, reject) => {
+		Purchases.addCustomerInfoUpdateListener(async (customerInfo) => {
+			console.log("[RootLayout.tsx]: Customer info update: ", customerInfo);
+			onUpdate(customerInfo);
+			resolve(customerInfo);
+		});
 	});
+	console.log("[RootLayout.tsx]: Customer info", customerInfo);
 };
 
 export default function RootLayout() {
@@ -89,6 +95,7 @@ export default function RootLayout() {
 						<QueryClientProvider client={queryClient}>
 							<GestureHandlerRootView onLayout={onLayoutRootView} style={{ flex: 1, backgroundColor: "#0f172a" }}>
 								<Slot />
+								<Toast config={toastConfig} position={"top"} topOffset={48} />
 							</GestureHandlerRootView>
 						</QueryClientProvider>
 					</ConvexProviderWithCustomAuth>

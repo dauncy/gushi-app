@@ -3,7 +3,9 @@ import RevenueCatUI, { PAYWALL_RESULT } from "react-native-purchases-ui";
 export async function presentPaywall(): Promise<boolean> {
 	try {
 		// Present paywall for current offering:
-		const paywallResult: PAYWALL_RESULT = await RevenueCatUI.presentPaywall();
+		const paywallResult: PAYWALL_RESULT = await RevenueCatUI.presentPaywallIfNeeded({
+			requiredEntitlementIdentifier: "pro",
+		});
 		// or if you need to present a specific offering:
 		switch (paywallResult) {
 			case PAYWALL_RESULT.NOT_PRESENTED:

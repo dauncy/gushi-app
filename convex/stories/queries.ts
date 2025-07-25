@@ -24,7 +24,7 @@ export const getAudioUrl = async (ctx: QueryCtx, audioId: Id<"audio">) => {
 export const getStories = query({
 	args: { paginationOpts: paginationOptsValidator },
 	handler: async (ctx, { paginationOpts }): Promise<PaginationResult<StoryPreview>> => {
-		const { hasSubscription } = await verifyAccess(ctx, { validateSubscription: false });
+		const { hasSubscription, dbUser } = await verifyAccess(ctx, { validateSubscription: false });
 		const storiesPage = await ctx.db
 			.query("stories")
 			.withIndex("by_enabled", (q) => q.eq("enabled", true))
@@ -68,10 +68,10 @@ export const getStory = query({
 		storyId: zodToConvex(zid("stories").nullable()),
 	},
 	handler: async (ctx, { storyId }): Promise<StoryExtended | null> => {
-		const { hasSubscription, dbUser } = await verifyAccess(ctx, { validateSubscription: true });
 		if (!storyId) {
 			return null;
 		}
+		const { hasSubscription, dbUser } = await verifyAccess(ctx, { validateSubscription: true });
 		const maybeStory = await ctx.db.get(storyId);
 		if (!maybeStory) {
 			return null;

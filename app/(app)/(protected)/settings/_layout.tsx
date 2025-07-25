@@ -8,7 +8,7 @@ export default function SettingsLayout() {
 				name="feedback"
 				options={{
 					headerShown: false,
-					presentation: "formSheet",
+					presentation: "modal",
 					sheetCornerRadius: 48,
 					sheetGrabberVisible: true,
 					animation: "slide_from_bottom",

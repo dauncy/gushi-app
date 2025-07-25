@@ -1,5 +1,6 @@
 import { httpRouter } from "convex/server";
 import { getWellKnownJWKsHttp, loginHttp, refreshHttp } from "./auth/http";
+import { revalidateCustomerHttpAction, subscriptionWebhooksHttpAction } from "./subscriptions/http";
 import { upsertUserHttp } from "./users/http";
 
 const http = httpRouter();
@@ -26,6 +27,18 @@ http.route({
 	path: "/users/me",
 	method: "POST",
 	handler: upsertUserHttp,
+});
+
+http.route({
+	path: "/subscriptions/revalidate",
+	method: "POST",
+	handler: revalidateCustomerHttpAction,
+});
+
+http.route({
+	path: "/webhooks/payments",
+	method: "POST",
+	handler: subscriptionWebhooksHttpAction,
 });
 
 export default http;

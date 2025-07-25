@@ -8,7 +8,7 @@ const Textarea = React.forwardRef<React.ElementRef<typeof TextInput>, TextInputP
 			<TextInput
 				ref={ref}
 				className={cn(
-					"web:flex min-h-[80px] w-full rounded-md border border-slate-500 bg-slate-700 px-3 py-2 text-lg leading-[1.25] text-slate-200  web:ring-offset-background placeholder:text-slate-400 web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2",
+					"web:flex min-h-[80px] w-full rounded-md border border-slate-500 bg-slate-800 px-3 py-2 text-lg leading-[1.25] text-slate-200  web:ring-offset-background placeholder:text-slate-400 web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2",
 					props.editable === false && "opacity-50 web:cursor-not-allowed",
 					className,
 				)}

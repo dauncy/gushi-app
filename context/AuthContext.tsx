@@ -16,18 +16,23 @@ const AuthContext = createContext<{
 	dbUser: Doc<"users"> | null;
 	setDbUser: (user: Doc<"users"> | null) => void;
 	setJwtClaims: (claims: JWTPayload | null) => void;
+	token: string | null;
+	setToken: (token: string | null) => void;
 }>({
 	jwtClaims: null,
 	loading: false,
 	dbUser: null,
 	setDbUser: () => {},
 	setJwtClaims: () => {},
+	token: null,
+	setToken: () => {},
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const [loading, setLoading] = useState(true);
 	const [jwtClaims, setJwtClaims] = useState<JWTPayload | null>(null);
 	const [dbUser, setDbUser] = useState<Doc<"users"> | null>(null);
+	const [token, setToken] = useState<string | null>(null);
 	const { customerInfo } = useSubscription();
 
 	const customerId = useMemo(() => {
@@ -54,6 +59,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 				const data = await res.json();
 				setJwtClaims(data.claims);
 				setDbUser(data.dbUser);
+				setToken(data.token);
 				return null;
 			} catch (error) {
 				console.error(error);
@@ -64,7 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		};
 
 		handleLogin();
-	}, [customerId, setJwtClaims, setLoading]);
+	}, [customerId, setJwtClaims, setLoading, setToken]);
 
 	return (
 		<AuthContext.Provider
@@ -74,6 +80,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 				dbUser,
 				setDbUser,
 				setJwtClaims,
+				token,
+				setToken,
 			}}
 		>
 			{children}
@@ -82,13 +90,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useAuth = () => {
-	const { jwtClaims, loading, dbUser, setDbUser, setJwtClaims } = useContext(AuthContext);
+	const { jwtClaims, loading, dbUser, setDbUser, setJwtClaims, token, setToken } = useContext(AuthContext);
 	return {
 		jwtClaims,
 		loading,
 		dbUser,
 		setDbUser,
 		setJwtClaims,
+		token,
+		setToken,
 	};
 };
 
@@ -108,7 +118,7 @@ export const ConvexProviderWithCustomAuth = ({
 
 const useCustomAuth = () => {
 	// Only use state here, not actions - prevents unnecessary re-renders
-	const { loading, dbUser } = useAuth();
+	const { loading, dbUser, setToken } = useAuth();
 	const { customerInfo } = useSubscription();
 	const customerId = useMemo(() => {
 		return customerInfo?.originalAppUserId;
@@ -135,9 +145,10 @@ const useCustomAuth = () => {
 				return null;
 			}
 			const data = await res.json();
+			setToken(data.token);
 			return data.token;
 		},
-		[customerId, dbUser],
+		[customerId, dbUser, setToken],
 	);
 
 	return useMemo(() => {

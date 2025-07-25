@@ -1,24 +1,27 @@
 import { internal } from "@/convex/_generated/api";
-import { mutation } from "@/convex/_generated/server";
-import { verifyAccess } from "@/convex/common/utils";
+import { action } from "@/convex/_generated/server";
 import { ConvexError, v } from "convex/values";
 
-export const bustSubscriptionCache = mutation({
+export const bustSubscriptionCache = action({
 	args: {
 		revenueCatId: v.string(),
 	},
 	handler: async (ctx, args) => {
-		const { dbUser } = await verifyAccess(ctx, { validateSubscription: false });
-		const { revenueCatId } = args;
-
-		if (dbUser.revenuecatUserId !== revenueCatId) {
+		const identity = await ctx.auth.getUserIdentity();
+		if (!identity) {
 			throw new ConvexError("Unauthorized");
 		}
-
-		await ctx.scheduler.runAfter(0, internal.subscriptions.actions.bustCustomerCache, {
-			revenuecatUserId: revenueCatId,
+		console.log("[bustSubscriptionCache:() => identity", identity);
+		console.log("[bustSubscriptionCache:() => revenueCatId", args.revenueCatId);
+		const customerFromJWT = await ctx.runAction(internal.subscriptions.actions.getCustomerAction, {
+			revenuecatUserId: identity.subject,
+		});
+		const customerFromRevenueCat = await ctx.runAction(internal.subscriptions.actions.getCustomerAction, {
+			revenuecatUserId: args.revenueCatId,
 		});
 
+		console.log("[bustSubscriptionCache:() => customerFromJWT", customerFromJWT);
+		console.log("[bustSubscriptionCache:() => customerFromRevenueCat", customerFromRevenueCat);
 		return {
 			success: true,
 		};

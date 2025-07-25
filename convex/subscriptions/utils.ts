@@ -19,3 +19,17 @@ export const getCustomer = async (customerId: string): Promise<RevenueCatCustome
 	const data = await res.json();
 	return data;
 };
+
+export const getaSubscriptionType = (customer: RevenueCatCustomer) => {
+	const maybeEntitlement = customer.active_entitlements.items.pop();
+	if (!maybeEntitlement) {
+		return null;
+	}
+	if (maybeEntitlement.expires_at === null) {
+		return "lifetime";
+	}
+	if (maybeEntitlement.expires_at && new Date(maybeEntitlement.expires_at).toISOString() >= new Date().toISOString()) {
+		return "monthly";
+	}
+	return null;
+};
