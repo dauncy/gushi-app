@@ -29,7 +29,6 @@ import type * as subscriptions_actions from "../subscriptions/actions.js";
 import type * as subscriptions_http from "../subscriptions/http.js";
 import type * as subscriptions_index from "../subscriptions/index.js";
 import type * as subscriptions_mutations from "../subscriptions/mutations.js";
-import type * as subscriptions_queries from "../subscriptions/queries.js";
 import type * as subscriptions_utils from "../subscriptions/utils.js";
 import type * as users_http from "../users/http.js";
 import type * as users_index from "../users/index.js";
@@ -72,7 +71,6 @@ declare const fullApi: ApiFromModules<{
   "subscriptions/http": typeof subscriptions_http;
   "subscriptions/index": typeof subscriptions_index;
   "subscriptions/mutations": typeof subscriptions_mutations;
-  "subscriptions/queries": typeof subscriptions_queries;
   "subscriptions/utils": typeof subscriptions_utils;
   "users/http": typeof users_http;
   "users/index": typeof users_index;

@@ -37,12 +37,12 @@ const initRevenueCat = async (onUpdate: (customerInfo: CustomerInfo) => void) =>
 	Purchases.configure({ apiKey: appleKey });
 	const customerInfo = await new Promise<CustomerInfo>((resolve, reject) => {
 		Purchases.addCustomerInfoUpdateListener(async (customerInfo) => {
-			console.log("[RootLayout.tsx]: Customer info update: ", customerInfo);
+			console.log("[RootLayout.tsx]: Customer update: ", { customerID: customerInfo.originalAppUserId });
 			onUpdate(customerInfo);
 			resolve(customerInfo);
 		});
 	});
-	console.log("[RootLayout.tsx]: Customer info", customerInfo);
+	console.log("[RootLayout.tsx]: Customer: ", { customerID: customerInfo.originalAppUserId });
 };
 
 export default function RootLayout() {

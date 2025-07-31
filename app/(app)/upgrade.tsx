@@ -1,17 +1,18 @@
 import { toastConfig } from "@/components/ui/toast";
+import { useSubscription } from "@/context/SubscriptionContext";
 import { api } from "@/convex/_generated/api";
 import { useAction } from "convex/react";
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { Pressable, Text, View } from "react-native";
-import Purchases, { CustomerInfo } from "react-native-purchases";
+import { CustomerInfo } from "react-native-purchases";
 import RevenueCatUI from "react-native-purchases-ui";
 import Toast from "react-native-toast-message";
 
 export default function UpgradePage() {
+	const { customerInfo, hasSubscription } = useSubscription();
 	const router = useRouter();
 	const updateCustomer = useAction(api.subscriptions.mutations.bustSubscriptionCache);
-	const [success, setSuccess] = useState(false);
 	const handleToast = useCallback(() => {
 		Toast.show({
 			type: "proUpgrade",
@@ -19,32 +20,33 @@ export default function UpgradePage() {
 		});
 	}, []);
 
+	useEffect(() => {
+		console.log("[UpgradePage.tsx]: Customer: ", { customerID: customerInfo?.originalAppUserId });
+	}, [customerInfo]);
+
 	const handleDismiss = useCallback(() => {
 		router.back();
 	}, [router]);
 
 	const handlePurchaseCompleted = useCallback(async () => {
 		console.log("[UpgradePage.tsx]: Purchase completed");
-		const customerInfo = await Purchases.getCustomerInfo();
-		console.log("[UpgradePage.tsx]: Customer info", customerInfo);
-		await updateCustomer({ revenueCatId: customerInfo.originalAppUserId });
+		console.log("[UpgradePage.tsx]: Customer: ", { customerID: customerInfo?.originalAppUserId });
+		await updateCustomer({ revenueCatId: customerInfo?.originalAppUserId ?? "" });
 		handleToast();
-		setSuccess(true);
-	}, [handleToast, setSuccess, updateCustomer]);
+	}, [handleToast, updateCustomer, customerInfo]);
 
 	const handleRestorePurchase = useCallback(
 		async ({ customerInfo }: { customerInfo: CustomerInfo }) => {
-			console.log("[UpgradePage.tsx]: Restore purchase: ", customerInfo);
+			console.log("[UpgradePage.tsx]: Restore purchase: ", { customerID: customerInfo.originalAppUserId });
 			await updateCustomer({ revenueCatId: customerInfo.originalAppUserId });
 			handleToast();
-			setSuccess(true);
 		},
 		[handleToast, updateCustomer],
 	);
 
 	return (
 		<>
-			{!success ? (
+			{!hasSubscription ? (
 				<RevenueCatUI.Paywall
 					onPurchaseCompleted={handlePurchaseCompleted}
 					onPurchaseError={({ error }) => {

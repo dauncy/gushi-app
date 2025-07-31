@@ -32,6 +32,7 @@ export const getCustomerCachedAction = internalAction({
 });
 
 export const getCustomerCached = async (ctx: ActionCtx, { revenuecatUserId }: { revenuecatUserId: string }) => {
+	console.log("[getCustomerCached]: revenuecatUserId", revenuecatUserId);
 	const customer = await customerCache.fetch(ctx, { revenuecatUserId });
 	return customer;
 };

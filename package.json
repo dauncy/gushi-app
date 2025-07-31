@@ -12,7 +12,7 @@
     "prepare": "husky",
     "typecheck": "bunx tsc --noEmit",
     "convex:dev": "bunx convex dev",
-    "convex:ios": "ngrok start --all --config=./ngrok.yaml"
+    "convex:tunnel": "ngrok start --all --config=./ngrok.yaml"
   },
   "dependencies": {
     "@convex-dev/action-cache": "^0.2.10",

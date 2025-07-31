@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, ReactNode, useContext, useEffect } from "react";
 import { CustomerInfo } from "react-native-purchases";
 
 interface SubscriptionContextType {
@@ -16,6 +16,10 @@ export const SubscriptionProvider = ({
 	children: ReactNode;
 	customerInfo: CustomerInfo | null;
 }) => {
+	useEffect(() => {
+		console.log("[SubscriptionContext.tsx]: Customer info", { customerID: customerInfo?.originalAppUserId });
+	}, [customerInfo]);
+
 	return <SubscriptionContext.Provider value={{ customerInfo }}>{children}</SubscriptionContext.Provider>;
 };
 
