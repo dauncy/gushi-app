@@ -45,6 +45,23 @@ export default function AppLayout() {
 
 				<Stack.Screen name="(tabs)" options={{ headerShown: false, contentStyle: { backgroundColor: "#0f172a" } }} />
 
+				<Stack.Screen
+					name="stories"
+					options={{
+						headerShown: false,
+						fullScreenGestureEnabled: true,
+						sheetGrabberVisible: true,
+						sheetCornerRadius: 48,
+						headerLargeTitleShadowVisible: true,
+						presentation: "formSheet",
+						contentStyle: {
+							backgroundColor: "#0f172a",
+							height: "100%",
+						},
+						gestureEnabled: true,
+					}}
+				/>
+
 				<Stack.Screen name="+not-found" options={{ headerShown: false }} />
 			</Stack>
 		</AudioProvider>

@@ -70,13 +70,6 @@ export default function TabsLayout() {
 						),
 					}}
 				/>
-
-				<Tabs.Screen
-					name="stories"
-					options={{
-						href: null,
-					}}
-				/>
 			</Tabs>
 		</SafeAreaView>
 	);
