@@ -64,7 +64,7 @@ export default function UpgradePage() {
 					<Text className="text-lg text-slate-400 mt-3">{"Enjoy access to every story."}</Text>
 					<Pressable
 						className="bg-slate-800 rounded-xl py-2 px-4 mt-4 border border-slate-700"
-						onPress={() => router.replace("/(app)/(protected)/stories")}
+						onPress={() => router.dismissTo("/(app)/(tabs)")}
 					>
 						<Text className="text-lg text-slate-400 font-bold">{"Continue"}</Text>
 					</Pressable>

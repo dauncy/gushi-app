@@ -15,15 +15,11 @@ export default function TabsLayout() {
 			<Tabs
 				screenOptions={() => ({
 					header: () => <Header />,
-					// headerShown: false,
 					tabBarShowLabel: false,
 					tabBarStyle: {
 						...(hasSubscription === false ? { display: "none" } : {}),
 						backgroundColor: "#0f172a",
 						height: 60,
-						// height: 65,
-						// position: "absolute",
-						// overflow: "hidden",
 						borderWidth: 0,
 						borderColor: "transparent",
 						paddingTop: 10,
@@ -31,18 +27,13 @@ export default function TabsLayout() {
 						borderTopColor: "#334155",
 						borderTopWidth: 1,
 					},
-					sceneStyle: {
-						backgroundColor: "red",
-					},
 					tabBarActiveTintColor: "#e2e8f0",
 					tabBarInactiveTintColor: "#475569",
 					tabBarIconStyle: {
 						width: 24,
 						height: 24,
 					},
-
 					tabBarLabelStyle: {
-						// marginTop: 3,
 						fontSize: 10,
 						fontWeight: "500",
 						letterSpacing: -0.24,
@@ -52,7 +43,6 @@ export default function TabsLayout() {
 				<Tabs.Screen
 					name="index"
 					options={{
-						// href: "/(app)/(protected)/(home)",
 						title: "Home",
 						tabBarAccessibilityLabel: "Home",
 						tabBarIcon: ({ color, size, focused }) => (

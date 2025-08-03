@@ -10,7 +10,6 @@ export default function ThreadsLayout() {
 				},
 			}}
 		>
-			<Stack.Screen name="index" options={{ headerShown: false }} />
 			<Stack.Screen
 				name="[storyId]"
 				options={{

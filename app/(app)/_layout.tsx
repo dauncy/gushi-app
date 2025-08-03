@@ -26,13 +26,11 @@ export default function AppLayout() {
 					</View>
 				)}
 			>
-				<Stack.Screen name="index" options={{ headerShown: false }} />
-
 				<Stack.Screen
 					name="upgrade"
 					options={{
 						headerShown: false,
-						presentation: "modal",
+						presentation: "formSheet",
 						sheetCornerRadius: 48,
 						gestureEnabled: true,
 						animation: "slide_from_bottom",
@@ -45,10 +43,7 @@ export default function AppLayout() {
 					}}
 				/>
 
-				<Stack.Screen
-					name="(protected)"
-					options={{ headerShown: false, contentStyle: { backgroundColor: "#0f172a" } }}
-				/>
+				<Stack.Screen name="(tabs)" options={{ headerShown: false, contentStyle: { backgroundColor: "#0f172a" } }} />
 
 				<Stack.Screen name="+not-found" options={{ headerShown: false }} />
 			</Stack>
