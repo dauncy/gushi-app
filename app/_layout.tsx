@@ -1,13 +1,16 @@
 import { toastConfig } from "@/components/ui/toast";
+import { AudioProvider } from "@/context/AudioContext";
 import { AuthProvider, ConvexProviderWithCustomAuth } from "@/context/AuthContext";
 import { SubscriptionProvider } from "@/context/SubscriptionContext";
 import { NAV_THEME } from "@/lib/constants";
 import { convex, queryClient } from "@/lib/convex.client";
+import { useColorScheme } from "@/lib/useColorScheme";
 import { DarkTheme, Theme, ThemeProvider } from "@react-navigation/native";
 import { QueryClientProvider } from "@tanstack/react-query";
 import * as Font from "expo-font";
 import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Purchases, { CustomerInfo } from "react-native-purchases";
@@ -45,6 +48,7 @@ const initRevenueCat = async (onUpdate: (customerInfo: CustomerInfo) => void) =>
 };
 
 export default function RootLayout() {
+	const { isDarkColorScheme } = useColorScheme();
 	const hasMounted = useRef(false);
 	const initialCustomerRef = useRef(false);
 	const [appReady, setAppReady] = useState(false);
@@ -92,8 +96,11 @@ export default function RootLayout() {
 					<ConvexProviderWithCustomAuth client={convex}>
 						<QueryClientProvider client={queryClient}>
 							<GestureHandlerRootView onLayout={onLayoutRootView} style={{ flex: 1, backgroundColor: "#0f172a" }}>
-								<Slot />
-								<Toast config={toastConfig} position={"top"} topOffset={48} />
+								<AudioProvider>
+									<StatusBar style={isDarkColorScheme ? "light" : "dark"} />
+									<Slot />
+									<Toast config={toastConfig} position={"top"} topOffset={48} />
+								</AudioProvider>
 							</GestureHandlerRootView>
 						</QueryClientProvider>
 					</ConvexProviderWithCustomAuth>

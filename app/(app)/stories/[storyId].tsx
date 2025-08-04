@@ -16,15 +16,18 @@ import { Id } from "@/convex/_generated/dataModel";
 import { SegmentTranscript, StoryExtended } from "@/convex/stories/schema";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
 import { cn, sanitizeStorageUrl } from "@/lib/utils";
+import { FlashList, ListRenderItemInfo, type FlashListRef } from "@shopify/flash-list";
 import { useMutation } from "convex/react";
 import { formatDistanceToNow } from "date-fns";
 import { BlurView } from "expo-blur";
 import { useLocalSearchParams } from "expo-router";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, Share as RNShare, ScrollView, Text, useWindowDimensions, View } from "react-native";
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Pressable, Share as RNShare, Text, useWindowDimensions, View } from "react-native";
 import Animated, {
 	interpolate,
 	LinearTransition,
+	runOnJS,
+	useAnimatedReaction,
 	useAnimatedStyle,
 	useSharedValue,
 	withSpring,
@@ -32,15 +35,25 @@ import Animated, {
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+/**
+ * Helpers
+ */
 const formatTime = (seconds: number) => {
 	const minutes = Math.floor(seconds / 60);
 	const remainingSeconds = Math.floor(seconds % 60);
 	return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
 };
 
+/**
+ * ────────────────────────────────────────────────────────────────────────────────
+ * PAGE
+ * ────────────────────────────────────────────────────────────────────────────────
+ */
 export default function StoryPage() {
 	const { storyId } = useLocalSearchParams();
-	const { data, isLoading } = useConvexQuery(api.stories.queries.getStory, { storyId: storyId as Id<"stories"> });
+	const { data, isLoading } = useConvexQuery(api.stories.queries.getStory, {
+		storyId: storyId as Id<"stories">,
+	});
 
 	return (
 		<SafeAreaView className="flex-1 bg-slate-900 flex">
@@ -51,41 +64,54 @@ export default function StoryPage() {
 	);
 }
 
+/**
+ * ────────────────────────────────────────────────────────────────────────────────
+ * STORY CONTENT
+ * ────────────────────────────────────────────────────────────────────────────────
+ */
 const StoryContent = ({ story }: { story: StoryExtended }) => {
 	const [showClosedCaption, setShowClosedCaption] = useState(false);
 	const { pause, play, isPlaying, currentTime, duration } = useAudio();
+	const [uiTime, setUiTime] = useState(0);
+
+	useAnimatedReaction(
+		() => currentTime.value,
+		(val, prev) => {
+			if (Math.floor(val) !== Math.floor(prev ?? -1)) {
+				runOnJS(setUiTime)(val);
+			}
+		},
+		[currentTime],
+	);
+	const togglePlay = useCallback(() => {
+		if (isPlaying) {
+			pause();
+		} else {
+			play();
+		}
+	}, [isPlaying, pause, play]);
+
 	return (
 		<View className="flex flex-1 flex-col items-center relative">
 			<StoryHeader story={story} isCollapsed={showClosedCaption} />
-			{showClosedCaption && <ClosedCaption transcript={story.transcript} />}
-			<View className="absolute bottom-0 left-0 right-0 w-full flex flex-col  bg-slate-900" style={{ zIndex: 1000 }}>
-				<View className="flex w-full flex-col bg-slate-900">
-					<Progress
-						value={duration > 0 ? (currentTime / duration) * 100 : 0}
-						className="h-2 bg-slate-800 w-full"
-						indicatorClassName="bg-slate-500"
-						style={{
-							shadowColor: "#000",
-							shadowOffset: { width: 1, height: 4 },
-							shadowOpacity: 0.25,
-							shadowRadius: 16,
-						}}
-					/>
-					<View className="flex w-full flex-row justify-between mt-3">
-						<Text className="text-slate-400 text-xs">{formatTime(currentTime)}</Text>
-						<Text className="text-slate-400 text-xs">{formatTime(duration)}</Text>
-					</View>
+			{showClosedCaption && <ClosedCaption transcript={story.transcript} currentTime={uiTime} />}
+
+			{/* ─── PLAYER BAR ──────────────────────────────────────────────────────── */}
+			<View className="absolute bottom-0 left-0 right-0 w-full flex flex-col bg-slate-900" style={{ zIndex: 1000 }}>
+				<Progress
+					value={duration > 0 ? (uiTime / duration) * 100 : 0}
+					className="h-2 bg-slate-800 w-full"
+					indicatorClassName="bg-slate-500"
+				/>
+
+				<View className="flex w-full flex-row justify-between mt-3">
+					<Text className="text-slate-400 text-xs">{formatTime(uiTime)}</Text>
+					<Text className="text-slate-400 text-xs">{formatTime(duration)}</Text>
 				</View>
 
-				<View className="flex w-full flex-col items-center">
+				<View className="flex w-full flex-col items-center py-4">
 					<Pressable
-						onPress={() => {
-							if (isPlaying) {
-								pause();
-							} else {
-								play();
-							}
-						}}
+						onPress={togglePlay}
 						className="size-20 active:bg-slate-800 rounded-full flex items-center justify-center"
 					>
 						{isPlaying ? (
@@ -95,10 +121,12 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 						)}
 					</Pressable>
 				</View>
-				<View className="flex w-full flex-col items-start">
+
+				{/* CC Toggle */}
+				<View className="flex w-full flex-col items-start pb-6 pl-2">
 					<Button
 						className={cn("bg-slate-900 rounded-xl border border-slate-900", showClosedCaption && "bg-slate-500")}
-						onPress={() => setShowClosedCaption(!showClosedCaption)}
+						onPress={() => setShowClosedCaption((p) => !p)}
 					>
 						<LetterText
 							className={cn("text-slate-500 size-6", showClosedCaption && "text-slate-900")}
@@ -112,85 +140,127 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 	);
 };
 
-const ClosedCaption = ({ transcript }: { transcript: SegmentTranscript[] }) => {
-	const { currentTime } = useAudio();
-	const scrollViewRef = useRef<ScrollView>(null);
-	const segmentRefs = useRef<{ [key: number]: View | null }>({});
-	const lastKnownSegmentRef = useRef<number>(-1);
+/**
+ * ────────────────────────────────────────────────────────────────────────────────
+ * CLOSED CAPTION (virtualised + memoised)
+ * ────────────────────────────────────────────────────────────────────────────────
+ */
+const ClosedCaption = ({ transcript, currentTime }: { transcript: SegmentTranscript[]; currentTime: number }) => {
+	const listRef = useRef<FlashListRef<SegmentTranscript>>(null);
+	const lastKnownIndex = useRef(-1);
+	const { duration } = useAudio();
 
-	const currentSegmentIndex = useMemo(() => {
-		const index = transcript.findIndex((segment) => {
-			return segment.start_time <= currentTime && segment.end_time >= currentTime;
-		});
+	/** Determine the active segment */
+	const currentIndex = useMemo(() => {
+		/**
+		 * Binary search over *sorted* transcript array.
+		 *  – O(log n) instead of O(n)
+		 *  – Handles gaps by returning the last segment whose end_time < currentTime.
+		 */
+		let lo = 0;
+		let hi = transcript.length - 1;
+		let match = -1;
 
-		if (index >= 0) {
-			lastKnownSegmentRef.current = index;
-			return index;
-		} else if (lastKnownSegmentRef.current >= 0) {
-			// Check if we're past the last known segment (in a gap)
-			const lastSegment = transcript[lastKnownSegmentRef.current];
-			if (lastSegment && currentTime > lastSegment.end_time) {
-				return lastKnownSegmentRef.current;
+		while (lo <= hi) {
+			const mid = (lo + hi) >> 1; // same as Math.floor((lo+hi)/2)
+			const seg = transcript[mid];
+			const start = seg?.start_time ?? 0;
+			const end = seg?.end_time ?? duration;
+			if (currentTime < start) {
+				hi = mid - 1;
+			} else if (currentTime > end) {
+				lo = mid + 1;
+			} else {
+				match = mid; // we are inside this segment
+				break;
 			}
 		}
 
-		return index;
-	}, [transcript, currentTime]);
+		// If no exact match, use the closest *previous* segment so CC doesn’t jump backwards
+		const idx = match !== -1 ? match : hi;
+		if (idx >= 0) {
+			lastKnownIndex.current = idx;
+			return idx;
+		}
+		return lastKnownIndex.current;
+	}, [transcript, currentTime, duration]);
 
-	// Auto-scroll to current segment
+	/** Auto‑scroll */
 	useEffect(() => {
-		if (currentSegmentIndex >= 0 && segmentRefs.current[currentSegmentIndex]) {
-			const segmentView = segmentRefs.current[currentSegmentIndex];
-			if (segmentView) {
-				segmentView.measure((x, y, width, height) => {
-					scrollViewRef.current?.scrollTo({
-						y: y - 75, // Offset to center the segment
-						animated: true,
-					});
-				});
-			}
+		if (currentIndex >= 0) {
+			listRef.current?.scrollToIndex({ index: currentIndex, animated: true, viewPosition: 0 });
 		}
-	}, [currentSegmentIndex]);
+	}, [currentIndex]);
 
-	const getSegmentStatus = (segmentIndex: number) => {
-		if (segmentIndex < currentSegmentIndex) return "completed";
-		if (segmentIndex === currentSegmentIndex) return "current";
-		return "upcoming";
-	};
+	/** Row renderer (memoised) */
+	const renderItem = useCallback(
+		({ item, index }: ListRenderItemInfo<SegmentTranscript>) => (
+			<TranscriptRow
+				key={item.start_time}
+				segment={item}
+				index={index}
+				currentIndex={currentIndex}
+				currentTime={currentTime}
+			/>
+		),
+		[currentIndex, currentTime],
+	);
 
-	const renderSegment = (segment: SegmentTranscript, segmentIndex: number) => {
-		const status = getSegmentStatus(segmentIndex);
-		const isInGap =
-			currentSegmentIndex === segmentIndex && !(currentTime >= segment.start_time && currentTime <= segment.end_time);
+	return (
+		<View className="flex-1 w-full pt-8">
+			<FlashList ref={listRef} data={transcript} renderItem={renderItem} showsVerticalScrollIndicator={false} />
+
+			{/* Top & bottom fade */}
+			<BlurView
+				intensity={25}
+				tint="dark"
+				className="absolute top-0 left-0 right-0"
+				style={{ zIndex: 1000, height: 64 }}
+			/>
+			<BlurView
+				intensity={12}
+				tint="dark"
+				className="absolute bottom-40 left-0 right-0"
+				style={{ zIndex: 1000, height: 140 }}
+			/>
+		</View>
+	);
+};
+
+/**
+ * Transcript row – *only* re‑renders when its own status changes
+ */
+interface TranscriptRowProps {
+	segment: SegmentTranscript;
+	index: number;
+	currentIndex: number;
+	currentTime: number;
+}
+
+const TranscriptRow = memo<TranscriptRowProps>(
+	({ segment, index, currentIndex, currentTime }) => {
+		const status = index < currentIndex ? "completed" : index === currentIndex ? "current" : "upcoming";
+		const isGap = index === currentIndex && !(currentTime >= segment.start_time && currentTime <= segment.end_time);
 
 		return (
-			<View
-				key={segment.start_time}
-				ref={(ref) => {
-					segmentRefs.current[segmentIndex] = ref;
-				}}
-				className={cn(
-					"w-full px-6 my-2 rounded-2xl transition-all duration-300",
-					status === "upcoming" && "bg-transparent",
-				)}
-			>
+			<View className={cn("w-full  my-16 px-1", status === "upcoming" && "bg-transparent")}>
 				<View className="flex flex-row flex-wrap">
-					{segment.words.map((word, wordIndex) => {
-						let textColor = "text-slate-600"; // Default for upcoming segments
-						let fontWeight = "font-normal";
+					{segment.words.map((word, wIdx) => {
+						let textColor = "text-slate-600";
+						let fontWeight: "font-normal" | "font-medium" | "font-bold" | "font-semibold" = "font-normal";
 						let textShadow = false;
 
 						if (status === "completed") {
 							textColor = "text-slate-400";
 						} else if (status === "current") {
-							const isPreviousWord = currentTime > word.end_time;
-							const isCurrentWord =
-								currentTime >= word.start_time && currentTime <= word.end_time && word.text.trim() !== "";
-							if (isCurrentWord) {
-								textColor = "text-white text-xl";
-								fontWeight = "font-bold";
+							const isPrevious = currentTime > word.end_time;
+							const isCurrent = currentTime >= word.start_time && currentTime <= word.end_time;
+
+							if (isCurrent) {
+								textColor = "text-white";
+								fontWeight = "font-semibold";
 								textShadow = true;
-							} else if (isPreviousWord || isInGap) {
+							} else if (isPrevious || isGap) {
 								textColor = "text-slate-200";
 								fontWeight = "font-medium";
 							} else {
@@ -199,71 +269,38 @@ const ClosedCaption = ({ transcript }: { transcript: SegmentTranscript[] }) => {
 						}
 
 						return (
-							<Animated.Text
-								key={`${segment.start_time}-${wordIndex}`}
-								className={cn("text-lg text-left", textColor, fontWeight)}
+							<Text
+								key={`${segment.start_time}-${wIdx}`}
+								className={cn("text-2xl", textColor, fontWeight)}
 								style={{
-									textShadowColor: textShadow ? "rgba(255, 255, 255, 0.4)" : "transparent",
+									textShadowColor: textShadow ? "rgba(255,255,255,0.4)" : "transparent",
 									textShadowOffset: { width: 0, height: 1 },
 									textShadowRadius: 3,
 								}}
 							>
 								{word.text}
-							</Animated.Text>
+							</Text>
 						);
 					})}
 				</View>
 			</View>
 		);
-	};
+	},
+	(prev, next) => prev.currentIndex === next.currentIndex && prev.currentTime === next.currentTime,
+);
 
-	return (
-		<View className="flex-1 w-full pt-8 flex relative">
-			<ScrollView
-				ref={scrollViewRef}
-				className="flex-1 w-full"
-				contentContainerStyle={{
-					paddingVertical: 40,
-					paddingHorizontal: 8,
-				}}
-				showsVerticalScrollIndicator={false}
-				scrollEventThrottle={16}
-			>
-				{transcript.map((segment, index) => renderSegment(segment, index))}
+TranscriptRow.displayName = "TranscriptRow";
 
-				{/* Bottom padding for better scrolling experience */}
-				<View style={{ height: 306 }} />
-			</ScrollView>
-
-			<BlurView
-				intensity={25}
-				tint="dark"
-				className="absolute top-0 left-0 right-0 "
-				style={{ zIndex: 1000, height: 98 }}
-			/>
-			<BlurView
-				intensity={12}
-				tint="dark"
-				className="absolute bottom-40 left-0 right-0 "
-				style={{
-					zIndex: 1000,
-					height: 180,
-				}}
-			/>
-			<BlurView
-				intensity={12}
-				tint="dark"
-				className="absolute bottom-40 left-0 right-0 "
-				style={{ zIndex: 1000, height: 180 }}
-			/>
-		</View>
-	);
-};
-
+/**
+ * ────────────────────────────────────────────────────────────────────────────────
+ * STORY HEADER (minor perf tweaks)
+ * ────────────────────────────────────────────────────────────────────────────────
+ */
 const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed: boolean }) => {
 	const progress = useSharedValue(isCollapsed ? 1 : 0);
 	const toggleFavorite = useMutation(api.favorites.mutations.toggleFavorite);
 
+	// Animate collapse / expand
 	useEffect(() => {
 		progress.value = withTiming(isCollapsed ? 1 : 0, { duration: 250 });
 	}, [isCollapsed, progress]);
@@ -277,10 +314,11 @@ const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed
 	const titleStyle = useAnimatedStyle(() => {
 		return {
 			marginTop: interpolate(progress.value, [0, 1], [48, 0]),
-			flex: isCollapsed ? interpolate(progress.value, [0, 1], [1, 1]) : undefined,
+			flex: isCollapsed ? 1 : undefined,
 		};
 	});
 
+	/** Sharing & favourite handlers */
 	const handleShare = async () => {
 		try {
 			await RNShare.share(
@@ -302,17 +340,15 @@ const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed
 
 	return (
 		<Animated.View
-			layout={LinearTransition.springify().duration(250).stiffness(150).damping(5)}
-			style={[
-				{
-					flexDirection: isCollapsed ? "row" : "column",
-					alignItems: "center",
-					width: "100%",
-					gap: isCollapsed ? 16 : 0,
-				},
-			]}
+			layout={LinearTransition.springify().duration(250).stiffness(150).damping(12)}
+			style={{
+				flexDirection: isCollapsed ? "row" : "column",
+				alignItems: "center",
+				width: "100%",
+				gap: isCollapsed ? 16 : 0,
+			}}
 		>
-			<Animated.View style={[imgStyle, { borderRadius: 16 }]}>
+			<Animated.View style={[imgStyle, { borderRadius: 16, overflow: "hidden" }]}>
 				<StoryImage imageUrl={story.imageUrl} disableAnimation={isCollapsed} />
 			</Animated.View>
 
@@ -356,6 +392,11 @@ const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed
 	);
 };
 
+/**
+ * ────────────────────────────────────────────────────────────────────────────────
+ * STORY IMAGE (simpler shadow, single blur)
+ * ────────────────────────────────────────────────────────────────────────────────
+ */
 const StoryImage = ({ imageUrl, disableAnimation }: { imageUrl: string | null; disableAnimation?: boolean }) => {
 	const [error, setError] = useState(false);
 	const showFallback = error || !imageUrl;
@@ -363,84 +404,69 @@ const StoryImage = ({ imageUrl, disableAnimation }: { imageUrl: string | null; d
 
 	const scale = useSharedValue(1);
 
-	// Update scale based on playing state
 	useEffect(() => {
-		if (disableAnimation) {
-			return;
-		}
+		if (disableAnimation) return;
 		scale.value = withSpring(isPlaying ? 1 : 0.75, {
 			damping: 15,
 			stiffness: 150,
 		});
-	}, [isPlaying, scale, disableAnimation]);
+	}, [isPlaying, disableAnimation, scale]);
 
-	// Animated style for the image container
-	const animatedStyle = useAnimatedStyle(() => {
-		return {
-			transform: [{ scale: scale.value }],
-		};
-	});
+	const animatedStyle = useAnimatedStyle(() => ({
+		transform: [{ scale: scale.value }],
+	}));
 
 	if (showFallback) {
 		return (
-			<View className="aspect-square w-full rounded-xl bg-slate-800 rounded-md border border-zinc-700 flex items-center justify-center">
+			<View className="aspect-square w-full rounded-xl bg-slate-800 flex items-center justify-center border border-zinc-700">
 				<Headphones className="text-zinc-700" strokeWidth={0.5} />
 			</View>
 		);
 	}
+
 	return (
-		<View className="flex w-full aspect-square rounded-xl flex items-center justify-center">
-			<Animated.View
-				className="flex w-full aspect-square rounded-xl flex items-center justify-center"
-				style={[
-					{
-						shadowColor: "#f1f5f9",
-						shadowOffset: { width: 1, height: 4 },
-						shadowOpacity: 0.25,
-						shadowRadius: 16,
-					},
-					!disableAnimation && animatedStyle,
-				]}
-			>
-				<Image
-					source={{ uri: sanitizeStorageUrl(imageUrl) }}
-					className="w-full rounded-xl aspect-square"
-					onError={() => setError(true)}
-				/>
-			</Animated.View>
-		</View>
+		<Animated.View style={[animatedStyle, { width: "100%", height: "100%" }]}>
+			<Image
+				source={{ uri: sanitizeStorageUrl(imageUrl) }}
+				className="w-full h-full rounded-xl"
+				onError={() => setError(true)}
+			/>
+		</Animated.View>
 	);
 };
 
-const StoryLoading = () => {
-	return (
-		<View className="flex flex-1 flex-col items-center">
-			<Skeleton className="aspect-square w-full rounded-xl bg-slate-800" />
-			<View className="flex w-full mt-12 flex-row gap-x-8">
-				<View className="flex flex-col flex-1">
-					<Skeleton className="h-6 w-full rounded-xl bg-slate-800" />
-					<Skeleton className="h-4 w-2/5 rounded-xl bg-slate-800 mt-2" />
-				</View>
-				<View className="flex gap-x-4 flex-row items-center">
-					<Skeleton className="h-10 w-10 rounded-full bg-slate-800" />
-					<Skeleton className="h-10 w-10 rounded-full bg-slate-800" />
-				</View>
+/**
+ * ────────────────────────────────────────────────────────────────────────────────
+ * LOADING SKELETON (unchanged)
+ * ────────────────────────────────────────────────────────────────────────────────
+ */
+const StoryLoading = () => (
+	<View className="flex flex-1 flex-col items-center">
+		<Skeleton className="aspect-square w-full rounded-xl bg-slate-800" />
+		<View className="flex w-full mt-12 flex-row gap-x-8">
+			<View className="flex flex-col flex-1">
+				<Skeleton className="h-6 w-full rounded-xl bg-slate-800" />
+				<Skeleton className="h-4 w-2/5 rounded-xl bg-slate-800 mt-2" />
 			</View>
-			<View className="flex w-full mt-12 flex-col">
-				<Skeleton className="h-3 w-full rounded-full bg-slate-800" />
-				<View className="flex w-full flex-row justify-between mt-3">
-					<Skeleton className="h-1 w-16 flex rounded-full bg-slate-800 flex" />
-					<Skeleton className="h-1 w-16 flex rounded-full bg-slate-800 flex" />
-				</View>
-			</View>
-
-			<View className="flex w-full mt-12 flex-col items-center">
-				<Skeleton className="size-20 rounded-full bg-slate-800" />
-			</View>
-
-			<View className="flex w-full mt-12 flex-col ">
-				<Skeleton className="w-20 h-9 rounded-full bg-slate-800" />
+			<View className="flex gap-x-4 flex-row items-center">
+				<Skeleton className="h-10 w-10 rounded-full bg-slate-800" />
+				<Skeleton className="h-10 w-10 rounded-full bg-slate-800" />
 			</View>
 		</View>
-	);
-};
+		<View className="flex w-full mt-12 flex-col">
+			<Skeleton className="h-3 w-full rounded-full bg-slate-800" />
+			<View className="flex w-full flex-row justify-between mt-3">
+				<Skeleton className="h-1 w-16 flex rounded-full bg-slate-800 flex" />
+				<Skeleton className="h-1 w-16 flex rounded-full bg-slate-800 flex" />
+			</View>
+		</View>
+
+		<View className="flex w-full mt-12 flex-col items-center">
+			<Skeleton className="size-20 rounded-full bg-slate-800" />
+		</View>
+
+		<View className="flex w-full mt-12 flex-col ">
+			<Skeleton className="w-20 h-9 rounded-full bg-slate-800" />
+		</View>
+	</View>
+);

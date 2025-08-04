@@ -42,3 +42,7 @@ ios/
 android/
 
 *.mp3
+
+in/
+
+out/

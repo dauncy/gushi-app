@@ -1,9 +1,9 @@
 import { Id } from "@/convex/_generated/dataModel";
 import { AudioStatus, setAudioModeAsync, useAudioPlayer } from "expo-audio";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { SharedValue, useSharedValue } from "react-native-reanimated";
 
 interface AudioState {
-	currentTime: number;
 	duration: number;
 	isPlaying: boolean;
 	storyId: Id<"stories"> | null;
@@ -14,8 +14,8 @@ interface AudioContextDTO {
 	play: () => void;
 	pause: () => void;
 	stop: () => void;
-	currentTime: number;
 	duration: number;
+	currentTime: SharedValue<number>;
 	isPlaying: boolean;
 	storyId: Id<"stories"> | null;
 }
@@ -25,19 +25,18 @@ const AudioContext = createContext<AudioContextDTO>({
 	play: () => {},
 	pause: () => {},
 	stop: () => {},
-	currentTime: 0,
 	duration: 0,
+	currentTime: { value: 0 } as SharedValue<number>,
 	isPlaying: false,
 	storyId: null,
 });
 
 export const AudioProvider = ({ children }: { children: ReactNode }) => {
 	const initRef = useRef<boolean>(false);
-	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+	const currentTime = useSharedValue(0);
 	const audio = useAudioPlayer();
 
 	const [audioState, setAudioState] = useState<AudioState>({
-		currentTime: 0,
 		duration: 0,
 		isPlaying: false,
 		storyId: null,
@@ -45,19 +44,23 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 
 	const statusCallback = useCallback(
 		(status: AudioStatus) => {
-			if (status.playing) {
+			const time = status.currentTime;
+			currentTime.value = time;
+			if (status.playing && !audioState.isPlaying) {
+				const currDuration = audioState.duration;
 				setAudioState((prev) => ({
 					...prev,
 					isPlaying: true,
+					...(currDuration === 0 ? { duration: status.duration } : {}),
 				}));
-			} else {
+			} else if (!status.playing && audioState.isPlaying) {
 				setAudioState((prev) => ({
 					...prev,
 					isPlaying: false,
 				}));
 			}
 		},
-		[setAudioState],
+		[currentTime, audioState.isPlaying, audioState.duration],
 	);
 	// Initialize the audio config
 	useEffect(() => {
@@ -87,46 +90,16 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 		};
 	}, [statusCallback, audio]);
 
-	// Sync audio time state from audio
-	useEffect(() => {
-		if (intervalRef.current) {
-			clearInterval(intervalRef.current);
-		}
-		intervalRef.current = setInterval(() => {
-			const { duration, isPlaying } = audioState;
-			if (duration === 0) {
-				setAudioState((prev) => ({
-					...prev,
-					duration: audio.duration,
-				}));
-			}
-
-			if (!isPlaying) {
-				return;
-			}
-			setAudioState((prev) => ({
-				...prev,
-				currentTime: audio.currentTime,
-			}));
-			// 500 is a decent balance between performance and accuracy
-		}, 250);
-
-		return () => {
-			if (intervalRef.current) {
-				clearInterval(intervalRef.current);
-			}
-		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [audio, audioState.isPlaying, audioState.duration]);
-
 	const play = useCallback(() => {
 		if (audio.currentTime === audio.duration) {
 			audio.seekTo(0);
 		}
 		audio.play();
+
 		setAudioState((prev) => ({
 			...prev,
 			isPlaying: true,
+			duration: audio.duration,
 		}));
 	}, [audio]);
 
@@ -167,6 +140,7 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 				pause,
 				stop,
 				...audioState,
+				currentTime,
 			}}
 		>
 			{children}
