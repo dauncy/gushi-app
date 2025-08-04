@@ -1,9 +1,9 @@
 import { components, internal } from "@/convex/_generated/api";
 import { ActionCtx, internalAction } from "@/convex/_generated/server";
-import { RevenueCatCustomer } from "@/lib/types";
+import { RevenueCatCustomer, RevenueCatCustomerAliases } from "@/lib/types";
 import { ActionCache } from "@convex-dev/action-cache";
 import { v } from "convex/values";
-import { getCustomer } from "./utils";
+import { getCustomer, getCustomerAliases } from "./utils";
 
 export const getCustomerAction = internalAction({
 	args: {
@@ -32,17 +32,21 @@ export const getCustomerCachedAction = internalAction({
 });
 
 export const getCustomerCached = async (ctx: ActionCtx, { revenuecatUserId }: { revenuecatUserId: string }) => {
-	console.log("[getCustomerCached]: revenuecatUserId", revenuecatUserId);
 	const customer = await customerCache.fetch(ctx, { revenuecatUserId });
 	return customer;
 };
 
-export const bustCustomerCache = internalAction({
+export const bustCustomerCache = async (ctx: ActionCtx, { revenuecatUserId }: { revenuecatUserId: string }) => {
+	await customerCache.remove(ctx, { revenuecatUserId });
+	return null;
+};
+
+export const getCustomerAliasesAction = internalAction({
 	args: {
-		revenuecatUserId: v.string(),
+		customerId: v.string(),
 	},
-	handler: async (ctx, args): Promise<null> => {
-		await customerCache.remove(ctx, { revenuecatUserId: args.revenuecatUserId });
-		return null;
+	handler: async (ctx, args): Promise<RevenueCatCustomerAliases[]> => {
+		const customerAliases = await getCustomerAliases(args.customerId);
+		return customerAliases.items;
 	},
 });

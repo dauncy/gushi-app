@@ -24,42 +24,51 @@ export const getAudioUrl = async (ctx: QueryCtx, audioId: Id<"audio">) => {
 export const getStories = query({
 	args: { paginationOpts: paginationOptsValidator },
 	handler: async (ctx, { paginationOpts }): Promise<PaginationResult<StoryPreview>> => {
-		const { hasSubscription, dbUser } = await verifyAccess(ctx, { validateSubscription: false });
-		const storiesPage = await ctx.db
-			.query("stories")
-			.withIndex("by_enabled", (q) => q.eq("enabled", true))
-			.paginate(paginationOpts);
+		try {
+			const { hasSubscription } = await verifyAccess(ctx, { validateSubscription: false });
+			const storiesPage = await ctx.db
+				.query("stories")
+				.withIndex("by_enabled", (q) => q.eq("enabled", true))
+				.paginate(paginationOpts);
 
-		const stories = await Promise.all(
-			storiesPage.page.map(async (story) => {
-				const promises: Promise<string | null>[] = [getImageUrl(ctx, story.imageId)];
-				if (story.subscription_required) {
-					if (hasSubscription) {
-						promises.push(getAudioUrl(ctx, story.audioId));
+			const stories = await Promise.all(
+				storiesPage.page.map(async (story) => {
+					const promises: Promise<string | null>[] = [getImageUrl(ctx, story.imageId)];
+					if (story.subscription_required) {
+						if (hasSubscription) {
+							promises.push(getAudioUrl(ctx, story.audioId));
+						} else {
+							promises.push(Promise.resolve(null));
+						}
 					} else {
-						promises.push(Promise.resolve(null));
+						promises.push(getAudioUrl(ctx, story.audioId));
 					}
-				} else {
-					promises.push(getAudioUrl(ctx, story.audioId));
-				}
-				const [imageUrl, audioUrl] = await Promise.all(promises);
-				const duration = story.transcript[story.transcript.length - 1].end_time;
-				return {
-					_id: story._id,
-					title: story.title,
-					imageUrl,
-					audioUrl,
-					duration,
-					updatedAt: story.updatedAt,
-					subscription_required: !!story.subscription_required,
-				};
-			}),
-		);
+					const [imageUrl, audioUrl] = await Promise.all(promises);
+					const duration = story.transcript[story.transcript.length - 1].end_time;
+					return {
+						_id: story._id,
+						title: story.title,
+						imageUrl,
+						audioUrl,
+						duration,
+						updatedAt: story.updatedAt,
+						subscription_required: !!story.subscription_required,
+					};
+				}),
+			);
 
-		return {
-			...storiesPage,
-			page: stories,
-		};
+			return {
+				...storiesPage,
+				page: stories,
+			};
+		} catch (error) {
+			console.warn("[convex/stories/queries.ts]: getStories() => --- ERROR --- ", error);
+			return {
+				page: [],
+				isDone: true,
+				continueCursor: "",
+			};
+		}
 	},
 });
 
@@ -71,43 +80,48 @@ export const getStory = query({
 		if (!storyId) {
 			return null;
 		}
-		const { hasSubscription, dbUser } = await verifyAccess(ctx, { validateSubscription: true });
-		const maybeStory = await ctx.db.get(storyId);
-		if (!maybeStory) {
+		try {
+			const { hasSubscription, dbUser } = await verifyAccess(ctx, { validateSubscription: true });
+			const maybeStory = await ctx.db.get(storyId);
+			if (!maybeStory) {
+				return null;
+			}
+
+			if (maybeStory.subscription_required && !hasSubscription) {
+				return null;
+			}
+
+			const [imageUrl, audioUrl] = await Promise.all([
+				getImageUrl(ctx, maybeStory.imageId),
+				getAudioUrl(ctx, maybeStory.audioId),
+			]);
+			if (!imageUrl || !audioUrl) {
+				return null;
+			}
+
+			const favorite = await ctx.db
+				.query("favorites")
+				.withIndex("by_user_story", (q) => q.eq("userId", dbUser._id).eq("storyId", maybeStory._id))
+				.first();
+
+			return {
+				_id: maybeStory._id,
+				title: maybeStory.title,
+				imageUrl,
+				audioUrl,
+				transcript: maybeStory.transcript,
+				body: maybeStory.body,
+				updatedAt: maybeStory.updatedAt,
+				favorite: favorite
+					? {
+							_id: favorite._id,
+							_createdAt: favorite.createdAt,
+						}
+					: null,
+			};
+		} catch (error) {
+			console.warn("[convex/stories/queries.ts]: getStory() => --- ERROR --- ", error);
 			return null;
 		}
-
-		if (maybeStory.subscription_required && !hasSubscription) {
-			return null;
-		}
-
-		const [imageUrl, audioUrl] = await Promise.all([
-			getImageUrl(ctx, maybeStory.imageId),
-			getAudioUrl(ctx, maybeStory.audioId),
-		]);
-		if (!imageUrl || !audioUrl) {
-			return null;
-		}
-
-		const favorite = await ctx.db
-			.query("favorites")
-			.withIndex("by_user_story", (q) => q.eq("userId", dbUser._id).eq("storyId", maybeStory._id))
-			.first();
-
-		return {
-			_id: maybeStory._id,
-			title: maybeStory.title,
-			imageUrl,
-			audioUrl,
-			transcript: maybeStory.transcript,
-			body: maybeStory.body,
-			updatedAt: maybeStory.updatedAt,
-			favorite: favorite
-				? {
-						_id: favorite._id,
-						_createdAt: favorite.createdAt,
-					}
-				: null,
-		};
 	},
 });

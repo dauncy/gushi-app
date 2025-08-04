@@ -1,7 +1,8 @@
-import { query } from "@/convex/_generated/server";
+import { internalQuery, query } from "@/convex/_generated/server";
 import { verifyAccess } from "@/convex/common/utils";
 import { StoryPreview } from "@/convex/stories";
 import { paginationOptsValidator, PaginationResult } from "convex/server";
+import { v } from "convex/values";
 import { getAudioUrl, getImageUrl } from "../stories/queries";
 
 export const getUserFavorites = query({
@@ -50,5 +51,18 @@ export const getUserFavorites = query({
 			...userFavorites,
 			page: stories.filter(Boolean) as StoryPreview[],
 		};
+	},
+});
+
+export const getfavoritesForUserId = internalQuery({
+	args: {
+		dbUserId: v.id("users"),
+	},
+	handler: async (ctx, { dbUserId }) => {
+		const favorites = await ctx.db
+			.query("favorites")
+			.withIndex("by_user", (q) => q.eq("userId", dbUserId))
+			.collect();
+		return favorites;
 	},
 });

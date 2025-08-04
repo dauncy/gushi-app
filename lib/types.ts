@@ -26,6 +26,12 @@ export type RevenueCatCustomer = {
 	project_id: string;
 };
 
+export type RevenueCatCustomerAliases = {
+	created_at: number;
+	id: string;
+	object: "customer.alias";
+};
+
 type RunMutationCtx = {
 	runMutation: GenericMutationCtx<GenericDataModel>["runMutation"];
 };

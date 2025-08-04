@@ -19,5 +19,6 @@ export const thumbnailPrompt = `
 
   Using the story details provided, create an illustration that meets these criteria.
 
-  Story Transcript: "{{TRANSCRIPT}}"
+  Story Transcript: 
+  
 `;

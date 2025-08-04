@@ -126,7 +126,6 @@ const useCustomAuth = () => {
 
 	const fetchAccessToken = useCallback(
 		async ({ forceRefreshToken }: { forceRefreshToken: boolean }) => {
-			console.log("[useCustomAuth:fetchAccessToken]: forceRefreshToken", { customerId });
 			const url = `${getConvexSiteURL()}/auth/refresh`;
 			if (!customerId || !dbUser) {
 				return null;

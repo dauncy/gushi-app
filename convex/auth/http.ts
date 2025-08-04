@@ -63,7 +63,7 @@ export const loginHttp = httpAction(async (ctx, req) => {
 
 	const token = await signJWT(
 		{
-			revenuecat_user_id: customer.id,
+			revenuecat_user_id,
 		},
 		activeKey.privateKey,
 		activeKey.keyId,
@@ -82,9 +82,6 @@ export const refreshHttp = httpAction(async (ctx, req) => {
 	try {
 		const body = await req.json();
 		const { revenuecat_user_id, force_refresh } = body;
-
-		console.log("[refreshHttp]: revenuecat_user_id", { revenuecat_user_id, force_refresh });
-
 		if (!revenuecat_user_id) {
 			return new Response(JSON.stringify({ error: "RevenueCat User ID required" }), {
 				status: 400,
@@ -101,8 +98,6 @@ export const refreshHttp = httpAction(async (ctx, req) => {
 			});
 		}
 		const customer = await getCustomerCached(ctx, { revenuecatUserId: revenuecat_user_id });
-		console.log("[refreshHttp]: customer", { customer: customer.id });
-
 		if (!customer) {
 			return new Response(JSON.stringify({ error: "Customer not found" }), {
 				status: 404,
@@ -111,11 +106,11 @@ export const refreshHttp = httpAction(async (ctx, req) => {
 		}
 		const subscriptionType = getaSubscriptionType(customer);
 		let dbUser = await ctx.runQuery(internal.users.queries.getUserByRevenuecatUserId, {
-			revenuecatUserId: customer.id,
+			revenuecatUserId: revenuecat_user_id,
 		});
 		if (force_refresh) {
 			dbUser = await ctx.runMutation(internal.users.mutations.upsertUser, {
-				revenuecatUserId: customer.id,
+				revenuecatUserId: revenuecat_user_id,
 				subscriptionType,
 			});
 			if (!dbUser) {
@@ -129,7 +124,7 @@ export const refreshHttp = httpAction(async (ctx, req) => {
 		// Generate new JWT
 		const token = await signJWT(
 			{
-				revenuecat_user_id: customer.id,
+				revenuecat_user_id: revenuecat_user_id,
 			},
 			activeKey.privateKey,
 			activeKey.keyId,
