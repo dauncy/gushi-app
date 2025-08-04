@@ -17,7 +17,15 @@ export default function StoriesLayout() {
 				</View>
 			}
 		>
-			<Stack>
+			<Stack
+				screenOptions={{
+					headerShown: false,
+					contentStyle: {
+						backgroundColor: "#0f172a",
+						height: "100%",
+					},
+				}}
+			>
 				<Stack.Screen name="[storyId]" />
 			</Stack>
 		</VerifyAccess>

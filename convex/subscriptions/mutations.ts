@@ -4,7 +4,7 @@ import { RevenueCatCustomer } from "@/lib/types";
 import { zodToConvex } from "convex-helpers/server/zod";
 import { ConvexError, v } from "convex/values";
 import { z } from "zod";
-import { bustCustomerCache } from "./actions";
+import { bustCustomerCache, getCustomerCached } from "./actions";
 import { getaSubscriptionType } from "./utils";
 
 export const bustSubscriptionCache = action({
@@ -16,6 +16,14 @@ export const bustSubscriptionCache = action({
 		if (!identity) {
 			throw new ConvexError("Unauthorized");
 		}
+		if (identity.subject === args.revenueCatId) {
+			const cachedCustomer = await getCustomerCached(ctx, { revenuecatUserId: identity.subject });
+			return {
+				success: true,
+				customer: cachedCustomer,
+			};
+		}
+
 		const customerFromJWT = await ctx.runAction(internal.subscriptions.actions.getCustomerAction, {
 			revenuecatUserId: identity.subject,
 		});
@@ -30,8 +38,15 @@ export const bustSubscriptionCache = action({
 		const subscriptionType = getaSubscriptionType(customerFromRevenueCat);
 
 		const customerAliases = await ctx.runAction(internal.subscriptions.actions.getCustomerAliasesAction, {
-			customerId: customerFromJWT.id,
+			customerId: args.revenueCatId,
 		});
+
+		if (customerAliases.length === 0) {
+			return {
+				success: true,
+				customer: customerFromRevenueCat,
+			};
+		}
 
 		await ctx.runMutation(internal.subscriptions.mutations.syncAliases, {
 			currentRevenueCatUserId: customerFromJWT.id,
