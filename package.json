@@ -13,7 +13,8 @@
     "typecheck": "bunx tsc --noEmit",
     "convex:dev": "bunx convex dev",
     "convex:tunnel": "ngrok start --all --config=./ngrok.yaml",
-    "combine-audio": "bun run ./scripts/combine-audio.ts"
+    "combine-audio": "bun run ./scripts/combine-audio.ts",
+    "chunk-transcript": "bun run ./scripts/chunk-transcript.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^2.0.2",
