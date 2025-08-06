@@ -99,8 +99,13 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 		setAudioState((prev) => ({
 			...prev,
 			isPlaying: true,
-			duration: audio.duration,
 		}));
+		setTimeout(() => {
+			setAudioState((prev) => ({
+				...prev,
+				duration: audio.duration,
+			}));
+		}, 100);
 	}, [audio]);
 
 	const pause = useCallback(() => {

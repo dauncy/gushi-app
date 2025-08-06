@@ -216,7 +216,7 @@ const ClosedCaption = ({ transcript, currentTime }: { transcript: SegmentTranscr
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ paddingBottom: 16 }}
 				// this is for auto-scrolling on last segment... hacky but meh
-				ListFooterComponent={() => <View style={{ height: 198 }} />}
+				ListFooterComponent={() => <View style={{ height: 248 }} />}
 			/>
 
 			{/* Top & bottom fade */}
@@ -374,7 +374,7 @@ const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed
 					</Marquee>
 					<View className="flex flex-row gap-x-2 items-center mt-2">
 						<Calendar className="text-slate-400 size-4" strokeWidth={1} />
-						<Text className="text-slate-400 text-sm font-medium">
+						<Text className="text-slate-400 text-xs font-medium " numberOfLines={2}>
 							{formatDistanceToNow(story.updatedAt, { addSuffix: true })}
 						</Text>
 					</View>
@@ -419,11 +419,11 @@ const FavoriteButton = ({ story }: { story: StoryExtended }) => {
 		<Button
 			size="icon"
 			variant="ghost"
-			className={cn("bg-slate-800 rounded-full border border-slate-600", story.favorite && "bg-slate-500")}
+			className={cn("bg-slate-800 rounded-full border border-slate-600", isFavorite && "bg-slate-500")}
 			onPress={handleToggleFavorite}
 		>
 			<Star
-				className={cn("text-slate-500 size-6", story.favorite && "text-amber-500 fill-amber-500")}
+				className={cn("text-slate-500 size-6", isFavorite && "text-amber-500 fill-amber-500")}
 				strokeWidth={1.5}
 				size={20}
 			/>
