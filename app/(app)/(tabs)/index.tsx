@@ -44,7 +44,6 @@ const StoryList = ({ onCardPress }: { onCardPress: (story: StoryPreview) => void
 				data={results}
 				keyExtractor={(item) => item._id}
 				renderItem={({ item }) => <StoryCard story={item} onCardPress={() => onCardPress(item)} />}
-				estimatedItemSize={100}
 				ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
 				contentContainerStyle={{
 					paddingBottom: 80,

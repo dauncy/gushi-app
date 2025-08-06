@@ -1,5 +1,5 @@
 import { Id } from "@/convex/_generated/dataModel";
-import { query, QueryCtx } from "@/convex/_generated/server";
+import { internalQuery, query, QueryCtx } from "@/convex/_generated/server";
 import { verifyAccess } from "@/convex/common";
 import { StoryExtended, StoryPreview } from "@/convex/stories/schema";
 import { zid, zodToConvex } from "convex-helpers/server/zod";
@@ -123,5 +123,54 @@ export const getStory = query({
 			console.warn("[convex/stories/queries.ts]: getStory() => --- ERROR --- ", error);
 			return null;
 		}
+	},
+});
+
+export const getStoryMetadata = internalQuery({
+	args: {
+		storyId: zodToConvex(zid("stories")),
+	},
+	handler: async (
+		ctx,
+		{ storyId },
+	): Promise<{ title: string; imageUrl: string; duration: number; updatedAt: string } | null> => {
+		const story = await ctx.db.get(storyId);
+		if (!story) {
+			return null;
+		}
+		const imageUrl = await getImageUrl(ctx, story.imageId);
+		if (!imageUrl) {
+			return null;
+		}
+		const duration = story.transcript[story.transcript.length - 1].end_time;
+		return {
+			title: story.title,
+			imageUrl,
+			duration,
+			updatedAt: story.updatedAt,
+		};
+	},
+});
+
+export const getStoryTranscript = internalQuery({
+	args: {
+		storyId: zodToConvex(zid("stories")),
+	},
+	handler: async (ctx, { storyId }) => {
+		const story = await ctx.db.get(storyId);
+		if (!story) {
+			return null;
+		}
+		return story.transcript;
+	},
+});
+
+export const getStoryBody = internalQuery({
+	args: {
+		storyId: zodToConvex(zid("stories")),
+	},
+	handler: async (ctx, { storyId }) => {
+		const story = await ctx.db.get(storyId);
+		return story?.body;
 	},
 });

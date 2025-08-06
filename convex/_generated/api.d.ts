@@ -23,6 +23,8 @@ import type * as favorites_queries from "../favorites/queries.js";
 import type * as feedback_index from "../feedback/index.js";
 import type * as feedback_mutations from "../feedback/mutations.js";
 import type * as http from "../http.js";
+import type * as stories_actions from "../stories/actions.js";
+import type * as stories_http from "../stories/http.js";
 import type * as stories_index from "../stories/index.js";
 import type * as stories_queries from "../stories/queries.js";
 import type * as subscriptions_actions from "../subscriptions/actions.js";
@@ -65,6 +67,8 @@ declare const fullApi: ApiFromModules<{
   "feedback/index": typeof feedback_index;
   "feedback/mutations": typeof feedback_mutations;
   http: typeof http;
+  "stories/actions": typeof stories_actions;
+  "stories/http": typeof stories_http;
   "stories/index": typeof stories_index;
   "stories/queries": typeof stories_queries;
   "subscriptions/actions": typeof subscriptions_actions;

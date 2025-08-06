@@ -1,5 +1,6 @@
 import { httpRouter } from "convex/server";
 import { getWellKnownJWKsHttp, loginHttp, refreshHttp } from "./auth/http";
+import { storyMetadataHttpAction } from "./stories";
 import { subscriptionWebhooksHttpAction } from "./subscriptions/http";
 import { upsertUserHttp } from "./users/http";
 
@@ -33,6 +34,12 @@ http.route({
 	path: "/webhooks/payments",
 	method: "POST",
 	handler: subscriptionWebhooksHttpAction,
+});
+
+http.route({
+	pathPrefix: "/stories/metadata/",
+	method: "GET",
+	handler: storyMetadataHttpAction,
 });
 
 export default http;

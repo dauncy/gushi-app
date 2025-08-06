@@ -21,6 +21,7 @@ import { useMutation } from "convex/react";
 import { formatDistanceToNow } from "date-fns";
 import { BlurView } from "expo-blur";
 import { useLocalSearchParams } from "expo-router";
+import { debounce } from "lodash";
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, Share as RNShare, Text, useWindowDimensions, View } from "react-native";
 import Animated, {
@@ -208,7 +209,15 @@ const ClosedCaption = ({ transcript, currentTime }: { transcript: SegmentTranscr
 
 	return (
 		<View className="flex-1 w-full pt-8">
-			<FlashList ref={listRef} data={transcript} renderItem={renderItem} showsVerticalScrollIndicator={false} />
+			<FlashList
+				ref={listRef}
+				data={transcript}
+				renderItem={renderItem}
+				showsVerticalScrollIndicator={false}
+				contentContainerStyle={{ paddingBottom: 16 }}
+				// this is for auto-scrolling on last segment... hacky but meh
+				ListFooterComponent={() => <View style={{ height: 198 }} />}
+			/>
 
 			{/* Top & bottom fade */}
 			<BlurView
@@ -221,7 +230,7 @@ const ClosedCaption = ({ transcript, currentTime }: { transcript: SegmentTranscr
 				intensity={12}
 				tint="dark"
 				className="absolute bottom-40 left-0 right-0"
-				style={{ zIndex: 1000, height: 140 }}
+				style={{ zIndex: 1000, height: 124 }}
 			/>
 		</View>
 	);
@@ -243,7 +252,7 @@ const TranscriptRow = memo<TranscriptRowProps>(
 		const isGap = index === currentIndex && !(currentTime >= segment.start_time && currentTime <= segment.end_time);
 
 		return (
-			<View className={cn("w-full  my-16 px-1", status === "upcoming" && "bg-transparent")}>
+			<View className={cn("w-full my-20 px-1", status === "upcoming" && "bg-transparent")}>
 				<View className="flex flex-row flex-wrap">
 					{segment.words.map((word, wIdx) => {
 						let textColor = "text-slate-600";
@@ -298,28 +307,13 @@ TranscriptRow.displayName = "TranscriptRow";
  */
 const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed: boolean }) => {
 	const progress = useSharedValue(isCollapsed ? 1 : 0);
-	const toggleFavorite = useMutation(api.favorites.mutations.toggleFavorite);
 
 	// Animate collapse / expand
 	useEffect(() => {
 		progress.value = withTiming(isCollapsed ? 1 : 0, { duration: 250 });
 	}, [isCollapsed, progress]);
 
-	const { width: screenW } = useWindowDimensions();
-	const imgStyle = useAnimatedStyle(() => {
-		const size = interpolate(progress.value, [0, 1], [screenW - 48, 80]);
-		return { width: size, height: size };
-	});
-
-	const titleStyle = useAnimatedStyle(() => {
-		return {
-			marginTop: interpolate(progress.value, [0, 1], [48, 0]),
-			flex: isCollapsed ? 1 : undefined,
-		};
-	});
-
-	/** Sharing & favourite handlers */
-	const handleShare = async () => {
+	const handleShare = useCallback(async () => {
 		try {
 			await RNShare.share(
 				{
@@ -332,11 +326,23 @@ const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed
 		} catch (e) {
 			console.warn("[StoryHeader] Error sharing story", e);
 		}
-	};
+	}, [story]);
 
-	const handleToggleFavorite = async () => {
-		await toggleFavorite({ storyId: story._id });
-	};
+	const { width: screenW } = useWindowDimensions();
+	const imgStyle = useAnimatedStyle(() => {
+		const size = interpolate(progress.value, [0, 1], [screenW - 48, 80]);
+		return { width: size, height: size };
+	});
+
+	const titleStyle = useAnimatedStyle(() => {
+		return {
+			marginTop: interpolate(progress.value, [0, 1], [48, 0]),
+			// Use explicit width instead of flex to avoid layout conflicts
+			width: isCollapsed ? screenW - 80 - 48 - 16 : "100%", // account for image + gaps
+		};
+	});
+
+	// ... sharing & favourite handlers remain the same
 
 	return (
 		<Animated.View
@@ -352,9 +358,18 @@ const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed
 				<StoryImage imageUrl={story.imageUrl} disableAnimation={isCollapsed} />
 			</Animated.View>
 
-			<Animated.View style={[titleStyle, { width: "100%", flexDirection: "row" }]}>
-				<View className="flex w-full overflow-hidden flex-1 mr-8 flex-col">
-					<Marquee speed={0.5} spacing={48} style={{ maxWidth: 150 }}>
+			{/* Use explicit width calculation instead of flex */}
+			<Animated.View
+				style={[
+					titleStyle,
+					{
+						flexDirection: "row",
+						alignItems: "center",
+					},
+				]}
+			>
+				<View className="flex overflow-hidden flex-1 mr-4 flex-col">
+					<Marquee speed={0.5} spacing={48} style={{ maxWidth: isCollapsed ? 150 : undefined }}>
 						<Text className="text-slate-200 text-2xl font-bold">{story.title}</Text>
 					</Marquee>
 					<View className="flex flex-row gap-x-2 items-center mt-2">
@@ -364,19 +379,10 @@ const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed
 						</Text>
 					</View>
 				</View>
-				<View className="flex flex-row gap-x-4 items-center">
-					<Button
-						size="icon"
-						variant="ghost"
-						className={cn("bg-slate-800 rounded-full border border-slate-600", story.favorite && "bg-slate-500")}
-						onPress={handleToggleFavorite}
-					>
-						<Star
-							className={cn("text-slate-500 size-6", story.favorite && "text-amber-500 fill-amber-500")}
-							strokeWidth={1.5}
-							size={20}
-						/>
-					</Button>
+
+				{/* Fixed width for buttons to prevent them from being cut off */}
+				<View className="flex flex-row gap-x-4 items-center" style={{ width: 88 }}>
+					<FavoriteButton story={story} />
 
 					<Button
 						onPress={handleShare}
@@ -389,6 +395,39 @@ const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed
 				</View>
 			</Animated.View>
 		</Animated.View>
+	);
+};
+
+const FavoriteButton = ({ story }: { story: StoryExtended }) => {
+	const toggleFavorite = useMutation(api.favorites.mutations.toggleFavorite);
+	const [isFavorite, setIsFavorite] = useState(!!story.favorite);
+
+	const debounceToggle = debounce(async (favorite: boolean) => {
+		await toggleFavorite({ storyId: story._id, favorite });
+	}, 250);
+
+	const handleToggleFavorite = useCallback(async () => {
+		if (isFavorite) {
+			debounceToggle(false);
+		} else {
+			debounceToggle(true);
+		}
+		setIsFavorite((p) => !p);
+	}, [isFavorite, debounceToggle, setIsFavorite]);
+
+	return (
+		<Button
+			size="icon"
+			variant="ghost"
+			className={cn("bg-slate-800 rounded-full border border-slate-600", story.favorite && "bg-slate-500")}
+			onPress={handleToggleFavorite}
+		>
+			<Star
+				className={cn("text-slate-500 size-6", story.favorite && "text-amber-500 fill-amber-500")}
+				strokeWidth={1.5}
+				size={20}
+			/>
+		</Button>
 	);
 };
 

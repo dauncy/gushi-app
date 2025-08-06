@@ -22,7 +22,7 @@ export const getConvexURL = () => {
 };
 
 export const secondsToMinuteString = (seconds: number) => {
-	const d = Math.round(seconds);
+	const d = Math.ceil(seconds);
 	const minutes = Math.floor(d / 60);
 	const remainingSeconds = d % 60;
 	return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
