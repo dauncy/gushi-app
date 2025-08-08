@@ -14,13 +14,15 @@
     "convex:dev": "bunx convex dev",
     "convex:tunnel": "ngrok start --all --config=./ngrok.yaml",
     "combine-audio": "bun run ./scripts/combine-audio.ts",
-    "chunk-transcript": "bun run ./scripts/chunk-transcript.ts"
+    "chunk-transcript": "bun run ./scripts/chunk-transcript.ts",
+    "generate-audio": "bun run ./scripts/generate-audio.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^2.0.2",
     "@convex-dev/action-cache": "^0.2.10",
     "@convex-dev/react-query": "^0.0.0-alpha.11",
     "@expo/vector-icons": "^14.1.0",
+    "@google/genai": "^1.13.0",
     "@hookform/resolvers": "^5.1.1",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",

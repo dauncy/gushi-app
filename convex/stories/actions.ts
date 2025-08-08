@@ -1,9 +1,13 @@
 import { google } from "@/ai/google";
 import { components, internal } from "@/convex/_generated/api";
 import { ActionCtx, internalAction } from "@/convex/_generated/server";
+import { storyPrompt } from "@/prompts/story.prompt";
+import { voiceDescriptionPrompt } from "@/prompts/voice-descriptions.prompt";
 import { ActionCache } from "@convex-dev/action-cache";
-import { generateText } from "ai";
+import { generateObject, generateText } from "ai";
+import { zodToConvex } from "convex-helpers/server/zod";
 import { v } from "convex/values";
+import { z } from "zod";
 import { Id } from "../_generated/dataModel";
 
 export const generateStoryDescription = internalAction({
@@ -54,3 +58,63 @@ const storyDescriptionCache = new ActionCache(components.actionCache, {
 export const getDescription = async (ctx: ActionCtx, { storyId }: { storyId: Id<"stories"> }) => {
 	return await storyDescriptionCache.fetch(ctx, { storyId });
 };
+
+const storyStranscript = z.object({
+	body: z.string(),
+	speaker: z.string(),
+	voiceInstructions: z.string(),
+	gender: z.enum(["male", "female"]),
+});
+
+export const generateStory = internalAction({
+	args: {
+		prompt: v.string(),
+	},
+	handler: async (ctx, args) => {
+		const response = await generateObject({
+			model: google("gemini-2.5-flash"),
+			schema: z.array(storyStranscript),
+			system: storyPrompt,
+			prompt: args.prompt,
+			temperature: 0.6,
+			providerOptions: {
+				google: {
+					thinkingBudget: -1,
+				},
+			},
+		});
+		return response.object;
+	},
+});
+
+const voiceDescriptionSchema = z.object({
+	voice: z.string(),
+	description: z.string(),
+});
+
+export const generateVoiceDescriptions = internalAction({
+	args: zodToConvex(
+		z.object({
+			transcript: z.array(storyStranscript),
+		}),
+	),
+	handler: async (ctx, args) => {
+		const response = await generateObject({
+			model: google("gemini-2.5-flash"),
+			schema: z.array(voiceDescriptionSchema),
+			system: voiceDescriptionPrompt,
+			prompt: `
+			Generate a voice description for each speaker in the following transcript:
+			${JSON.stringify(args.transcript, null, 2)}
+			`,
+			providerOptions: {
+				google: {
+					thinkingBudget: -1,
+				},
+			},
+			temperature: 0.6,
+		});
+
+		return response.object;
+	},
+});
