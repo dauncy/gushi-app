@@ -2,6 +2,7 @@ import { httpRouter } from "convex/server";
 import { getWellKnownJWKsHttp, loginHttp, refreshHttp } from "./auth/http";
 import { storyMetadataHttpAction } from "./stories";
 import { subscriptionWebhooksHttpAction } from "./subscriptions/http";
+import { createSupportRequestHttp } from "./support/http";
 import { upsertUserHttp } from "./users/http";
 
 const http = httpRouter();
@@ -40,6 +41,12 @@ http.route({
 	pathPrefix: "/stories/metadata/",
 	method: "GET",
 	handler: storyMetadataHttpAction,
+});
+
+http.route({
+	path: "/support",
+	method: "POST",
+	handler: createSupportRequestHttp,
 });
 
 export default http;
