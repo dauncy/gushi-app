@@ -56,7 +56,8 @@ export const getaSubscriptionType = (customer: RevenueCatCustomer) => {
 	const now = new Date().toISOString();
 	const expiresAt = maybeEntitlement.expires_at;
 	// give it 5 min buffer for revalidations
-	if (expiresAt && new Date(expiresAt + 5000 * 60).toISOString() >= now) {
+	const fiveMinMs = 5 * 60 * 1000;
+	if (expiresAt && new Date(expiresAt + fiveMinMs).toISOString() >= now) {
 		return "monthly";
 	}
 	return null;
