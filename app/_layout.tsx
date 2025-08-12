@@ -40,7 +40,7 @@ const initRevenueCat = async (onUpdate: (customerInfo: CustomerInfo) => void) =>
 	Purchases.configure({ apiKey: appleKey });
 	const customerInfo = await new Promise<CustomerInfo>((resolve, reject) => {
 		Purchases.addCustomerInfoUpdateListener(async (customerInfo) => {
-			// onUpdate(customerInfo);
+			onUpdate(customerInfo);
 			resolve(customerInfo);
 		});
 	});
@@ -64,7 +64,9 @@ export default function RootLayout() {
 				await Font.loadAsync({
 					SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
 				});
-				const customerInfo = await initRevenueCat((updates) => {});
+				const customerInfo = await initRevenueCat((updates) => {
+					setCustomerInfo(updates);
+				});
 				setCustomerInfo(customerInfo);
 				if (!initialCustomerRef.current) {
 					initialCustomerRef.current = true;

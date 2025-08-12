@@ -53,7 +53,10 @@ export const getaSubscriptionType = (customer: RevenueCatCustomer) => {
 	if (maybeEntitlement.expires_at === null) {
 		return "lifetime";
 	}
-	if (maybeEntitlement.expires_at && new Date(maybeEntitlement.expires_at).toISOString() >= new Date().toISOString()) {
+	const now = new Date().toISOString();
+	const expiresAt = maybeEntitlement.expires_at;
+	// give it 5 min buffer for revalidations
+	if (expiresAt && new Date(expiresAt + 5000 * 60).toISOString() >= now) {
 		return "monthly";
 	}
 	return null;

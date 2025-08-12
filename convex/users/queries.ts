@@ -1,5 +1,6 @@
 import { v } from "convex/values";
-import { internalQuery, QueryCtx } from "../_generated/server";
+import { internalQuery, query, QueryCtx } from "../_generated/server";
+import { verifyAccess } from "../common/utils";
 
 export const getUserById = internalQuery({
 	args: {
@@ -24,5 +25,18 @@ export const getUserByRevenuecatUserId = internalQuery({
 	},
 	handler: async (ctx, args) => {
 		return await getUser(ctx, args);
+	},
+});
+
+export const getUserPublic = query({
+	args: {},
+	handler: async (ctx, args) => {
+		try {
+			const { dbUser } = await verifyAccess(ctx, { validateSubscription: false });
+			return dbUser;
+		} catch (e) {
+			console.warn("[convex/users/queries.ts]: getUserPublic() => error", e);
+			return null;
+		}
 	},
 });

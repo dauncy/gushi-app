@@ -10,6 +10,7 @@ export const useConvexPaginatedQuery = <T extends PaginatedQueryReference>(
 	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const abortControllerRef = useRef<AbortController | null>(null);
 	const isMountedRef = useRef(true);
+
 	const shouldSkip = refreshing;
 	const { isLoading, loadMore, results, status } = usePaginatedQuery(query, shouldSkip ? "skip" : args, options);
 

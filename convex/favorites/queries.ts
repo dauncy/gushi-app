@@ -10,47 +10,56 @@ export const getUserFavorites = query({
 		paginationOpts: paginationOptsValidator,
 	},
 	handler: async (ctx, { paginationOpts }): Promise<PaginationResult<StoryPreview>> => {
-		const { dbUser } = await verifyAccess(ctx, { validateSubscription: true });
-		const userFavorites = await ctx.db
-			.query("favorites")
-			.withIndex("by_user", (q) => q.eq("userId", dbUser._id))
-			.paginate(paginationOpts);
-		const stories = await Promise.all(
-			userFavorites.page.map(async (fav) => {
-				const story = await ctx.db.get(fav.storyId);
-				if (!story) {
-					return null;
-				}
+		try {
+			const { dbUser } = await verifyAccess(ctx, { validateSubscription: true });
+			const userFavorites = await ctx.db
+				.query("favorites")
+				.withIndex("by_user", (q) => q.eq("userId", dbUser._id))
+				.paginate(paginationOpts);
+			const stories = await Promise.all(
+				userFavorites.page.map(async (fav) => {
+					const story = await ctx.db.get(fav.storyId);
+					if (!story) {
+						return null;
+					}
 
-				const [imageUrl, audioUrl] = await Promise.all([
-					getImageUrl(ctx, story.imageId),
-					getAudioUrl(ctx, story.audioId),
-				]);
+					const [imageUrl, audioUrl] = await Promise.all([
+						getImageUrl(ctx, story.imageId),
+						getAudioUrl(ctx, story.audioId),
+					]);
 
-				if (!imageUrl || !audioUrl) {
-					return null;
-				}
+					if (!imageUrl || !audioUrl) {
+						return null;
+					}
 
-				return {
-					_id: story._id,
-					title: story.title,
-					subscription_required: story.subscription_required,
-					imageUrl,
-					audioUrl,
-					updatedAt: story.updatedAt,
-					duration: story.transcript[story.transcript.length - 1].end_time,
-					favorite: {
-						_id: fav._id,
-						_createdAt: fav.createdAt,
-					},
-				};
-			}),
-		);
+					return {
+						_id: story._id,
+						title: story.title,
+						subscription_required: story.subscription_required,
+						imageUrl,
+						audioUrl,
+						updatedAt: story.updatedAt,
+						duration: story.transcript[story.transcript.length - 1].end_time,
+						favorite: {
+							_id: fav._id,
+							_createdAt: fav.createdAt,
+						},
+					};
+				}),
+			);
 
-		return {
-			...userFavorites,
-			page: stories.filter(Boolean) as StoryPreview[],
-		};
+			return {
+				...userFavorites,
+				page: stories.filter(Boolean) as StoryPreview[],
+			};
+		} catch (e) {
+			console.warn("[convex/favorites/queries.ts]: getUserFavorites() => error", e);
+			return {
+				page: [],
+				isDone: true,
+				continueCursor: "",
+			};
+		}
 	},
 });
 

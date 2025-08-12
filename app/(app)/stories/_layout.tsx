@@ -1,8 +1,10 @@
 import { VerifyAccess } from "@/components/control-flows/VerifyAccess";
+import { useAudio } from "@/context/AudioContext";
 import { Link, Stack } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
 export default function StoriesLayout() {
+	const { ended, stop } = useAudio();
 	return (
 		<VerifyAccess
 			fallback={
@@ -26,7 +28,16 @@ export default function StoriesLayout() {
 					},
 				}}
 			>
-				<Stack.Screen name="[storyId]" />
+				<Stack.Screen
+					name="[storyId]"
+					listeners={{
+						beforeRemove: async (e) => {
+							if (ended) {
+								await stop();
+							}
+						},
+					}}
+				/>
 			</Stack>
 		</VerifyAccess>
 	);

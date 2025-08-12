@@ -17,7 +17,13 @@ export const bustSubscriptionCache = action({
 			throw new ConvexError("Unauthorized");
 		}
 		if (identity.subject === args.revenueCatId) {
+			await bustCustomerCache(ctx, { revenuecatUserId: identity.subject });
 			const cachedCustomer = await getCustomerCached(ctx, { revenuecatUserId: identity.subject });
+			const subscriptionType = getaSubscriptionType(cachedCustomer);
+			await ctx.runMutation(internal.users.mutations.upsertUser, {
+				revenuecatUserId: identity.subject,
+				subscriptionType: subscriptionType,
+			});
 			return {
 				success: true,
 				customer: cachedCustomer,

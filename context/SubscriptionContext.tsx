@@ -51,6 +51,13 @@ export const useSubscription = () => {
 		return { customerInfo, hasSubscription: true, subscriptionType: "lifetime", revalidateSubscription, revalidating };
 	}
 	if (activeEntitlements["Pro - Recurring"]) {
+		const entitlement = activeEntitlements["Pro - Recurring"];
+		const expiresAt = new Date(entitlement.expirationDateMillis as number).toISOString();
+		const now = new Date().toISOString();
+		const isExpired = expiresAt < now;
+		if (isExpired) {
+			return { customerInfo, hasSubscription: false, subscriptionType: null, revalidateSubscription, revalidating };
+		}
 		return { customerInfo, hasSubscription: true, subscriptionType: "recurring", revalidateSubscription, revalidating };
 	}
 	return { customerInfo, hasSubscription: false, subscriptionType: null, revalidateSubscription, revalidating };

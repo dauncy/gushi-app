@@ -9,7 +9,7 @@ export default function AppLayout() {
 			screenOptions={{
 				headerShown: false,
 				contentStyle: {
-					backgroundColor: "#0f172a",
+					backgroundColor: "#082F49",
 				},
 			}}
 			layout={({ children }) => (
@@ -63,7 +63,7 @@ const RenderLayout = ({ children }: { children: ReactNode }) => {
 	const { isAuthenticated, isLoading } = useConvexAuth();
 	if (isLoading && !isAuthenticated) {
 		return (
-			<View className="flex-1 items-center justify-center bg-slate-900">
+			<View className="flex-1 items-center justify-center bg-[#082F49]">
 				<ActivityIndicator size="large" color="#c026d3" />
 			</View>
 		);

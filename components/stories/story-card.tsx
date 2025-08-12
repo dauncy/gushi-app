@@ -142,8 +142,13 @@ export const StoryCard = ({ story, onCardPress }: { story: StoryPreview; onCardP
 								return;
 							}
 							pressableRef.current = false;
-							setStory({ storyUrl: sanitizeStorageUrl(story.audioUrl), storyId: story._id });
-							play();
+							setStory({
+								storyUrl: sanitizeStorageUrl(story.audioUrl),
+								storyId: story._id,
+								storyImage: sanitizeStorageUrl(story.imageUrl ?? ""),
+								storyTitle: story.title,
+								autoPlay: true,
+							});
 							setTimeout(() => {
 								pressableRef.current = true;
 							}, 300);

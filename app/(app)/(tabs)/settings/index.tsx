@@ -3,7 +3,10 @@ import { Bug } from "@/components/ui/icons/bug-icon";
 import { Feather } from "@/components/ui/icons/feather-icon";
 import { Lightbulb } from "@/components/ui/icons/lightbulb-icon";
 import { Shield } from "@/components/ui/icons/shield-icons";
+import { Trash2 } from "@/components/ui/icons/trash-icon";
 import { useSubscription } from "@/context/SubscriptionContext";
+import { api } from "@/convex/_generated/api";
+import { useMutation } from "convex/react";
 import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
 import { useRef } from "react";
@@ -13,6 +16,7 @@ export default function SettingsListPage() {
 	const clickRef = useRef(false);
 	const { subscriptionType } = useSubscription();
 	const router = useRouter();
+	const resetUserAppData = useMutation(api.users.mutations.resetAppData);
 
 	const handleCancelSubscription = () => {
 		if (clickRef.current) return;
@@ -30,6 +34,27 @@ export default function SettingsListPage() {
 			},
 			{
 				text: "Keep Subscription",
+				style: "cancel",
+				onPress: () => {
+					clickRef.current = false;
+				},
+			},
+		]);
+	};
+
+	const handleResetAppData = () => {
+		if (clickRef.current) return;
+		clickRef.current = true;
+		Alert.alert("Reset App Data", "Are you sure you want to reset your app data? This action cannot be undone.", [
+			{
+				text: "Reset App Data",
+				onPress: async () => {
+					clickRef.current = false;
+					await resetUserAppData({});
+				},
+			},
+			{
+				text: "Cancel",
 				style: "cancel",
 				onPress: () => {
 					clickRef.current = false;
@@ -100,22 +125,37 @@ export default function SettingsListPage() {
 					</TouchableOpacity>
 				</View>
 			</View>
+			<View className="flex flex-col gap-y-12 mt-auto mb-4">
+				{subscriptionType === "recurring" && (
+					<View className="flex flex-col gap-1 ">
+						<Text className="text-slate-500 text-sm font-semibold ml-2">{"Subscription"}</Text>
+						<View className="bg-slate-800/50 rounded-2xl flex flex-col">
+							<TouchableOpacity
+								activeOpacity={0.8}
+								className="px-4 py-4 flex flex-row items-center gap-4"
+								onPress={handleCancelSubscription}
+							>
+								<Ban className="w-4 h-4 text-red-500" />
+								<Text className="text-red-500 text-base font-medium">{"Cancel Subscription"}</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
+				)}
 
-			{subscriptionType === "recurring" && (
-				<View className="flex flex-col gap-1 mt-auto mb-4">
-					<Text className="text-slate-500 text-sm font-semibold ml-2">{"Subscription"}</Text>
+				<View className="flex flex-col gap-1">
+					<Text className="text-slate-500 text-sm font-semibold ml-2">{"Personal Data"}</Text>
 					<View className="bg-slate-800/50 rounded-2xl flex flex-col">
 						<TouchableOpacity
 							activeOpacity={0.8}
 							className="px-4 py-4 flex flex-row items-center gap-4"
-							onPress={handleCancelSubscription}
+							onPress={handleResetAppData}
 						>
-							<Ban className="w-4 h-4 text-red-500" />
-							<Text className="text-red-500 text-base font-medium">{"Cancel Subscription"}</Text>
+							<Trash2 className="w-4 h-4 text-red-500" />
+							<Text className="text-red-500 text-base font-medium">{"Reset App Data"}</Text>
 						</TouchableOpacity>
 					</View>
 				</View>
-			)}
+			</View>
 		</View>
 	);
 }

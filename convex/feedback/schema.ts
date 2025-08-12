@@ -13,4 +13,4 @@ export const feedback = defineTable(
 			userId: zid("users"),
 		}),
 	),
-);
+).index("by_user", ["userId"]);

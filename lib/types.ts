@@ -7,7 +7,7 @@ export type RevenueCatCustomer = {
 	active_entitlements: {
 		items: {
 			entitlement_id: string;
-			expires_at: number | null | string;
+			expires_at: number;
 			object: string;
 		}[];
 		next_page: null;

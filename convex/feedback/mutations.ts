@@ -13,18 +13,23 @@ export const createFeedback = mutation({
 		}),
 	),
 	handler: async (ctx, args) => {
-		const { dbUser } = await verifyAccess(ctx, { validateSubscription: true });
-		const { type, title, body, email } = args;
+		try {
+			const { dbUser } = await verifyAccess(ctx, { validateSubscription: true });
+			const { type, title, body, email } = args;
 
-		const feedback = await ctx.db.insert("feedback", {
-			type,
-			title,
-			body,
-			email,
-			createdAt: new Date().toISOString(),
-			userId: dbUser._id,
-		});
+			const feedback = await ctx.db.insert("feedback", {
+				type,
+				title,
+				body,
+				email,
+				createdAt: new Date().toISOString(),
+				userId: dbUser._id,
+			});
 
-		return feedback;
+			return feedback;
+		} catch (e) {
+			console.warn("[convex/feedback/mutations.ts]: createFeedback() => error", e);
+			return null;
+		}
 	},
 });

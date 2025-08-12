@@ -18,9 +18,10 @@ import { useConvexQuery } from "@/hooks/use-convexQuery";
 import { cn, sanitizeStorageUrl } from "@/lib/utils";
 import { FlashList, ListRenderItemInfo, type FlashListRef } from "@shopify/flash-list";
 import { useMutation } from "convex/react";
+import { ConvexError } from "convex/values";
 import { formatDistanceToNow } from "date-fns";
 import { BlurView } from "expo-blur";
-import { useLocalSearchParams } from "expo-router";
+import { Redirect, useLocalSearchParams } from "expo-router";
 import { debounce } from "lodash";
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, Share as RNShare, Text, useWindowDimensions, View } from "react-native";
@@ -52,10 +53,15 @@ const formatTime = (seconds: number) => {
  */
 export default function StoryPage() {
 	const { storyId } = useLocalSearchParams();
-	const { data, isLoading } = useConvexQuery(api.stories.queries.getStory, {
+	const { data, isLoading, error } = useConvexQuery(api.stories.queries.getStory, {
 		storyId: storyId as Id<"stories">,
 	});
 
+	if (error && error instanceof ConvexError) {
+		if (error.data === "No Subscription") {
+			return <Redirect href={"/"} />;
+		}
+	}
 	return (
 		<SafeAreaView className="flex-1 bg-slate-900 flex">
 			<View className="flex-1 flex-col py-12 px-8 flex relative">
@@ -317,8 +323,8 @@ const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed
 		try {
 			await RNShare.share(
 				{
-					message: `Check out this story: ${story.title}`,
-					url: `${process.env.EXPO_PUBLIC_APP_URL}/stories/${story._id}`,
+					message: `Check out this story on Gushi: ${story.title}`,
+					url: `${process.env.EXPO_PUBLIC_WEB_URL}/stories/${story._id}`,
 					title: `Share ${story.title}`,
 				},
 				{ dialogTitle: `Share ${story.title}` },

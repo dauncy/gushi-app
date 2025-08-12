@@ -115,8 +115,10 @@ const AnonymousHomePage = () => {
 						setStory({
 							storyUrl: sanitizeStorageUrl(story.audioUrl),
 							storyId: story._id,
+							storyImage: sanitizeStorageUrl(story.imageUrl ?? ""),
+							storyTitle: story.title,
+							autoPlay: true,
 						});
-						play();
 					}
 				}}
 			/>
@@ -136,8 +138,13 @@ const CustomerHomePage = () => {
 				onCardPress={(story) => {
 					if (story.audioUrl) {
 						if (storyId !== story._id) {
-							setStory({ storyUrl: sanitizeStorageUrl(story.audioUrl), storyId: story._id });
-							play();
+							setStory({
+								storyUrl: sanitizeStorageUrl(story.audioUrl),
+								storyId: story._id,
+								storyImage: sanitizeStorageUrl(story.imageUrl ?? ""),
+								storyTitle: story.title,
+								autoPlay: true,
+							});
 							router.push(`/stories/${story._id}`);
 						} else {
 							if (!isPlaying) {

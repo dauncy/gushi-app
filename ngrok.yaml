@@ -8,3 +8,6 @@ tunnels:
   client:
     addr: 3210
     proto: http
+  web:
+    addr: 3000
+    proto: http
