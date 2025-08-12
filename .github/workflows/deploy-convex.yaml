@@ -1,0 +1,37 @@
+name: Deploy Convex
+
+on:
+  push:
+    branches: [main]   
+    paths:                      # run only when backend changes
+      - "convex/**"             # everything inside the convex dir
+      - ".github/workflows/deploy-convex.yaml"   # keep itself deployable
+      - "ai/**" # this should move into a backend directory
+      - "prompts/**" # this should move into a backend directory
+      - "lib/**"
+      - "constants/**"
+      - "fixtures/**"
+  workflow_dispatch:            # manual trigger remains
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: prod
+    concurrency: convex-deploy
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0        # lets GH evaluate the path filter correctly
+
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install deps
+        run: bun install --frozen-lockfile
+
+      - name: Deploy to Convex
+        env:
+          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
+        run: bunx convex@latest deploy --yes
