@@ -52,14 +52,14 @@ const StoryList = ({ onCardPress }: { onCardPress: (story: StoryPreview) => void
 				ListEmptyComponent={
 					<>
 						{isLoading ? (
-							<View className="flex flex-col gap-y-3 mt-16">
+							<View className="flex flex-col gap-y-3">
 								{Array.from({ length: 10 }).map((_, index) => (
 									<StoryCardLoading key={`loading-${index}`} />
 								))}
 							</View>
 						) : (
-							<View className="flex flex-col gap-y-3 mt-16">
-								<Text>No stories found</Text>
+							<View className="flex flex-col gap-y-3 mt-24">
+								<Text className="text-slate-200 text-center">No stories found</Text>
 							</View>
 						)}
 					</>
@@ -106,7 +106,7 @@ const UpgradeSection = () => {
 };
 
 const AnonymousHomePage = () => {
-	const { play, setStory } = useAudio();
+	const { setStory } = useAudio();
 	return (
 		<View style={{ flex: 1 }} className="relative bg-neutral-950 px-2">
 			<StoryList
