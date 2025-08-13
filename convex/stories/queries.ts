@@ -28,7 +28,7 @@ export const getStories = query({
 			const { hasSubscription } = await verifyAccess(ctx, { validateSubscription: false });
 			const storiesPage = await ctx.db
 				.query("stories")
-				.withIndex("by_enabled", (q) => q.eq("enabled", true))
+				.withIndex("by_featured_enabled", (q) => q.eq("featured", false).eq("enabled", true))
 				.paginate(paginationOpts);
 
 			const stories = await Promise.all(
@@ -44,7 +44,7 @@ export const getStories = query({
 						promises.push(getAudioUrl(ctx, story.audioId));
 					}
 					const [imageUrl, audioUrl] = await Promise.all(promises);
-					const duration = story.transcript[story.transcript.length - 1].end_time;
+					const duration = Math.ceil(story.transcript[story.transcript.length - 1].end_time);
 					return {
 						_id: story._id,
 						title: story.title,
@@ -172,5 +172,40 @@ export const getStoryBody = internalQuery({
 	handler: async (ctx, { storyId }) => {
 		const story = await ctx.db.get(storyId);
 		return story?.body;
+	},
+});
+
+export const getFeaturedStory = query({
+	args: {},
+	handler: async (ctx): Promise<StoryPreview | null> => {
+		const { hasSubscription } = await verifyAccess(ctx, { validateSubscription: false });
+		const story = await ctx.db
+			.query("stories")
+			.withIndex("by_featured_enabled", (q) => q.eq("featured", true).eq("enabled", true))
+			.first();
+		if (!story) {
+			return null;
+		}
+		const promises: Promise<string | null>[] = [getImageUrl(ctx, story.imageId)];
+		if (story.subscription_required) {
+			if (hasSubscription) {
+				promises.push(getAudioUrl(ctx, story.audioId));
+			} else {
+				promises.push(Promise.resolve(null));
+			}
+		} else {
+			promises.push(getAudioUrl(ctx, story.audioId));
+		}
+		const [imageUrl, audioUrl] = await Promise.all(promises);
+		const duration = Math.ceil(story.transcript[story.transcript.length - 1].end_time);
+		return {
+			_id: story._id,
+			title: story.title,
+			imageUrl,
+			audioUrl,
+			duration,
+			updatedAt: story.updatedAt,
+			subscription_required: !!story.subscription_required,
+		};
 	},
 });

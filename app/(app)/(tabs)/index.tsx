@@ -1,4 +1,5 @@
 import { AudioPreviewPlayer } from "@/components/audio/audio-preview";
+import { FeaturedStoryCard } from "@/components/stories/featured-card";
 import { StoryCard, StoryCardLoading } from "@/components/stories/story-card";
 import { ChevronUp } from "@/components/ui/icons/chevron-up-icon";
 import { useAudio } from "@/context/AudioContext";
@@ -9,7 +10,7 @@ import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { sanitizeStorageUrl } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
-import { useCallback, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { ActivityIndicator, Pressable, RefreshControl, Text, View } from "react-native";
 
 export default function Home() {
@@ -21,6 +22,7 @@ export default function Home() {
 }
 
 const StoryList = ({ onCardPress }: { onCardPress: (story: StoryPreview) => void }) => {
+	const { hasSubscription } = useSubscription();
 	const { isLoading, refreshing, refresh, loadMore, results, status } = useConvexPaginatedQuery(
 		api.stories.queries.getStories,
 		{},
@@ -35,13 +37,20 @@ const StoryList = ({ onCardPress }: { onCardPress: (story: StoryPreview) => void
 		}
 	}, [loadMore, status]);
 
+	const listItems = useMemo(() => {
+		if (hasSubscription) {
+			return results;
+		}
+		return results.filter((story) => story.subscription_required === true);
+	}, [hasSubscription, results]);
+
 	return (
 		<View className="flex-1" style={{ marginTop: 44 }}>
 			<FlashList
 				refreshControl={<RefreshControl tintColor="#8b5cf6" refreshing={refreshing} onRefresh={refresh} />}
 				onEndReached={onEndReached}
-				extraData={{ isLoading, refreshing, status }}
-				data={results}
+				extraData={{ isLoading, refreshing, status, hasSubscription }}
+				data={listItems}
 				keyExtractor={(item) => item._id}
 				renderItem={({ item }) => <StoryCard story={item} onCardPress={() => onCardPress(item)} />}
 				ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
@@ -64,6 +73,21 @@ const StoryList = ({ onCardPress }: { onCardPress: (story: StoryPreview) => void
 						)}
 					</>
 				}
+				ListHeaderComponent={() => {
+					if (hasSubscription) {
+						return <FeaturedStoryCard />;
+					}
+					return (
+						<View className="flex flex-col gap-y-4">
+							{results
+								.filter((story) => story.subscription_required === false)
+								.map((story) => (
+									<StoryCard key={story._id} story={story} onCardPress={() => onCardPress(story)} />
+								))}
+							<FeaturedStoryCard />
+						</View>
+					);
+				}}
 				ListFooterComponent={
 					<>
 						{status === "LoadingMore" ? (

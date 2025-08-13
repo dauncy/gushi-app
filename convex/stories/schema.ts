@@ -45,6 +45,7 @@ const storiesSchema = z.object({
 	transcript: z.array(segmentTranscriptSchema),
 	enabled: z.boolean().default(false),
 	subscription_required: z.boolean().default(true),
+	featured: z.boolean().default(false),
 	imageId: zid("images"),
 	audioId: zid("audio"),
 	createdAt: z.string().datetime(),
@@ -59,12 +60,12 @@ export type StoryPublic = Omit<
 
 export type StoryPreview = Omit<
 	StoryPrivate,
-	"body" | "enabled" | "transcript" | "imageId" | "audioId" | "createdAt"
+	"body" | "enabled" | "transcript" | "imageId" | "audioId" | "createdAt" | "featured"
 > & { imageUrl: Nullable<string>; audioUrl: Nullable<string>; duration: number; _id: Id<"stories"> };
 
 export type StoryExtended = Omit<
 	StoryPrivate,
-	"enabled" | "subscription_required" | "imageId" | "audioId" | "createdAt"
+	"enabled" | "subscription_required" | "imageId" | "audioId" | "createdAt" | "featured"
 > & {
 	imageUrl: Nullable<string>;
 	audioUrl: Nullable<string>;
@@ -79,4 +80,6 @@ export type SegmentTranscript = z.infer<typeof segmentTranscriptSchema>;
 
 export const stories = defineTable(zodToConvex(storiesSchema))
 	.index("by_enabled", ["enabled"])
-	.index("by_subscription_required", ["subscription_required"]);
+	.index("by_subscription_required", ["subscription_required"])
+	.index("by_featured", ["featured"])
+	.index("by_featured_enabled", ["featured", "enabled"]);
