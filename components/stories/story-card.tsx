@@ -6,10 +6,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAudio } from "@/context/AudioContext";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { StoryPreview } from "@/convex/stories/schema";
-import { presentPaywall } from "@/lib/revenue-cat";
 import { sanitizeStorageUrl, secondsToMinuteString } from "@/lib/utils";
 import { BlurView } from "expo-blur";
-import { useMemo, useRef } from "react";
+import { useRouter } from "expo-router";
+import { useCallback, useMemo, useRef } from "react";
 import { Pressable, Text, TouchableOpacity, View } from "react-native";
 import { Stop } from "../ui/icons/stop-icon";
 import { StoryImagePreview } from "./story-image";
@@ -32,7 +32,18 @@ export const StoryCardLoading = () => {
 export const StoryCard = ({ story, onCardPress }: { story: StoryPreview; onCardPress: () => void }) => {
 	const pressableRef = useRef<boolean>(true);
 	const { hasSubscription } = useSubscription();
+	const router = useRouter();
 	const { play, setStory, isPlaying, storyId, stop } = useAudio();
+
+	const presentPaywall = useCallback(() => {
+		if (pressableRef.current) {
+			pressableRef.current = false;
+			router.push("/upgrade");
+			setTimeout(() => {
+				pressableRef.current = true;
+			}, 300);
+		}
+	}, [router, pressableRef]);
 
 	const isCurrentStory = useMemo(() => {
 		return storyId === story._id;
@@ -51,7 +62,7 @@ export const StoryCard = ({ story, onCardPress }: { story: StoryPreview; onCardP
 	if (locked) {
 		return (
 			<TouchableOpacity activeOpacity={0.8} onPress={presentPaywall}>
-				<View className="flex w-full p-3 rounded-xl bg-slate-900 p-4 flex-row  w-full gap-4 border border-slate-800 relative">
+				<View className="flex w-full rounded-xl bg-slate-900 p-4 flex-row  w-full gap-4 border border-slate-800 relative">
 					<StoryImagePreview imageUrl={story.imageUrl} />
 					<View className="flex flex-col gap-y-1 flex-1 mt-0.5">
 						<Text className="text-slate-300 text-lg font-semibold">{story.title}</Text>
@@ -97,7 +108,7 @@ export const StoryCard = ({ story, onCardPress }: { story: StoryPreview; onCardP
 					pressableRef.current = true;
 				}, 300);
 			}}
-			className="flex w-full p-3 rounded-xl bg-slate-900 p-4 flex-row  w-full gap-4 border border-slate-800"
+			className="flex w-full rounded-xl bg-slate-900 p-4 flex-row  w-full gap-4 border border-slate-800"
 		>
 			<StoryImagePreview imageUrl={story.imageUrl} active={isCurrentStory} />
 			<View className="flex flex-col gap-y-1 flex-1 mt-0.5">

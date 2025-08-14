@@ -3,14 +3,15 @@ import { FileX } from "@/components/ui/icons/image-fail-icon";
 import { Image } from "@/components/ui/image";
 import { cn, sanitizeStorageUrl } from "@/lib/utils";
 import { cva } from "class-variance-authority";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { View } from "react-native";
 
-const imageVariants = cva("rounded-md flex items-center justify-center", {
+const imageVariants = cva("flex items-center justify-center", {
 	variants: {
 		size: {
-			default: "size-20",
-			sm: "size-10",
+			default: "size-20 rounded-md ",
+			sm: "size-10 rounded-md ",
+			featured: "w-full h-full rounded-t-xl",
 		},
 	},
 	defaultVariants: {
@@ -18,37 +19,51 @@ const imageVariants = cva("rounded-md flex items-center justify-center", {
 	},
 });
 
-export const StoryImagePreview = ({
+const StoryImagePreviewComp = ({
 	imageUrl,
 	size = "default",
 	active = false,
+	className = "",
 }: {
 	imageUrl: string | null;
-	size?: "default" | "sm";
+	size?: "default" | "sm" | "featured";
 	active?: boolean;
+	className?: string;
 }) => {
 	const [error, setError] = useState(false);
 
 	const showFallback = error || !imageUrl;
 	if (showFallback) {
 		return (
-			<View className={cn(imageVariants({ size }), "bg-slate-800 border border-zinc-700")}>
+			<View className={cn(imageVariants({ size }), "bg-slate-800 border border-zinc-700", className)}>
 				<FileX className="text-zinc-700" strokeWidth={1} size={36} />
 			</View>
 		);
 	}
 	return (
-		<View className={cn(imageVariants({ size }), "relative")}>
+		<View className={cn(imageVariants({ size }), "relative", className)}>
 			<Image
+				cachePolicy={"memory-disk"}
 				source={{ uri: sanitizeStorageUrl(imageUrl) }}
 				className={cn(imageVariants({ size }))}
 				onError={() => setError(true)}
 			/>
 			{active && (
-				<View className="absolute inset-0 bg-black/50 rounded-md flex items-center justify-center">
-					<AudioLines className="text-slate-300" size={size === "default" ? 20 : 16} />
+				<View
+					className={cn(
+						"absolute inset-0 bg-black/50 lex items-center justify-center",
+						size !== "featured" && "rounded-md",
+					)}
+				>
+					<AudioLines
+						className={cn("text-slate-300", size === "featured" && "text-white")}
+						size={size === "default" ? 20 : size === "sm" ? 16 : 48}
+					/>
 				</View>
 			)}
 		</View>
 	);
 };
+
+export const StoryImagePreview = memo(StoryImagePreviewComp);
+StoryImagePreview.displayName = "StoryImagePreview";
