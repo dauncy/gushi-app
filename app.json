@@ -16,6 +16,9 @@
           "audio"
         ]
       },
+      "config": {
+        "usesNonExemptEncryption": false
+      },
       "appleTeamId": "X2HJ883WPZ",
       "associatedDomains": [
         "applinks:gushi.spacenoodle.ai"
