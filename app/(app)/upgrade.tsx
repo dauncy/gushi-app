@@ -19,7 +19,7 @@ export default function UpgradePage() {
 	const handleToast = useCallback(() => {
 		Toast.show({
 			type: "proUpgrade",
-			text1: "Congrats! You've upgraded to TuckedIn Pro 🌙",
+			text1: "Congrats! You've upgraded to Gushi Pro 🌙",
 		});
 	}, []);
 
@@ -81,7 +81,7 @@ export default function UpgradePage() {
 		}
 		return (
 			<View className="flex-1 items-center flex-col justify-center">
-				<Text className="text-2xl font-bold text-slate-200">Welcome to TuckedIn Pro 🌙</Text>
+				<Text className="text-2xl font-bold text-slate-200">Welcome to Gushi Pro 🌙</Text>
 				<Text className="text-lg text-slate-400 mt-3">{"Enjoy access to every story."}</Text>
 				<Pressable
 					disabled={revalidating}

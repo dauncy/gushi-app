@@ -3,7 +3,7 @@ import { FileX } from "@/components/ui/icons/image-fail-icon";
 import { Image } from "@/components/ui/image";
 import { cn, sanitizeStorageUrl } from "@/lib/utils";
 import { cva } from "class-variance-authority";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { View } from "react-native";
 
 const imageVariants = cva("flex items-center justify-center", {
@@ -19,7 +19,7 @@ const imageVariants = cva("flex items-center justify-center", {
 	},
 });
 
-export const StoryImagePreview = ({
+const StoryImagePreviewComp = ({
 	imageUrl,
 	size = "default",
 	active = false,
@@ -43,6 +43,7 @@ export const StoryImagePreview = ({
 	return (
 		<View className={cn(imageVariants({ size }), "relative", className)}>
 			<Image
+				cachePolicy={"memory-disk"}
 				source={{ uri: sanitizeStorageUrl(imageUrl) }}
 				className={cn(imageVariants({ size }))}
 				onError={() => setError(true)}
@@ -63,3 +64,6 @@ export const StoryImagePreview = ({
 		</View>
 	);
 };
+
+export const StoryImagePreview = memo(StoryImagePreviewComp);
+StoryImagePreview.displayName = "StoryImagePreview";

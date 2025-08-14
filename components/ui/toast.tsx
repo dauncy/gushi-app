@@ -8,7 +8,7 @@ const ProUpgradeToast = ({ text1 }: { text1?: string }) => {
 			<MoonStar size={24} color="#facc15" />
 			<View className="flex-1">
 				<Text className="text-white font-semibold text-base">
-					{text1 ?? "Congrats! You've upgraded to TuckedIn Pro 🌙"}
+					{text1 ?? "Congrats! You've upgraded to Gushi Pro 🌙"}
 				</Text>
 			</View>
 		</View>

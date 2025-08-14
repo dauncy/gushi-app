@@ -10,7 +10,7 @@ import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { sanitizeStorageUrl } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
-import { useCallback, useMemo, useRef } from "react";
+import { memo, useCallback, useMemo, useRef } from "react";
 import { ActivityIndicator, Pressable, RefreshControl, Text, View } from "react-native";
 
 export default function Home() {
@@ -21,7 +21,7 @@ export default function Home() {
 	return <AnonymousHomePage />;
 }
 
-const StoryList = ({ onCardPress }: { onCardPress: (story: StoryPreview) => void }) => {
+const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => void }) => {
 	const { hasSubscription } = useSubscription();
 	const { isLoading, refreshing, refresh, loadMore, results, status } = useConvexPaginatedQuery(
 		api.stories.queries.getStories,
@@ -43,6 +43,10 @@ const StoryList = ({ onCardPress }: { onCardPress: (story: StoryPreview) => void
 		}
 		return results.filter((story) => story.subscription_required === true);
 	}, [hasSubscription, results]);
+
+	const freeStories = useMemo(() => {
+		return listItems.filter((story) => story.subscription_required === false);
+	}, [listItems]);
 
 	return (
 		<View className="flex-1" style={{ marginTop: 44 }}>
@@ -73,21 +77,7 @@ const StoryList = ({ onCardPress }: { onCardPress: (story: StoryPreview) => void
 						)}
 					</>
 				}
-				ListHeaderComponent={() => {
-					if (hasSubscription) {
-						return <FeaturedStoryCard />;
-					}
-					return (
-						<View className="flex flex-col gap-y-4">
-							{results
-								.filter((story) => story.subscription_required === false)
-								.map((story) => (
-									<StoryCard key={story._id} story={story} onCardPress={() => onCardPress(story)} />
-								))}
-							<FeaturedStoryCard />
-						</View>
-					);
-				}}
+				ListHeaderComponent={<ListHeader onCardPress={onCardPress} freeStories={freeStories} />}
 				ListFooterComponent={
 					<>
 						{status === "LoadingMore" ? (
@@ -101,6 +91,33 @@ const StoryList = ({ onCardPress }: { onCardPress: (story: StoryPreview) => void
 		</View>
 	);
 };
+
+const StoryList = memo(StoryListComp);
+StoryList.displayName = "StoryList";
+
+const ListHeaderComp = ({
+	onCardPress,
+	freeStories,
+}: {
+	onCardPress: (story: StoryPreview) => void;
+	freeStories: StoryPreview[];
+}) => {
+	const { hasSubscription } = useSubscription();
+	if (hasSubscription) {
+		return <FeaturedStoryCard onCardPress={(story) => onCardPress(story)} />;
+	}
+	return (
+		<View className="flex flex-col gap-y-4">
+			{freeStories.map((story) => (
+				<StoryCard key={story._id} story={story} onCardPress={() => onCardPress(story)} />
+			))}
+			<FeaturedStoryCard onCardPress={(story) => onCardPress(story)} />
+		</View>
+	);
+};
+
+const ListHeader = memo(ListHeaderComp);
+ListHeader.displayName = "ListHeader";
 
 const UpgradeSection = () => {
 	const router = useRouter();
