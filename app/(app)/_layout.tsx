@@ -49,6 +49,7 @@ export default function AppLayout() {
 					contentStyle: {
 						backgroundColor: "#0f172a",
 						height: "100%",
+						width: "100%",
 					},
 					gestureEnabled: true,
 				}}

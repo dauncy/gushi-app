@@ -24,7 +24,15 @@ import { BlurView } from "expo-blur";
 import { Redirect, useLocalSearchParams } from "expo-router";
 import { debounce } from "lodash";
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, Share as RNShare, Text, useWindowDimensions, View } from "react-native";
+import {
+	Platform,
+	PlatformIOSStatic,
+	Pressable,
+	Share as RNShare,
+	Text,
+	useWindowDimensions,
+	View,
+} from "react-native";
 import Animated, {
 	interpolate,
 	LinearTransition,
@@ -51,22 +59,37 @@ const formatTime = (seconds: number) => {
  * PAGE
  * ────────────────────────────────────────────────────────────────────────────────
  */
+
 export default function StoryPage() {
 	const { storyId } = useLocalSearchParams();
-	const { data, isLoading, error } = useConvexQuery(api.stories.queries.getStory, {
+	const { data, error, isLoading } = useConvexQuery(api.stories.queries.getStory, {
 		storyId: storyId as Id<"stories">,
 	});
+	const padeContent = useMemo(() => {
+		if (Platform.OS === "ios") {
+			const platformIOS = Platform as PlatformIOSStatic;
+			if (platformIOS.isPad) {
+				if (isLoading || !data) {
+					return <StoryTabletLoading />;
+				}
+				return <StoryContentTablet story={data} />;
+			}
+		}
+		if (isLoading || !data) {
+			return <StoryLoading />;
+		}
+		return <StoryContent story={data} />;
+	}, [data, isLoading]);
 
 	if (error && error instanceof ConvexError) {
 		if (error.data === "No Subscription") {
 			return <Redirect href={"/"} />;
 		}
 	}
+
 	return (
 		<SafeAreaView className="flex-1 bg-slate-900 flex">
-			<View className="flex-1 flex-col py-12 px-8 flex relative">
-				{isLoading || !data ? <StoryLoading /> : <StoryContent story={data} />}
-			</View>
+			<View className="flex-1 flex-col py-12 px-8 flex relative">{padeContent}</View>
 		</SafeAreaView>
 	);
 }
@@ -76,6 +99,7 @@ export default function StoryPage() {
  * STORY CONTENT
  * ────────────────────────────────────────────────────────────────────────────────
  */
+
 const StoryContent = ({ story }: { story: StoryExtended }) => {
 	const [showClosedCaption, setShowClosedCaption] = useState(false);
 	const { pause, play, isPlaying, currentTime, duration } = useAudio();
@@ -515,3 +539,184 @@ const StoryLoading = () => (
 		</View>
 	</View>
 );
+
+const StoryContentTablet = ({ story }: { story: StoryExtended }) => {
+	const [showClosedCaption, setShowClosedCaption] = useState(false);
+	const { pause, play, isPlaying, currentTime, duration } = useAudio();
+	const [uiTime, setUiTime] = useState(0);
+
+	useAnimatedReaction(
+		() => currentTime.value,
+		(val, prev) => {
+			if (Math.floor(val) !== Math.floor(prev ?? -1)) {
+				runOnJS(setUiTime)(val);
+			}
+		},
+		[currentTime],
+	);
+	const togglePlay = useCallback(() => {
+		if (isPlaying) {
+			pause();
+		} else {
+			play();
+		}
+	}, [isPlaying, pause, play]);
+
+	return (
+		<View className="flex flex-1 flex-col items-center relative w-2/3 mx-auto">
+			<StoryHeaderTablet story={story} isCollapsed={showClosedCaption} />
+			{showClosedCaption && <ClosedCaption transcript={story.transcript} currentTime={uiTime} />}
+
+			{/* ─── PLAYER BAR ──────────────────────────────────────────────────────── */}
+			<View className="absolute bottom-0 left-0 right-0 w-full flex flex-col bg-slate-900" style={{ zIndex: 1000 }}>
+				<Progress
+					value={duration > 0 ? (uiTime / duration) * 100 : 0}
+					className="h-2 bg-slate-800 w-full"
+					indicatorClassName="bg-slate-500"
+				/>
+
+				<View className="flex w-full flex-row justify-between mt-3">
+					<Text className="text-slate-400 text-xs">{formatTime(uiTime)}</Text>
+					<Text className="text-slate-400 text-xs">{formatTime(duration)}</Text>
+				</View>
+
+				<View className="flex w-full flex-col items-center py-4">
+					<Pressable
+						onPress={togglePlay}
+						className="size-20 active:bg-slate-800 rounded-full flex items-center justify-center"
+					>
+						{isPlaying ? (
+							<Pause className="text-white fill-white" size={36} />
+						) : (
+							<Play className="text-white fill-white" size={36} />
+						)}
+					</Pressable>
+				</View>
+
+				{/* CC Toggle */}
+				<View className="flex w-full flex-col items-start pb-6 pl-2">
+					<Button
+						className={cn("bg-slate-900 rounded-xl border border-slate-900", showClosedCaption && "bg-slate-500")}
+						onPress={() => setShowClosedCaption((p) => !p)}
+					>
+						<LetterText
+							className={cn("text-slate-500 size-6", showClosedCaption && "text-slate-900")}
+							strokeWidth={2}
+							size={20}
+						/>
+					</Button>
+				</View>
+			</View>
+		</View>
+	);
+};
+
+const StoryTabletLoading = () => {
+	return (
+		<View className="flex flex-1 flex-col items-center">
+			<Skeleton className="aspect-square w-2/3 rounded-xl bg-slate-800" />
+			<View className="flex w-2/3 mt-12 flex-row gap-x-8 mx-auto">
+				<View className="flex flex-col flex-1">
+					<Skeleton className="h-6 w-1/5 rounded-xl bg-slate-800" />
+					<Skeleton className="h-4 w-2/5 rounded-xl bg-slate-800 mt-2" />
+				</View>
+				<View className="flex gap-x-4 flex-row items-center">
+					<Skeleton className="h-10 w-10 rounded-full bg-slate-800" />
+					<Skeleton className="h-10 w-10 rounded-full bg-slate-800" />
+				</View>
+			</View>
+		</View>
+	);
+};
+
+const StoryHeaderTablet = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed: boolean }) => {
+	const progress = useSharedValue(isCollapsed ? 1 : 0);
+
+	// Animate collapse / expand
+	useEffect(() => {
+		progress.value = withTiming(isCollapsed ? 1 : 0, { duration: 250 });
+	}, [isCollapsed, progress]);
+
+	const handleShare = useCallback(async () => {
+		try {
+			await RNShare.share(
+				{
+					message: `Check out this story on Gushi: ${story.title}`,
+					url: `${process.env.EXPO_PUBLIC_WEB_URL}/stories/${story._id}`,
+					title: `Share ${story.title}`,
+				},
+				{ dialogTitle: `Share ${story.title}` },
+			);
+		} catch (e) {
+			console.warn("[StoryHeader] Error sharing story", e);
+		}
+	}, [story]);
+
+	const imgStyle = useAnimatedStyle(() => {
+		const size = interpolate(progress.value, [0, 1], [248, 80]);
+		return { width: size, height: size };
+	});
+
+	const titleStyle = useAnimatedStyle(() => {
+		return {
+			marginTop: interpolate(progress.value, [0, 1], [48, 0]),
+			// Use explicit width instead of flex to avoid layout conflicts
+			width: isCollapsed ? 48 - 16 : "100%", // account for image + gaps
+		};
+	});
+
+	// ... sharing & favourite handlers remain the same
+
+	return (
+		<Animated.View
+			layout={LinearTransition.springify().duration(250).stiffness(150).damping(12)}
+			style={{
+				flexDirection: isCollapsed ? "row" : "column",
+				alignItems: "center",
+				width: "100%",
+				gap: isCollapsed ? 16 : 0,
+			}}
+		>
+			<Animated.View style={[imgStyle, { borderRadius: 16, overflow: "hidden" }]}>
+				<StoryImage imageUrl={story.imageUrl} disableAnimation={isCollapsed} />
+			</Animated.View>
+
+			{/* Use explicit width calculation instead of flex */}
+			<Animated.View
+				style={[
+					titleStyle,
+					{
+						flexDirection: "row",
+						alignItems: "center",
+					},
+				]}
+			>
+				<View className="flex overflow-hidden flex-1 mr-4 flex-col">
+					<Marquee speed={0.5} spacing={48} style={{ maxWidth: isCollapsed ? 150 : undefined }}>
+						<Text className="text-slate-200 text-2xl font-bold">{story.title}</Text>
+					</Marquee>
+					<View className="flex flex-row gap-x-2 items-center mt-2">
+						<Calendar className="text-slate-400 size-4" strokeWidth={1} />
+						<Text className="text-slate-400 text-xs font-medium " numberOfLines={2}>
+							{formatDistanceToNow(story.updatedAt, { addSuffix: true })}
+						</Text>
+					</View>
+				</View>
+
+				{/* Fixed width for buttons to prevent them from being cut off */}
+				<View className="flex flex-row gap-x-4 items-center" style={{ width: 88 }}>
+					<FavoriteButton story={story} />
+
+					<Button
+						onPress={handleShare}
+						size="icon"
+						variant="ghost"
+						className="bg-slate-800 rounded-full border border-slate-600"
+					>
+						<Share className="text-slate-500 size-6" strokeWidth={1.5} size={20} />
+					</Button>
+				</View>
+			</Animated.View>
+		</Animated.View>
+	);
+};

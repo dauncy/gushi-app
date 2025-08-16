@@ -42,7 +42,6 @@ export const SubscriptionProvider = ({
 
 export const useSubscription = () => {
 	const { customerInfo, revalidateSubscription, revalidating } = useContext(SubscriptionContext);
-
 	const activeEntitlements = customerInfo?.entitlements?.active;
 	if (!activeEntitlements) {
 		return { customerInfo, hasSubscription: false, subscriptionType: null, revalidateSubscription, revalidating };
