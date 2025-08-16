@@ -46,6 +46,7 @@ export const loginHttp = httpAction(async (ctx, req) => {
 	}
 
 	const activeKey = await ctx.runQuery(internal.auth.queries.getActiveJWTKey);
+	console.log("[convex/auth/http.ts]: loginHttp() => --- activeJWTKey ---", { activeKey });
 	if (!activeKey) {
 		return new Response("Internal Server Error", { status: 500 });
 	}
