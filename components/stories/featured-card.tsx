@@ -77,7 +77,7 @@ const FeaturedStoryCardCom = ({ onCardPress }: { onCardPress: (story: StoryPrevi
 		return (
 			<TouchableOpacity activeOpacity={0.8} onPress={presentPaywall}>
 				<View className="flex flex-col w-full rounded-xl bg-slate-900  border border-slate-800 mb-4">
-					<View className="flex flex-row items-center justify-between w-full h-36 bg-black relative">
+					<View className="flex flex-row items-center justify-between w-full h-36 bg-black relative rounded-t-xl">
 						<View
 							className="absolute top-2 right-2 bg-amber-500 z-20 w-24 rounded-full p-1 border border-white"
 							style={{
@@ -109,7 +109,7 @@ const FeaturedStoryCardCom = ({ onCardPress }: { onCardPress: (story: StoryPrevi
 
 					<View className="flex items-center justify-center"></View>
 					<View className="absolute inset-0 rounded-xl bg-black opacity-40" style={{ zIndex: 1 }}></View>
-					<View className="absolute inset-0 items-center justify-center" style={{ zIndex: 50 }}>
+					<View className="absolute inset-0 items-center justify-center rounded-xl" style={{ zIndex: 50 }}>
 						<View
 							style={{
 								shadowColor: "#f8fafc",
@@ -135,11 +135,10 @@ const FeaturedStoryCardCom = ({ onCardPress }: { onCardPress: (story: StoryPrevi
 			</TouchableOpacity>
 		);
 	}
-	console.log("story.imageUrl: ", imageUrl);
 	return (
 		<TouchableOpacity onPress={() => onCardPress(story)}>
 			<View className="flex flex-col w-full rounded-xl bg-slate-900  border border-slate-800 mb-4">
-				<View className="flex flex-row items-center justify-between w-full h-36 relative">
+				<View className="flex flex-row items-center justify-between w-full h-36 relative rounded-t-xl">
 					<View
 						className="absolute top-2 right-2 bg-amber-500 z-20 w-24 rounded-full p-1 border border-white"
 						style={{

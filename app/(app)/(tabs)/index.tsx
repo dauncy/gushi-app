@@ -45,15 +45,15 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 	}, [hasSubscription, results]);
 
 	const freeStories = useMemo(() => {
-		return listItems.filter((story) => story.subscription_required === false);
-	}, [listItems]);
+		return results.filter((story) => story.subscription_required === false);
+	}, [results]);
 
 	return (
 		<View className="flex-1" style={{ marginTop: 44 }}>
 			<FlashList
 				refreshControl={<RefreshControl tintColor="#8b5cf6" refreshing={refreshing} onRefresh={refresh} />}
 				onEndReached={onEndReached}
-				extraData={{ isLoading, refreshing, status, hasSubscription }}
+				extraData={{ isLoading, refreshing, status, hasSubscription, listItems, freeStories }}
 				data={listItems}
 				keyExtractor={(item) => item._id}
 				renderItem={({ item }) => <StoryCard story={item} onCardPress={() => onCardPress(item)} />}

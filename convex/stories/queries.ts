@@ -25,7 +25,6 @@ export const getStories = query({
 	args: { paginationOpts: paginationOptsValidator },
 	handler: async (ctx, { paginationOpts }): Promise<PaginationResult<StoryPreview>> => {
 		try {
-			console.log("[convex/stories/queries.ts]: getStories() => --- START ---", { paginationOpts });
 			const { hasSubscription } = await verifyAccess(ctx, { validateSubscription: false });
 			const storiesPage = await ctx.db
 				.query("stories")
