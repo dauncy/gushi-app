@@ -15,6 +15,7 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { SegmentTranscript, StoryExtended } from "@/convex/stories/schema";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
+import { BLUR_HASH } from "@/lib/constants";
 import { cn, sanitizeStorageUrl } from "@/lib/utils";
 import { FlashList, ListRenderItemInfo, type FlashListRef } from "@shopify/flash-list";
 import { useMutation } from "convex/react";
@@ -495,11 +496,16 @@ const StoryImage = ({ imageUrl, disableAnimation }: { imageUrl: string | null; d
 
 	return (
 		<Animated.View style={[animatedStyle, { width: "100%", height: "100%" }]}>
-			<Image
-				source={{ uri: sanitizeStorageUrl(imageUrl) }}
-				className="w-full h-full rounded-xl"
-				onError={() => setError(true)}
-			/>
+			<View className="w-full h-full rounded-xl bg-slate-800">
+				<Image
+					source={{ uri: sanitizeStorageUrl(imageUrl) }}
+					className="w-full h-full rounded-xl"
+					onError={() => setError(true)}
+					placeholder={{ blurhash: BLUR_HASH }}
+					cachePolicy={"memory-disk"}
+					transition={150}
+				/>
+			</View>
 		</Animated.View>
 	);
 };

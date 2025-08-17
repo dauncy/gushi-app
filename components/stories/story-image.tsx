@@ -1,6 +1,7 @@
 import { AudioLines } from "@/components/ui/icons/audio-lines-icon";
 import { FileX } from "@/components/ui/icons/image-fail-icon";
 import { Image } from "@/components/ui/image";
+import { BLUR_HASH } from "@/lib/constants";
 import { cn, sanitizeStorageUrl } from "@/lib/utils";
 import { cva } from "class-variance-authority";
 import { memo, useState } from "react";
@@ -41,12 +42,14 @@ const StoryImagePreviewComp = ({
 		);
 	}
 	return (
-		<View className={cn(imageVariants({ size }), "relative", className)}>
+		<View className={cn(imageVariants({ size }), "relative bg-slate-800", className)}>
 			<Image
 				cachePolicy={"memory-disk"}
 				source={{ uri: sanitizeStorageUrl(imageUrl) }}
 				className={cn(imageVariants({ size }))}
 				onError={() => setError(true)}
+				placeholder={{ blurhash: BLUR_HASH }}
+				transition={150}
 			/>
 			{active && (
 				<View
