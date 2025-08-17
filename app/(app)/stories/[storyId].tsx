@@ -386,7 +386,7 @@ const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed
 			}}
 		>
 			<Animated.View style={[imgStyle, { borderRadius: 16, overflow: "hidden" }]}>
-				<StoryImage imageUrl={story.imageUrl} disableAnimation={isCollapsed} />
+				<StoryImage imageUrl={story.imageUrl} disableAnimation={isCollapsed} blurHash={story.blurHash ?? undefined} />
 			</Animated.View>
 
 			{/* Use explicit width calculation instead of flex */}
@@ -467,7 +467,15 @@ const FavoriteButton = ({ story }: { story: StoryExtended }) => {
  * STORY IMAGE (simpler shadow, single blur)
  * ────────────────────────────────────────────────────────────────────────────────
  */
-const StoryImage = ({ imageUrl, disableAnimation }: { imageUrl: string | null; disableAnimation?: boolean }) => {
+const StoryImage = ({
+	imageUrl,
+	disableAnimation,
+	blurHash = BLUR_HASH,
+}: {
+	imageUrl: string | null;
+	disableAnimation?: boolean;
+	blurHash?: string;
+}) => {
 	const [error, setError] = useState(false);
 	const showFallback = error || !imageUrl;
 	const { isPlaying } = useAudio();
@@ -501,9 +509,9 @@ const StoryImage = ({ imageUrl, disableAnimation }: { imageUrl: string | null; d
 					source={{ uri: sanitizeStorageUrl(imageUrl) }}
 					className="w-full h-full rounded-xl"
 					onError={() => setError(true)}
-					placeholder={{ blurhash: BLUR_HASH }}
+					placeholder={{ blurhash: blurHash }}
 					cachePolicy={"memory-disk"}
-					transition={150}
+					transition={100}
 				/>
 			</View>
 		</Animated.View>
@@ -684,7 +692,7 @@ const StoryHeaderTablet = ({ story, isCollapsed }: { story: StoryExtended; isCol
 			}}
 		>
 			<Animated.View style={[imgStyle, { borderRadius: 16, overflow: "hidden" }]}>
-				<StoryImage imageUrl={story.imageUrl} disableAnimation={isCollapsed} />
+				<StoryImage imageUrl={story.imageUrl} disableAnimation={isCollapsed} blurHash={story.blurHash ?? undefined} />
 			</Animated.View>
 
 			{/* Use explicit width calculation instead of flex */}

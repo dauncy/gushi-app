@@ -22,6 +22,7 @@ const imageVariants = cva("flex items-center justify-center", {
 
 const StoryImagePreviewComp = ({
 	imageUrl,
+	blurHash = BLUR_HASH,
 	size = "default",
 	active = false,
 	className = "",
@@ -30,6 +31,7 @@ const StoryImagePreviewComp = ({
 	size?: "default" | "sm" | "featured";
 	active?: boolean;
 	className?: string;
+	blurHash?: string;
 }) => {
 	const [error, setError] = useState(false);
 
@@ -48,8 +50,8 @@ const StoryImagePreviewComp = ({
 				source={{ uri: sanitizeStorageUrl(imageUrl) }}
 				className={cn(imageVariants({ size }))}
 				onError={() => setError(true)}
-				placeholder={{ blurhash: BLUR_HASH }}
-				transition={150}
+				placeholder={{ blurhash: blurHash }}
+				transition={100}
 			/>
 			{active && (
 				<View

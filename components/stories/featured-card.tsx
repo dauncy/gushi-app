@@ -94,6 +94,7 @@ const FeaturedStoryCardCom = ({ onCardPress }: { onCardPress: (story: StoryPrevi
 						</View>
 
 						<StoryImagePreview
+							blurHash={story.blurHash ?? undefined}
 							imageUrl={story.imageUrl}
 							className="w-full h-full rounded-t-xl opacity-30"
 							size="featured"
@@ -158,6 +159,7 @@ const FeaturedStoryCardCom = ({ onCardPress }: { onCardPress: (story: StoryPrevi
 						imageUrl={imageUrl}
 						className="w-full h-full rounded-t-xl opacity-70"
 						size="featured"
+						blurHash={story.blurHash ?? undefined}
 						active={isCurrentStory}
 					/>
 				</View>

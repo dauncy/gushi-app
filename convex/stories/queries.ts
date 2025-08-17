@@ -8,17 +8,24 @@ import { paginationOptsValidator, PaginationResult } from "convex/server";
 export const getImageUrl = async (ctx: QueryCtx, imageId: Id<"images">) => {
 	const image = await ctx.db.get(imageId);
 	if (!image) {
-		return null;
+		return { url: null, blurHash: null };
 	}
-	return await ctx.storage.getUrl(image.storageId);
+	const url = await ctx.storage.getUrl(image.storageId);
+	return {
+		url,
+		blurHash: image.blurHash ?? null,
+	};
 };
 
 export const getAudioUrl = async (ctx: QueryCtx, audioId: Id<"audio">) => {
 	const audio = await ctx.db.get(audioId);
 	if (!audio) {
-		return null;
+		return { url: null };
 	}
-	return await ctx.storage.getUrl(audio.storageId);
+	const url = await ctx.storage.getUrl(audio.storageId);
+	return {
+		url,
+	};
 };
 
 export const getStories = query({
@@ -33,23 +40,26 @@ export const getStories = query({
 
 			const stories = await Promise.all(
 				storiesPage.page.map(async (story) => {
-					const promises: Promise<string | null>[] = [getImageUrl(ctx, story.imageId)];
+					const promises: Promise<{ url: string | null; blurHash?: string | null }>[] = [
+						getImageUrl(ctx, story.imageId),
+					];
 					if (story.subscription_required) {
 						if (hasSubscription) {
 							promises.push(getAudioUrl(ctx, story.audioId));
 						} else {
-							promises.push(Promise.resolve(null));
+							promises.push(Promise.resolve({ url: null }));
 						}
 					} else {
 						promises.push(getAudioUrl(ctx, story.audioId));
 					}
-					const [imageUrl, audioUrl] = await Promise.all(promises);
+					const [imageData, audioData] = await Promise.all(promises);
 					const duration = Math.ceil(story.transcript[story.transcript.length - 1].end_time);
 					return {
 						_id: story._id,
 						title: story.title,
-						imageUrl,
-						audioUrl,
+						imageUrl: imageData.url,
+						audioUrl: audioData.url,
+						blurHash: imageData.blurHash,
 						duration,
 						updatedAt: story.updatedAt,
 						subscription_required: !!story.subscription_required,
@@ -91,11 +101,11 @@ export const getStory = query({
 				return null;
 			}
 
-			const [imageUrl, audioUrl] = await Promise.all([
+			const [imageData, audioData] = await Promise.all([
 				getImageUrl(ctx, maybeStory.imageId),
 				getAudioUrl(ctx, maybeStory.audioId),
 			]);
-			if (!imageUrl || !audioUrl) {
+			if (!imageData.url || !audioData.url) {
 				return null;
 			}
 
@@ -107,10 +117,11 @@ export const getStory = query({
 			return {
 				_id: maybeStory._id,
 				title: maybeStory.title,
-				imageUrl,
-				audioUrl,
+				imageUrl: imageData.url,
+				audioUrl: audioData.url,
 				transcript: maybeStory.transcript,
 				body: maybeStory.body,
+				blurHash: imageData.blurHash,
 				updatedAt: maybeStory.updatedAt,
 				favorite: favorite
 					? {
@@ -138,14 +149,14 @@ export const getStoryMetadata = internalQuery({
 		if (!story) {
 			return null;
 		}
-		const imageUrl = await getImageUrl(ctx, story.imageId);
-		if (!imageUrl) {
+		const imageData = await getImageUrl(ctx, story.imageId);
+		if (!imageData.url) {
 			return null;
 		}
 		const duration = story.transcript[story.transcript.length - 1].end_time;
 		return {
 			title: story.title,
-			imageUrl,
+			imageUrl: imageData.url,
 			duration,
 			updatedAt: story.updatedAt,
 		};
@@ -186,23 +197,24 @@ export const getFeaturedStory = query({
 		if (!story) {
 			return null;
 		}
-		const promises: Promise<string | null>[] = [getImageUrl(ctx, story.imageId)];
+		const promises: Promise<{ url: string | null; blurHash?: string | null }>[] = [getImageUrl(ctx, story.imageId)];
 		if (story.subscription_required) {
 			if (hasSubscription) {
 				promises.push(getAudioUrl(ctx, story.audioId));
 			} else {
-				promises.push(Promise.resolve(null));
+				promises.push(Promise.resolve({ url: null }));
 			}
 		} else {
 			promises.push(getAudioUrl(ctx, story.audioId));
 		}
-		const [imageUrl, audioUrl] = await Promise.all(promises);
+		const [imageData, audioData] = await Promise.all(promises);
 		const duration = Math.ceil(story.transcript[story.transcript.length - 1].end_time);
 		return {
 			_id: story._id,
 			title: story.title,
-			imageUrl,
-			audioUrl,
+			imageUrl: imageData.url,
+			audioUrl: audioData.url,
+			blurHash: imageData.blurHash,
 			duration,
 			updatedAt: story.updatedAt,
 			subscription_required: !!story.subscription_required,

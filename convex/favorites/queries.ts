@@ -23,12 +23,12 @@ export const getUserFavorites = query({
 						return null;
 					}
 
-					const [imageUrl, audioUrl] = await Promise.all([
+					const [imageData, audioData] = await Promise.all([
 						getImageUrl(ctx, story.imageId),
 						getAudioUrl(ctx, story.audioId),
 					]);
 
-					if (!imageUrl || !audioUrl) {
+					if (!imageData.url || !audioData.url) {
 						return null;
 					}
 
@@ -36,8 +36,9 @@ export const getUserFavorites = query({
 						_id: story._id,
 						title: story.title,
 						subscription_required: story.subscription_required,
-						imageUrl,
-						audioUrl,
+						imageUrl: imageData.url,
+						audioUrl: audioData.url,
+						blurHash: imageData.blurHash,
 						updatedAt: story.updatedAt,
 						duration: story.transcript[story.transcript.length - 1].end_time,
 						favorite: {

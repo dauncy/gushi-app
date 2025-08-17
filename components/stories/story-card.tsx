@@ -63,7 +63,7 @@ export const StoryCard = ({ story, onCardPress }: { story: StoryPreview; onCardP
 		return (
 			<TouchableOpacity activeOpacity={0.8} onPress={presentPaywall}>
 				<View className="flex w-full rounded-xl bg-slate-900 p-4 flex-row  w-full gap-4 border border-slate-800 relative">
-					<StoryImagePreview imageUrl={story.imageUrl} />
+					<StoryImagePreview imageUrl={story.imageUrl} blurHash={story.blurHash ?? undefined} />
 					<View className="flex flex-col gap-y-1 flex-1 mt-0.5">
 						<Text className="text-slate-300 text-lg font-semibold">{story.title}</Text>
 						<View className="flex flex-row items-center gap-x-2">
@@ -110,7 +110,7 @@ export const StoryCard = ({ story, onCardPress }: { story: StoryPreview; onCardP
 			}}
 			className="flex w-full rounded-xl bg-slate-900 p-4 flex-row  w-full gap-4 border border-slate-800"
 		>
-			<StoryImagePreview imageUrl={story.imageUrl} active={isCurrentStory} />
+			<StoryImagePreview imageUrl={story.imageUrl} active={isCurrentStory} blurHash={story.blurHash ?? undefined} />
 			<View className="flex flex-col gap-y-1 flex-1 mt-0.5">
 				<Text className="text-slate-300 text-lg font-semibold">{story.title}</Text>
 				<View className="flex flex-row items-center gap-x-2">

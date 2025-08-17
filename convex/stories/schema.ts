@@ -11,6 +11,7 @@ export const images = defineTable(
 			storageId: zid("_storage"),
 			createdAt: z.string().datetime(),
 			updatedAt: z.string().datetime(),
+			blurHash: z.string().optional(),
 		}),
 	),
 );
@@ -56,12 +57,18 @@ export type StoryPrivate = z.infer<typeof storiesSchema>;
 export type StoryPublic = Omit<
 	StoryPrivate,
 	"body" | "enabled" | "subscription_required" | "transcript" | "imageId" | "audioId"
-> & { imageUrl: Nullable<string>; audioUrl: Nullable<string>; duration: number };
+> & { imageUrl: Nullable<string>; audioUrl: Nullable<string>; duration: number; blurHash: Nullable<string> };
 
 export type StoryPreview = Omit<
 	StoryPrivate,
 	"body" | "enabled" | "transcript" | "imageId" | "audioId" | "createdAt" | "featured"
-> & { imageUrl: Nullable<string>; audioUrl: Nullable<string>; duration: number; _id: Id<"stories"> };
+> & {
+	imageUrl: Nullable<string>;
+	audioUrl: Nullable<string>;
+	duration: number;
+	blurHash?: Nullable<string>;
+	_id: Id<"stories">;
+};
 
 export type StoryExtended = Omit<
 	StoryPrivate,
@@ -69,6 +76,7 @@ export type StoryExtended = Omit<
 > & {
 	imageUrl: Nullable<string>;
 	audioUrl: Nullable<string>;
+	blurHash: Nullable<string>;
 	_id: Id<"stories">;
 	favorite: null | {
 		_id: Id<"favorites">;
