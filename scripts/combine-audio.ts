@@ -8,7 +8,7 @@ async function main() {
 	const audioBufferA = await fs.readFile(fileA);
 	const audioBufferB = await fs.readFile(fileB);
 	const combinedBuffer = Buffer.concat([audioBufferA, audioBufferB]);
-	await fs.writeFile(path.join(process.cwd(), "out", "pluto-combined.mp3"), combinedBuffer);
+	await fs.writeFile(path.join(process.cwd(), "out", "rainbow-feathers-combined.mp3"), combinedBuffer);
 }
 
 main().then(() => {
