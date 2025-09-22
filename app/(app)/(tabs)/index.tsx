@@ -1,7 +1,10 @@
 import { AudioPreviewPlayer } from "@/components/audio/audio-preview";
-import { FeaturedStoryCard } from "@/components/stories/featured-card";
 import { StoryCard, StoryCardLoading } from "@/components/stories/story-card";
+import { BedSingle } from "@/components/ui/icons/bed-single";
 import { ChevronUp } from "@/components/ui/icons/chevron-up-icon";
+import { GraduationCap } from "@/components/ui/icons/graduation-cap-icon";
+import { Grid2X2Plus } from "@/components/ui/icons/grid-2-plus-icon";
+import { Rocket } from "@/components/ui/icons/rocket-icon";
 import { useAudio } from "@/context/AudioContext";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { api } from "@/convex/_generated/api";
@@ -11,7 +14,7 @@ import { sanitizeStorageUrl } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { memo, useCallback, useMemo, useRef } from "react";
-import { ActivityIndicator, Pressable, RefreshControl, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
 
 export default function Home() {
 	const { hasSubscription } = useSubscription();
@@ -49,18 +52,19 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 	}, [results]);
 
 	return (
-		<View className="flex-1" style={{ marginTop: 44 }}>
+		<View className="flex-1">
 			<FlashList
+				numColumns={2}
 				refreshControl={<RefreshControl tintColor="#8b5cf6" refreshing={refreshing} onRefresh={refresh} />}
 				onEndReached={onEndReached}
 				extraData={{ isLoading, refreshing, status, hasSubscription, listItems, freeStories }}
-				data={listItems}
+				data={[...freeStories, ...listItems]}
 				keyExtractor={(item) => item._id}
-				renderItem={({ item }) => <StoryCard story={item} onCardPress={() => onCardPress(item)} />}
-				ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
+				renderItem={({ item, index: idx }) => (
+					<StoryCard story={item} onCardPress={() => onCardPress(item)} margin={idx % 2 === 0 ? "right" : "left"} />
+				)}
 				contentContainerStyle={{
 					paddingBottom: 80,
-					paddingTop: 12,
 				}}
 				ListEmptyComponent={
 					<>
@@ -77,7 +81,6 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 						)}
 					</>
 				}
-				ListHeaderComponent={<ListHeader onCardPress={onCardPress} freeStories={freeStories} />}
 				ListFooterComponent={
 					<>
 						{status === "LoadingMore" ? (
@@ -94,30 +97,6 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 
 const StoryList = memo(StoryListComp);
 StoryList.displayName = "StoryList";
-
-const ListHeaderComp = ({
-	onCardPress,
-	freeStories,
-}: {
-	onCardPress: (story: StoryPreview) => void;
-	freeStories: StoryPreview[];
-}) => {
-	const { hasSubscription } = useSubscription();
-	if (hasSubscription) {
-		return <FeaturedStoryCard onCardPress={(story) => onCardPress(story)} />;
-	}
-	return (
-		<View className="flex flex-col gap-y-4">
-			{freeStories.map((story) => (
-				<StoryCard key={story._id} story={story} onCardPress={() => onCardPress(story)} />
-			))}
-			<FeaturedStoryCard onCardPress={(story) => onCardPress(story)} />
-		</View>
-	);
-};
-
-const ListHeader = memo(ListHeaderComp);
-ListHeader.displayName = "ListHeader";
 
 const UpgradeSection = () => {
 	const router = useRouter();
@@ -149,7 +128,48 @@ const UpgradeSection = () => {
 const AnonymousHomePage = () => {
 	const { setStory } = useAudio();
 	return (
-		<View style={{ flex: 1 }} className="relative bg-neutral-950 px-2">
+		<View style={{ flex: 1 }} className="relative bg-neutral-950 px-2 flex flex-col">
+			<View className="w-full" style={{ marginTop: 46, paddingTop: 12, paddingBottom: 12 }}>
+				<ScrollView
+					contentContainerStyle={{ gap: 12 }}
+					horizontal
+					showsHorizontalScrollIndicator={false}
+					alwaysBounceHorizontal={false}
+					className="w-full p-1 bg-slate-900 rounded-3xl border border-2 border-slate-800 flex flex-row "
+				>
+					<View className="flex flex-col gap-y-1 items-center py-2 px-4 rounded-3xl bg-teal-600 w-[96px]">
+						<BedSingle className="text-slate-200" size={24} />
+						<Text className="text-slate-200 text-xs font-semibold mt-auto">Bedtime</Text>
+					</View>
+					<View className="flex flex-col gap-y-1 items-center py-2 px-4 p-2 rounded-2xl w-[96px]">
+						<GraduationCap className="text-slate-600" size={24} />
+						<Text className="text-slate-600 text-xs font-medium mt-auto">Lesson</Text>
+					</View>
+					<View className="flex flex-col gap-y-1 items-center py-2 px-4 p-2 rounded-2xl w-[96px]">
+						<Rocket className="text-slate-600" size={24} />
+						<Text className="text-slate-600 text-xs font-medium mt-auto">Adventure</Text>
+					</View>
+					<View className="flex flex-col gap-y-1 items-center py-2  rounded-2xl w-[112px] relative">
+						<Grid2X2Plus className="text-slate-600" size={24} />
+						<Text className="text-slate-600 text-xs font-medium mt-auto">Create your own</Text>
+						<View className="absolute inset-0 bg-black/40 opacity-50 z-10 rounded-2xl"></View>
+						<View
+							className="p-1 px-2 rounded-2xl bg-amber-400 absolute top-0 right-4 z-20"
+							style={{
+								shadowColor: "#ffffff",
+								shadowOffset: {
+									width: 0.5,
+									height: 1.5,
+								},
+								shadowOpacity: 0.25,
+								shadowRadius: 8,
+							}}
+						>
+							<Text className="text-white text-xs font-bold mt-auto">Soon</Text>
+						</View>
+					</View>
+				</ScrollView>
+			</View>
 			<StoryList
 				onCardPress={(story) => {
 					if (story.audioUrl) {
