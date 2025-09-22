@@ -58,6 +58,7 @@ const StoryImagePreviewComp = ({
 					className={cn(
 						"absolute inset-0 bg-black/50 lex items-center justify-center",
 						size !== "featured" && "rounded-md",
+						size === "featured" && "rounded-t-xl",
 					)}
 				>
 					<AudioLines

@@ -28,19 +28,19 @@ export const StoryCardLoading = () => {
 				onLayout={(e) => {
 					setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.width });
 				}}
-				className="flex flex-col rounded-xl w-full bg-slate-900 border border-slate-800 relative"
+				className="flex flex-col rounded-xl w-full bg-[#0D3311]/20 border-2 border-[#0D3311]/10 relative"
 			>
 				<View className="w-full rounded-t-xl" style={{ height: cardDimensions.width }}>
-					<Skeleton className="size-full rounded-t-xl bg-slate-800" />
+					<Skeleton className="size-full rounded-t-xl bg-black/20" />
 				</View>
 				<View className="p-2 flex flex-col gap-y-3 pb-4">
 					<View className="flex flex-col gap-y-1">
-						<Skeleton className="w-3/5 h-4 rounded-xl bg-slate-800" />
-						<Skeleton className="w-1/3 h-4 rounded-xl bg-slate-800" />
+						<Skeleton className="w-3/5 h-4 rounded-xl bg-black/20" />
+						<Skeleton className="w-1/3 h-4 rounded-xl bg-black/20" />
 					</View>
 					<View className="flex flex-row items-center gap-x-2">
-						<Skeleton className="size-4 rounded-full bg-slate-800" />
-						<Skeleton className="w-1/3 h-4 rounded-xl bg-slate-800" />
+						<Skeleton className="size-4 rounded-full bg-black/20" />
+						<Skeleton className="w-1/3 h-4 rounded-xl bg-black/20" />
 					</View>
 				</View>
 			</View>
@@ -102,12 +102,12 @@ export const StoryCard = ({
 					onLayout={(e) => {
 						setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.width });
 					}}
-					className="flex flex-col rounded-xl w-full bg-slate-900 border border-slate-800 w-full h-full relative"
+					className="flex flex-col rounded-xl w-full bg-[#0D3311]/20 border-2 border-[#0D3311]/10 w-full h-full relative n"
 				>
 					<View className="w-full  rounded-t-xl w-full relative" style={{ height: cardDimensions.width }}>
 						{story.featured && (
 							<View
-								className="absolute top-2 right-2 bg-amber-500 z-20 w-24 rounded-full p-1 border border-white"
+								className="absolute top-2 right-2 bg-amber-400 z-20 w-24 rounded-md p-1 border border-rose-500"
 								style={{
 									shadowColor: "#f8fafc",
 									shadowOffset: {
@@ -118,23 +118,29 @@ export const StoryCard = ({
 									shadowRadius: 4,
 								}}
 							>
-								<Text className="text-white text-center text-xs font-bold">FEATURED</Text>
+								<Text className="text-rose-500 text-center text-xs font-bold">FEATURED</Text>
 							</View>
 						)}
 						<StoryImagePreview imageUrl={story.imageUrl} blurHash={story.blurHash ?? undefined} size={"featured"} />
 					</View>
 					<View className="p-2 flex flex-col gap-y-1 pb-4">
-						<Text className="text-slate-300 text-lg font-medium" style={{ fontSize: 16, lineHeight: 20 }}>
+						<Text className="text-[#0D3311] text-lg font-medium" style={{ fontSize: 16, lineHeight: 20 }}>
 							{story.title}
 						</Text>
 						<View className="flex flex-row items-center gap-x-2">
-							<Clock className="size-4 text-slate-400" size={16} />
-							<Text className="text-slate-400 text-sm font-medium">{secondsToMinuteString(story.duration)}</Text>
+							<Clock className="size-4 text-[#0D3311]/50" size={16} />
+							<Text className="text-[#0D3311]/50 text-sm font-medium">{secondsToMinuteString(story.duration)}</Text>
 						</View>
 					</View>
 
-					<View className="absolute inset-0 rounded-xl bg-black opacity-40" style={{ zIndex: 1 }}></View>
-					<View className="absolute inset-0 items-center justify-center" style={{ zIndex: 3 }}>
+					<View
+						className="absolute inset-0 rounded-xl bg-black opacity-40 overflow-hidden"
+						style={{ zIndex: 1 }}
+					></View>
+					<View
+						className="absolute inset-0 items-center justify-center rounded-xl overflow-hidden"
+						style={{ zIndex: 3 }}
+					>
 						<View
 							style={{
 								shadowColor: "#ffffff",
@@ -150,7 +156,12 @@ export const StoryCard = ({
 							<LockKeyhole className="text-slate-200" size={24} />
 						</View>
 					</View>
-					<BlurView intensity={8} tint="dark" className="absolute inset-0 rounded-xl bg-black " style={{ zIndex: 2 }} />
+					<BlurView
+						intensity={8}
+						tint="dark"
+						className="absolute inset-0 rounded-xl bg-black overflow-hidden"
+						style={{ zIndex: 2, borderRadius: 12 }}
+					/>
 				</View>
 			</TouchableOpacity>
 		);
@@ -175,7 +186,7 @@ export const StoryCard = ({
 			}}
 		>
 			<View
-				className="flex flex-col rounded-xl w-full bg-slate-900 border border-slate-800 h-full"
+				className="flex flex-col rounded-xl w-full bg-[#0D3311]/20 border-2 border-[#0D3311]/10  h-full"
 				onLayout={(e) => {
 					setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.width });
 				}}
@@ -189,7 +200,7 @@ export const StoryCard = ({
 					/>
 					{story.featured && (
 						<View
-							className="absolute top-2 right-2 bg-amber-500 z-20 w-24 rounded-full p-1 border border-white"
+							className="absolute top-2 right-2 bg-amber-400 z-20 w-24 rounded-md p-1 border border-rose-500"
 							style={{
 								shadowColor: "#f8fafc",
 								shadowOffset: {
@@ -200,18 +211,18 @@ export const StoryCard = ({
 								shadowRadius: 4,
 							}}
 						>
-							<Text className="text-white text-center text-xs font-bold">FEATURED</Text>
+							<Text className="text-rose-500 text-center text-xs font-bold">FEATURED</Text>
 						</View>
 					)}
 				</View>
 				<View className="w-full flex flex-row gap-x-2 p-2 pb-4 items-start">
 					<View className="flex-1 flex flex-col gap-y-1">
-						<Text className="text-slate-300 text-lg font-medium" style={{ fontSize: 16, lineHeight: 20 }}>
+						<Text className="text-[#0D3311] text-lg font-medium" style={{ fontSize: 16, lineHeight: 20 }}>
 							{story.title}
 						</Text>
 						<View className="flex flex-row items-center gap-x-2">
-							<Clock className="size-4 text-slate-400" size={16} />
-							<Text className="text-slate-400 text-sm font-medium">{secondsToMinuteString(story.duration)}</Text>
+							<Clock className="size-4 text-[#0D3311]/50" size={16} />
+							<Text className="text-[#0D3311]/50 text-sm font-medium">{secondsToMinuteString(story.duration)}</Text>
 						</View>
 					</View>
 					<View className="flex items-center justify-center mt-0.5">
@@ -221,9 +232,9 @@ export const StoryCard = ({
 									stop();
 								}}
 								size="icon"
-								className="bg-transparent border-transparent active:bg-slate-800 rounded-full"
+								className="bg-transparent border-transparent active:bg-[#0D3311]/20 rounded-full"
 							>
-								<Stop className="text-slate-400 fill-slate-400" size={20} />
+								<Stop className="text-white fill-white" size={20} />
 							</Button>
 						) : isCurrentStory ? (
 							<Button
@@ -231,14 +242,14 @@ export const StoryCard = ({
 									play();
 								}}
 								size="icon"
-								className="bg-transparent border-transparent active:bg-slate-800 rounded-full"
+								className="bg-transparent border-transparent active:bg-[#0D3311]/20 rounded-full"
 							>
-								<Play className="text-slate-400 fill-slate-400" size={20} />
+								<Play className="text-white fill-white" size={20} />
 							</Button>
 						) : (
 							<Button
 								size="icon"
-								className="bg-teal-500 border-teal-100 border rounded-full p-1"
+								className="bg-[#7AC0B4] active:bg-[#7AC0B4]/80 border-white border rounded-full p-1"
 								onPress={(e) => {
 									e.stopPropagation();
 									if (!story.audioUrl) {

@@ -10,8 +10,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function TabsLayout() {
 	const { hasSubscription } = useSubscription();
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: "#0f172a", padding: 0 }} edges={["top", "bottom"]}>
-			<StatusBar style={"light"} />
+		<SafeAreaView style={{ flex: 1, backgroundColor: "#E0FFE0", padding: 0 }} edges={["top", "bottom"]}>
+			<StatusBar style={"dark"} />
 			<Tabs
 				screenOptions={() => ({
 					header: () => <Header />,

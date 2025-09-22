@@ -8,9 +8,6 @@ export default function AppLayout() {
 		<Stack
 			screenOptions={{
 				headerShown: false,
-				contentStyle: {
-					backgroundColor: "#082F49",
-				},
 			}}
 			layout={({ children }) => (
 				<View className="flex-1">
@@ -35,7 +32,7 @@ export default function AppLayout() {
 				}}
 			/>
 
-			<Stack.Screen name="(tabs)" options={{ headerShown: false, contentStyle: { backgroundColor: "#0f172a" } }} />
+			<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
 			<Stack.Screen
 				name="stories"
@@ -47,7 +44,6 @@ export default function AppLayout() {
 					headerLargeTitleShadowVisible: true,
 					presentation: "formSheet",
 					contentStyle: {
-						backgroundColor: "#0f172a",
 						height: "100%",
 						width: "100%",
 					},
@@ -64,7 +60,7 @@ const RenderLayout = ({ children }: { children: ReactNode }) => {
 	const { isAuthenticated, isLoading } = useConvexAuth();
 	if (isLoading && !isAuthenticated) {
 		return (
-			<View className="flex-1 items-center justify-center bg-[#082F49]">
+			<View className="flex-1 items-center justify-center">
 				<ActivityIndicator size="large" color="#c026d3" />
 			</View>
 		);
