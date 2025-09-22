@@ -10,6 +10,7 @@ import { useSubscription } from "@/context/SubscriptionContext";
 import { api } from "@/convex/_generated/api";
 import { StoryPreview } from "@/convex/stories";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
+import { useConvexQuery } from "@/hooks/use-convexQuery";
 import { sanitizeStorageUrl } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
@@ -26,6 +27,7 @@ export default function Home() {
 
 const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => void }) => {
 	const { hasSubscription } = useSubscription();
+
 	const { isLoading, refreshing, refresh, loadMore, results, status } = useConvexPaginatedQuery(
 		api.stories.queries.getStories,
 		{},
@@ -33,6 +35,12 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 			initialNumItems: 10,
 		},
 	);
+
+	const {
+		data: featuredStory,
+		isLoading: isFeaturedStoryLoading,
+		refetch: refetchFeaturedStory,
+	} = useConvexQuery(api.stories.queries.getFeaturedStory, {}, {});
 
 	const onEndReached = useCallback(() => {
 		if (status === "CanLoadMore") {
@@ -51,27 +59,50 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 		return results.filter((story) => story.subscription_required === false);
 	}, [results]);
 
+	const handleListRefetch = useCallback(async () => {
+		await Promise.all([refetchFeaturedStory(), refresh()]);
+	}, [refetchFeaturedStory, refresh]);
+
+	const listData = useMemo(() => {
+		const data: StoryPreview[] = [];
+		if (hasSubscription) {
+			if (featuredStory && !isFeaturedStoryLoading && !isLoading && !refreshing) {
+				data.push(featuredStory);
+			}
+			data.push(...listItems);
+		} else {
+			data.push(...freeStories);
+			if (featuredStory && !isFeaturedStoryLoading && !isLoading && !refreshing) {
+				data.push(featuredStory);
+			}
+			data.push(...listItems);
+		}
+		return data;
+	}, [hasSubscription, featuredStory, isFeaturedStoryLoading, isLoading, refreshing, listItems, freeStories]);
+
 	return (
 		<View className="flex-1">
 			<FlashList
+				showsVerticalScrollIndicator={false}
 				numColumns={2}
-				refreshControl={<RefreshControl tintColor="#8b5cf6" refreshing={refreshing} onRefresh={refresh} />}
+				refreshControl={<RefreshControl tintColor="#8b5cf6" refreshing={refreshing} onRefresh={handleListRefetch} />}
 				onEndReached={onEndReached}
-				extraData={{ isLoading, refreshing, status, hasSubscription, listItems, freeStories }}
-				data={[...freeStories, ...listItems]}
+				extraData={{ isLoading, refreshing, status, hasSubscription, listItems, freeStories, isFeaturedStoryLoading }}
+				data={listData}
 				keyExtractor={(item) => item._id}
 				renderItem={({ item, index: idx }) => (
 					<StoryCard story={item} onCardPress={() => onCardPress(item)} margin={idx % 2 === 0 ? "right" : "left"} />
 				)}
 				contentContainerStyle={{
 					paddingBottom: 80,
+					flex: isLoading ? 1 : undefined,
 				}}
 				ListEmptyComponent={
 					<>
 						{isLoading ? (
-							<View className="flex flex-col gap-y-3">
-								{Array.from({ length: 10 }).map((_, index) => (
-									<StoryCardLoading key={`loading-${index}`} />
+							<View style={{ flexWrap: "wrap", display: "flex", flexDirection: "row" }}>
+								{Array.from({ length: 10 }).map((_, idx) => (
+									<StoryCardLoading key={`loading-${idx}`} />
 								))}
 							</View>
 						) : (
@@ -154,7 +185,7 @@ const AnonymousHomePage = () => {
 						<Text className="text-slate-600 text-xs font-medium mt-auto">Create your own</Text>
 						<View className="absolute inset-0 bg-black/40 opacity-50 z-10 rounded-2xl"></View>
 						<View
-							className="p-1 px-2 rounded-2xl bg-amber-400 absolute top-0 right-4 z-20"
+							className="p-1 px-2 rounded-full bg-amber-500 absolute top-1 right-2 z-20 border border-white"
 							style={{
 								shadowColor: "#ffffff",
 								shadowOffset: {
@@ -165,7 +196,7 @@ const AnonymousHomePage = () => {
 								shadowRadius: 8,
 							}}
 						>
-							<Text className="text-white text-xs font-bold mt-auto">Soon</Text>
+							<Text className="text-white text-[8px] font-bold mt-auto">Soon</Text>
 						</View>
 					</View>
 				</ScrollView>

@@ -15,20 +15,38 @@ import { Stop } from "../ui/icons/stop-icon";
 import { StoryImagePreview } from "./story-image";
 
 export const StoryCardLoading = () => {
+	const [cardDimensions, setCardDimensions] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
 	return (
-		<View className="flex w-full p-3 rounded-xl bg-slate-900 p-3 px-4 flex-row  w-full gap-3">
-			<Skeleton className="size-20 rounded-md bg-slate-800" />
-			<View className="flex flex-col gap-y-2 flex-1 mt-1">
-				<Skeleton className="w-3/5 h-4 rounded-xl bg-slate-800" />
-				<Skeleton className="w-1/3 h-4 rounded-xl bg-slate-800" />
-			</View>
-			<View className="flex items-center justify-center">
-				<Skeleton className="size-12 rounded-full bg-slate-800" />
+		<View
+			style={{
+				width: "50%", // Takes exactly half the container
+				paddingHorizontal: 6, // Padding instead of margin for consistent spacing
+				paddingBottom: 12,
+			}}
+		>
+			<View
+				onLayout={(e) => {
+					setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.width });
+				}}
+				className="flex flex-col rounded-xl w-full bg-slate-900 border border-slate-800 relative"
+			>
+				<View className="w-full rounded-t-xl" style={{ height: cardDimensions.width }}>
+					<Skeleton className="size-full rounded-t-xl bg-slate-800" />
+				</View>
+				<View className="p-2 flex flex-col gap-y-3 pb-4">
+					<View className="flex flex-col gap-y-1">
+						<Skeleton className="w-3/5 h-4 rounded-xl bg-slate-800" />
+						<Skeleton className="w-1/3 h-4 rounded-xl bg-slate-800" />
+					</View>
+					<View className="flex flex-row items-center gap-x-2">
+						<Skeleton className="size-4 rounded-full bg-slate-800" />
+						<Skeleton className="w-1/3 h-4 rounded-xl bg-slate-800" />
+					</View>
+				</View>
 			</View>
 		</View>
 	);
 };
-
 export const StoryCard = ({
 	story,
 	onCardPress,
@@ -86,7 +104,23 @@ export const StoryCard = ({
 					}}
 					className="flex flex-col rounded-xl w-full bg-slate-900 border border-slate-800 w-full h-full relative"
 				>
-					<View className="w-full  rounded-t-xl w-full" style={{ height: cardDimensions.width }}>
+					<View className="w-full  rounded-t-xl w-full relative" style={{ height: cardDimensions.width }}>
+						{story.featured && (
+							<View
+								className="absolute top-2 right-2 bg-amber-500 z-20 w-24 rounded-full p-1 border border-white"
+								style={{
+									shadowColor: "#f8fafc",
+									shadowOffset: {
+										width: 0.5,
+										height: 1.5,
+									},
+									shadowOpacity: 0.25,
+									shadowRadius: 4,
+								}}
+							>
+								<Text className="text-white text-center text-xs font-bold">FEATURED</Text>
+							</View>
+						)}
 						<StoryImagePreview imageUrl={story.imageUrl} blurHash={story.blurHash ?? undefined} size={"featured"} />
 					</View>
 					<View className="p-2 flex flex-col gap-y-1 pb-4">
@@ -146,13 +180,29 @@ export const StoryCard = ({
 					setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.width });
 				}}
 			>
-				<View className="w-full rounded-t-xl w-full" style={{ height: cardDimensions.width }}>
+				<View className="w-full rounded-t-xl w-full relative" style={{ height: cardDimensions.width }}>
 					<StoryImagePreview
 						imageUrl={story.imageUrl}
 						blurHash={story.blurHash ?? undefined}
 						size={"featured"}
 						active={isCurrentStory}
 					/>
+					{story.featured && (
+						<View
+							className="absolute top-2 right-2 bg-amber-500 z-20 w-24 rounded-full p-1 border border-white"
+							style={{
+								shadowColor: "#f8fafc",
+								shadowOffset: {
+									width: 0.5,
+									height: 1.5,
+								},
+								shadowOpacity: 0.25,
+								shadowRadius: 4,
+							}}
+						>
+							<Text className="text-white text-center text-xs font-bold">FEATURED</Text>
+						</View>
+					)}
 				</View>
 				<View className="w-full flex flex-row gap-x-2 p-2 pb-4 items-start">
 					<View className="flex-1 flex flex-col gap-y-1">

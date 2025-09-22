@@ -61,7 +61,7 @@ export type StoryPublic = Omit<
 
 export type StoryPreview = Omit<
 	StoryPrivate,
-	"body" | "enabled" | "transcript" | "imageId" | "audioId" | "createdAt" | "featured"
+	"body" | "enabled" | "transcript" | "imageId" | "audioId" | "createdAt"
 > & {
 	imageUrl: Nullable<string>;
 	audioUrl: Nullable<string>;
@@ -91,3 +91,26 @@ export const stories = defineTable(zodToConvex(storiesSchema))
 	.index("by_subscription_required", ["subscription_required"])
 	.index("by_featured", ["featured"])
 	.index("by_featured_enabled", ["featured", "enabled"]);
+
+export const categories = defineTable(
+	zodToConvex(
+		z.object({
+			name: z.string(),
+			createdAt: z.string().datetime(),
+			updatedAt: z.string().datetime(),
+		}),
+	),
+);
+
+export const storyCategories = defineTable(
+	zodToConvex(
+		z.object({
+			storyId: zid("stories"),
+			categoryId: zid("categories"),
+			createdAt: z.string().datetime(),
+			updatedAt: z.string().datetime(),
+		}),
+	),
+)
+	.index("by_story", ["storyId"])
+	.index("by_category", ["categoryId"]);

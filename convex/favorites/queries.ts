@@ -45,6 +45,7 @@ export const getUserFavorites = query({
 							_id: fav._id,
 							_createdAt: fav.createdAt,
 						},
+						featured: !!story.featured,
 					};
 				}),
 			);

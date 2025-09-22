@@ -63,6 +63,7 @@ export const getStories = query({
 						duration,
 						updatedAt: story.updatedAt,
 						subscription_required: !!story.subscription_required,
+						featured: !!story.featured,
 					};
 				}),
 			);
@@ -194,9 +195,11 @@ export const getFeaturedStory = query({
 			.query("stories")
 			.withIndex("by_featured_enabled", (q) => q.eq("featured", true).eq("enabled", true))
 			.first();
+
 		if (!story) {
 			return null;
 		}
+
 		const promises: Promise<{ url: string | null; blurHash?: string | null }>[] = [getImageUrl(ctx, story.imageId)];
 		if (story.subscription_required) {
 			if (hasSubscription) {
@@ -218,6 +221,7 @@ export const getFeaturedStory = query({
 			duration,
 			updatedAt: story.updatedAt,
 			subscription_required: !!story.subscription_required,
+			featured: !!story.featured,
 		};
 	},
 });
