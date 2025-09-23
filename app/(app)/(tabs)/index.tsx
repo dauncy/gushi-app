@@ -82,7 +82,7 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 			<FlashList
 				showsVerticalScrollIndicator={false}
 				numColumns={2}
-				refreshControl={<RefreshControl tintColor="#8b5cf6" refreshing={refreshing} onRefresh={handleListRefetch} />}
+				refreshControl={<RefreshControl tintColor="#7AC0B4" refreshing={refreshing} onRefresh={handleListRefetch} />}
 				onEndReached={onEndReached}
 				extraData={{ isLoading, refreshing, status, hasSubscription, listItems, freeStories, isFeaturedStoryLoading }}
 				data={listData}
@@ -144,7 +144,7 @@ const UpgradeSection = () => {
 	return (
 		<Pressable
 			onPress={handlePress}
-			className="flex absolute bottom-0 right-0 left-0 bg-[#E0FFE0] border-t-[0.5px] border-[#0D3311]/50 p-4 h-20 flex-row items-start justify-between"
+			className="flex absolute bottom-0 right-0 left-0 bg-blue-700  border-t-[0.5px] border-[#0D3311]/50 p-4 h-20 flex-row items-start justify-between"
 		>
 			<View className="flex flex-col gap-y-2 flex-1">
 				<Text className="text-[#0D3311]/50 font-semibold">Want to listen to more stories?</Text>
@@ -157,7 +157,7 @@ const UpgradeSection = () => {
 const AnonymousHomePage = () => {
 	const { setStory } = useAudio();
 	return (
-		<View style={{ flex: 1 }} className="relative bg-[#E0FFE0] flex flex-col">
+		<View style={{ flex: 1 }} className="relative bg-[#036aa1cc] flex flex-col">
 			<View className="w-full px-2" style={{ marginTop: 46, paddingTop: 12, paddingBottom: 12 }}>
 				<CategoriesSelector />
 			</View>
@@ -174,7 +174,6 @@ const AnonymousHomePage = () => {
 					}
 				}}
 			/>
-			<UpgradeSection />
 			<AudioPreviewPlayer />
 		</View>
 	);

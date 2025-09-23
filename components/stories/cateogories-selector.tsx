@@ -42,7 +42,7 @@ export const CategoriesSelector = () => {
 	const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
 
 	return (
-		<View className="w-full p-1 bg-black/10 rounded-3xl  flex flex-row justify-between ">
+		<View className="w-full p-1 bg-white/20 rounded-3xl  flex flex-row justify-between ">
 			{categories.map((category) => {
 				const selected = category.id === currentCategory?.id;
 				return (
@@ -58,17 +58,17 @@ export const CategoriesSelector = () => {
 						key={category.id}
 						className={cn(
 							"flex flex-col gap-y-1 items-center p-2 px-4 rounded-3xl border border-black/0",
-							selected && "bg-[#7AC0B4] border-white border",
+							selected && "bg-black/40 border-white border",
 						)}
 					>
 						<category.icon
-							className={cn("text-[#0D3311]/50", selected && "text-white", category.soon && "opacity-50")}
-							size={24}
+							className={cn("text-[#e0f2fe]/50", selected && "text-white/80", category.soon && "opacity-50")}
+							size={28}
 						/>
 						<Text
 							className={cn(
-								"text-[#0D3311]/50 text-xs font-medium mt-auto",
-								selected && "text-white font-semibold",
+								"text-[#e0f2fe]/50 text-sm font-medium mt-auto",
+								selected && "text-white/80 font-semibold",
 								category.soon && "opacity-50",
 							)}
 						>

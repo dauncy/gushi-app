@@ -10,7 +10,7 @@ export default function AppLayout() {
 				headerShown: false,
 			}}
 			layout={({ children }) => (
-				<View className="flex-1">
+				<View className="flex-1" style={{ backgroundColor: "#036aacc" }}>
 					<RenderLayout>{children}</RenderLayout>
 				</View>
 			)}
@@ -26,7 +26,6 @@ export default function AppLayout() {
 					animationDuration: 300,
 					sheetGrabberVisible: true,
 					contentStyle: {
-						backgroundColor: "#0f172a",
 						height: "100%",
 					},
 				}}
@@ -61,7 +60,7 @@ const RenderLayout = ({ children }: { children: ReactNode }) => {
 	if (isLoading && !isAuthenticated) {
 		return (
 			<View className="flex-1 items-center justify-center">
-				<ActivityIndicator size="large" color="#c026d3" />
+				<ActivityIndicator size="large" color="#7AC0B4" />
 			</View>
 		);
 	}

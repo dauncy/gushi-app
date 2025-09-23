@@ -56,8 +56,9 @@ const FavoritesList = () => {
 				extraData={{ isLoading, refreshing, status, storyId, isPlaying }}
 				data={results}
 				keyExtractor={(item) => item._id}
-				renderItem={({ item }) => (
+				renderItem={({ item, index }) => (
 					<StoryCard
+						margin={index % 2 === 0 ? "right" : "left"}
 						story={item}
 						onCardPress={() => {
 							if (item.audioUrl) {

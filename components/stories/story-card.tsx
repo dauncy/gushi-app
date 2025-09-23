@@ -28,7 +28,7 @@ export const StoryCardLoading = () => {
 				onLayout={(e) => {
 					setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.width });
 				}}
-				className="flex flex-col rounded-xl w-full bg-[#0D3311]/20 border-2 border-[#0D3311]/10 relative"
+				className="flex flex-col rounded-xl w-full bg-[#ecfdf5]/60 border-2 border-[#0D3311]/10 relative"
 			>
 				<View className="w-full rounded-t-xl" style={{ height: cardDimensions.width }}>
 					<Skeleton className="size-full rounded-t-xl bg-black/20" />
@@ -102,7 +102,7 @@ export const StoryCard = ({
 					onLayout={(e) => {
 						setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.width });
 					}}
-					className="flex flex-col rounded-xl w-full bg-[#0D3311]/20 border-2 border-[#0D3311]/10 w-full h-full relative n"
+					className="flex flex-col rounded-xl w-full bg-[#ecfdf5]/60 border-2 border-[#0D3311]/10 w-full h-full relative n"
 				>
 					<View className="w-full  rounded-t-xl w-full relative" style={{ height: cardDimensions.width }}>
 						{story.featured && (
@@ -186,7 +186,7 @@ export const StoryCard = ({
 			}}
 		>
 			<View
-				className="flex flex-col rounded-xl w-full bg-[#0D3311]/20 border-2 border-[#0D3311]/10  h-full"
+				className="flex flex-col rounded-xl w-full bg-[#ecfdf5]/60 border-2 border-[#0D3311]/10  h-full"
 				onLayout={(e) => {
 					setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.width });
 				}}

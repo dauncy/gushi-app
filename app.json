@@ -27,7 +27,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
-        "backgroundColor": "#020617"
+        "backgroundColor": "#036aa1"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.danielwilderdev.gushi",
@@ -49,7 +49,7 @@
           "image": "./assets/images/icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#082F49"
+          "backgroundColor": "#036aa1"
         }
       ]
     ],
