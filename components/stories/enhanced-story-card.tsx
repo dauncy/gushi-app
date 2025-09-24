@@ -6,7 +6,7 @@ import { StoryPreview } from "@/convex/stories/schema";
 import { sanitizeStorageUrl, secondsToMinuteString } from "@/lib/utils";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, Text, TouchableWithoutFeedback, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -33,38 +33,55 @@ interface LongPressModalProps {
 }
 
 const LongPressModal: React.FC<LongPressModalProps> = ({ visible, story, onClose }) => {
-	if (!story) return null;
+	const [shouldRender, setShouldRender] = useState(visible);
+
+	useEffect(() => {
+		if (visible) {
+			setShouldRender(true);
+		} else if (shouldRender) {
+			// Unmount after animation completes
+			setTimeout(() => {
+				Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+				setShouldRender(false);
+			}, 600); // Match your longest exit animation duration
+		}
+	}, [visible, shouldRender, setShouldRender]);
+
+	if (!story) {
+		return null;
+	}
 
 	return (
-		<Modal animationType="none" transparent={true} visible={visible} onRequestClose={onClose} statusBarTranslucent>
+		<Modal animationType="none" transparent={true} visible={shouldRender} onRequestClose={onClose} statusBarTranslucent>
 			<View className="flex-1 flex relative">
 				<BlurView intensity={30} tint="light" className="absolute inset-0" />
 				<View className="flex-1 z-20">
-					{/* Animated Backdrop */}
-					<TouchableWithoutFeedback onPress={onClose}>
-						<View className="flex-1 flex flex-col items-center justify-center gap-y-1">
-							<Animated.View
-								entering={SlideInDown.easing(Easing.bezier(0.25, 0.1, 0.25, 1.0)).duration(300)}
-								exiting={SlideOutDown.easing(Easing.bezier(0.25, 0.1, 0.25, 1.0))
-									.duration(300)
-									.delay(300)}
-								className="w-full max-w-[51%] h-[300px]"
-								style={{ paddingLeft: 6, paddingRight: 6 }}
-							>
-								<StoryCard story={story} onCardPress={onClose} />
-							</Animated.View>
-							<Animated.View
-								entering={SlideInDown.easing(Easing.bezier(0.25, 0.1, 0.25, 1.0))
-									.duration(300)
-									.delay(300)}
-								exiting={SlideOutDown.easing(Easing.bezier(0.25, 0.1, 0.25, 1.0)).duration(300)}
-								className="w-full max-w-[51%]"
-								style={{ paddingLeft: 6, paddingRight: 6 }}
-							>
-								<View className="bg-background w-ful h-24 rounded-xl border border-border"></View>
-							</Animated.View>
-						</View>
-					</TouchableWithoutFeedback>
+					{visible && (
+						<TouchableWithoutFeedback onPress={onClose}>
+							<View className="flex-1 flex flex-col items-center justify-center gap-y-1">
+								<Animated.View
+									entering={SlideInDown.easing(Easing.bezier(0.25, 0.1, 0.25, 1.0)).duration(300)}
+									exiting={SlideOutDown.easing(Easing.bezier(0.25, 0.1, 0.25, 1.0))
+										.duration(300)
+										.delay(300)}
+									className="w-full max-w-[51%] h-[300px]"
+									style={{ paddingLeft: 6, paddingRight: 6 }}
+								>
+									<StoryCard story={story} onCardPress={onClose} />
+								</Animated.View>
+								<Animated.View
+									entering={SlideInDown.easing(Easing.bezier(0.25, 0.1, 0.25, 1.0))
+										.duration(300)
+										.delay(300)}
+									exiting={SlideOutDown.easing(Easing.bezier(0.25, 0.1, 0.25, 1.0)).duration(300)}
+									className="w-full max-w-[51%]"
+									style={{ paddingLeft: 6, paddingRight: 6 }}
+								>
+									<View className="bg-background w-ful h-24 rounded-xl border border-border"></View>
+								</Animated.View>
+							</View>
+						</TouchableWithoutFeedback>
+					)}
 				</View>
 			</View>
 		</Modal>

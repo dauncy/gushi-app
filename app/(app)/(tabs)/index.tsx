@@ -3,32 +3,27 @@ import { CategoriesSelector } from "@/components/stories/cateogories-selector";
 import { EnhancedStoryCard } from "@/components/stories/enhanced-story-card";
 import { StoryCardLoading } from "@/components/stories/story-card";
 import { useAudio } from "@/context/AudioContext";
+import { useSelectedCategory } from "@/context/SelectedCategoryContext";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { api } from "@/convex/_generated/api";
 import { StoryPreview } from "@/convex/stories";
-import { useCategorySelect } from "@/hooks/use-category-select";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
 import { sanitizeStorageUrl } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
-import { useRouter } from "expo-router";
 import { memo, useCallback, useMemo } from "react";
 import { ActivityIndicator, RefreshControl, Text, View } from "react-native";
 
 export default function Home() {
-	const { hasSubscription } = useSubscription();
-	if (hasSubscription) {
-		return <CustomerHomePage />;
-	}
-	return <AnonymousHomePage />;
+	return <HomePage />;
 }
 
 const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => void }) => {
 	const { hasSubscription } = useSubscription();
-	const { category } = useCategorySelect();
+	const { categoryId } = useSelectedCategory();
 	const { isLoading, refreshing, refresh, loadMore, results, status } = useConvexPaginatedQuery(
 		api.stories.queries.getStories,
-		{ categoryId: category ?? undefined },
+		{ categoryId: categoryId ?? undefined },
 		{
 			initialNumItems: 10,
 		},
@@ -132,7 +127,7 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 const StoryList = memo(StoryListComp);
 StoryList.displayName = "StoryList";
 
-const AnonymousHomePage = () => {
+const HomePage = () => {
 	const { setStory } = useAudio();
 	return (
 		<View style={{ flex: 1 }} className="relative bg-[#fffbf3] flex flex-col">
@@ -153,43 +148,6 @@ const AnonymousHomePage = () => {
 				}}
 			/>
 			<AudioPreviewPlayer />
-		</View>
-	);
-};
-
-const CustomerHomePage = () => {
-	const { play, setStory, isPlaying, storyId } = useAudio();
-	const router = useRouter();
-
-	return (
-		<View style={{ flex: 1 }} className="relative px-2">
-			<StoryList
-				onCardPress={(story) => {
-					if (story.audioUrl) {
-						if (storyId !== story._id) {
-							setStory({
-								storyUrl: sanitizeStorageUrl(story.audioUrl),
-								storyId: story._id,
-								storyImage: sanitizeStorageUrl(story.imageUrl ?? ""),
-								storyTitle: story.title,
-								autoPlay: true,
-							});
-							router.push(`/stories/${story._id}`);
-						} else {
-							if (!isPlaying) {
-								play();
-							}
-							router.push(`/stories/${story._id}`);
-						}
-					}
-				}}
-			/>
-			<AudioPreviewPlayer
-				className="bottom-2"
-				onCardPress={(id) => {
-					router.push(`/stories/${id}`);
-				}}
-			/>
 		</View>
 	);
 };

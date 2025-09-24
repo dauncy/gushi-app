@@ -1,10 +1,11 @@
+import { useSelectedCategory } from "@/context/SelectedCategoryContext";
 import { api } from "@/convex/_generated/api";
-import { useCategorySelect } from "@/hooks/use-category-select";
+import { Id } from "@/convex/_generated/dataModel";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
 import { cn } from "@/lib/utils";
 import * as Haptics from "expo-haptics";
 import { LucideIcon } from "lucide-react-native";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { BedSingle } from "../ui/icons/bed-single";
 import { Circle } from "../ui/icons/circle-icon";
@@ -93,31 +94,16 @@ const LoadingCategory = () => {
 };
 
 const CategoryPill = ({ categoryData }: { categoryData: Category }) => {
-	const { category, handleCategorySelect } = useCategorySelect();
-	const [instantSelect, setInstantSelect] = useState(false);
-
-	useEffect(() => {
-		if (category === categoryData.id) {
-			setInstantSelect(true);
-		} else {
-			setInstantSelect(false);
-		}
-	}, [category, categoryData.id, setInstantSelect]);
-
-	useEffect(() => {
-		if (instantSelect) {
-			handleCategorySelect(categoryData.id);
-		}
-	}, [instantSelect, handleCategorySelect, categoryData.id]);
+	const { categoryId, setCategoryId } = useSelectedCategory();
 
 	const selected = useMemo(() => {
-		return category === categoryData.id;
-	}, [category, categoryData.id]);
+		return categoryId === categoryData.id;
+	}, [categoryId, categoryData.id]);
 
 	const handlePress = useCallback(() => {
-		setInstantSelect(true);
+		setCategoryId(categoryData.id as Id<"categories">);
 		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-	}, [setInstantSelect]);
+	}, [setCategoryId, categoryData.id]);
 
 	return (
 		<TouchableOpacity
@@ -127,14 +113,14 @@ const CategoryPill = ({ categoryData }: { categoryData: Category }) => {
 			key={categoryData.id}
 			className={cn(
 				"flex flex-col gap-y-1 items-center p-2 px-4 rounded-3xl border-2 border-transparent",
-				(instantSelect || selected) && "bg-[#ceef32] border-[#0395ff] border-2",
+				selected && "bg-[#ceef32] border-[#0395ff] border-2",
 			)}
 		>
 			<categoryData.icon className={cn("text-[#0395ff]", categoryData.soon && "opacity-50")} size={28} />
 			<Text
 				className={cn(
 					"text-[#0395ff] text-sm font-medium mt-auto",
-					(instantSelect || selected) && "font-semibold",
+					selected && "font-semibold",
 					categoryData.soon && "opacity-50",
 				)}
 			>
