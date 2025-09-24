@@ -28,7 +28,7 @@ export const StoryCardLoading = () => {
 				onLayout={(e) => {
 					setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.width });
 				}}
-				className="flex flex-col rounded-xl w-full bg-[#ecfdf5]/60 border-2 border-[#0D3311]/10 relative"
+				className="flex flex-col rounded-xl w-full bg-[#fffbf3]/60 border-2 border-[#0395ff] relative"
 			>
 				<View className="w-full rounded-t-xl" style={{ height: cardDimensions.width }}>
 					<Skeleton className="size-full rounded-t-xl bg-black/20" />
@@ -47,6 +47,7 @@ export const StoryCardLoading = () => {
 		</View>
 	);
 };
+
 export const StoryCard = ({
 	story,
 	onCardPress,
@@ -54,10 +55,9 @@ export const StoryCard = ({
 }: {
 	story: StoryPreview;
 	onCardPress: () => void;
-	margin: "right" | "left";
+	margin?: "right" | "left";
 }) => {
 	const [cardDimensions, setCardDimensions] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
-
 	const pressableRef = useRef<boolean>(true);
 	const { hasSubscription } = useSubscription();
 	const router = useRouter();
@@ -90,7 +90,7 @@ export const StoryCard = ({
 	if (locked) {
 		return (
 			<TouchableOpacity
-				activeOpacity={0.8}
+				activeOpacity={1}
 				onPress={presentPaywall}
 				style={{
 					marginRight: margin === "right" ? 6 : 0,
@@ -102,12 +102,12 @@ export const StoryCard = ({
 					onLayout={(e) => {
 						setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.width });
 					}}
-					className="flex flex-col rounded-xl w-full bg-[#ecfdf5]/60 border-2 border-[#0D3311]/10 w-full h-full relative n"
+					className="flex flex-col rounded-xl w-full bg-[#fffbf3]/60 border-2 border-[#0395ff] w-full h-full relative"
 				>
-					<View className="w-full  rounded-t-xl w-full relative" style={{ height: cardDimensions.width }}>
+					<View className="w-full rounded-t-xl w-full relative" style={{ height: cardDimensions.width }}>
 						{story.featured && (
 							<View
-								className="absolute top-2 right-2 bg-amber-400 z-20 w-24 rounded-md p-1 border border-rose-500"
+								className="absolute top-2 right-2 bg-[#fffbf3] z-20 w-24 rounded-md p-1 border border-[#ff2d01]"
 								style={{
 									shadowColor: "#f8fafc",
 									shadowOffset: {
@@ -118,7 +118,7 @@ export const StoryCard = ({
 									shadowRadius: 4,
 								}}
 							>
-								<Text className="text-rose-500 text-center text-xs font-bold">FEATURED</Text>
+								<Text className="text-[#ff2d01] text-center text-xs font-bold">FEATURED</Text>
 							</View>
 						)}
 						<StoryImagePreview imageUrl={story.imageUrl} blurHash={story.blurHash ?? undefined} size={"featured"} />
@@ -186,7 +186,7 @@ export const StoryCard = ({
 			}}
 		>
 			<View
-				className="flex flex-col rounded-xl w-full bg-[#ecfdf5]/60 border-2 border-[#0D3311]/10  h-full"
+				className="flex flex-col rounded-xl w-full bg-[#fffbf3]/60 border-2 border-[#0395ff] h-full"
 				onLayout={(e) => {
 					setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.width });
 				}}
@@ -200,7 +200,7 @@ export const StoryCard = ({
 					/>
 					{story.featured && (
 						<View
-							className="absolute top-2 right-2 bg-amber-400 z-20 w-24 rounded-md p-1 border border-rose-500"
+							className="absolute top-2 right-2 bg-[#fffbf3] z-20 w-24 rounded-md p-1 border border-[#ff2d01]"
 							style={{
 								shadowColor: "#f8fafc",
 								shadowOffset: {
@@ -211,7 +211,7 @@ export const StoryCard = ({
 								shadowRadius: 4,
 							}}
 						>
-							<Text className="text-rose-500 text-center text-xs font-bold">FEATURED</Text>
+							<Text className="text-[#ff2d01] text-center text-xs font-bold">FEATURED</Text>
 						</View>
 					)}
 				</View>
@@ -249,7 +249,7 @@ export const StoryCard = ({
 						) : (
 							<Button
 								size="icon"
-								className="bg-[#7AC0B4] active:bg-[#7AC0B4]/80 border-white border rounded-full p-1"
+								className="bg-[#ff78e5] active:bg-[#ff78e5]/80 border-white border rounded-full p-1"
 								onPress={(e) => {
 									e.stopPropagation();
 									if (!story.audioUrl) {

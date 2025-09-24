@@ -1,10 +1,12 @@
 import { AudioPreviewPlayer } from "@/components/audio/audio-preview";
 import { CategoriesSelector } from "@/components/stories/cateogories-selector";
-import { StoryCard, StoryCardLoading } from "@/components/stories/story-card";
+import { EnhancedStoryCard } from "@/components/stories/enhanced-story-card";
+import { StoryCardLoading } from "@/components/stories/story-card";
 import { useAudio } from "@/context/AudioContext";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { api } from "@/convex/_generated/api";
 import { StoryPreview } from "@/convex/stories";
+import { useCategorySelect } from "@/hooks/use-category-select";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
 import { sanitizeStorageUrl } from "@/lib/utils";
@@ -23,10 +25,10 @@ export default function Home() {
 
 const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => void }) => {
 	const { hasSubscription } = useSubscription();
-
+	const { category } = useCategorySelect();
 	const { isLoading, refreshing, refresh, loadMore, results, status } = useConvexPaginatedQuery(
 		api.stories.queries.getStories,
-		{},
+		{ categoryId: category ?? undefined },
 		{
 			initialNumItems: 10,
 		},
@@ -81,13 +83,17 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 			<FlashList
 				showsVerticalScrollIndicator={false}
 				numColumns={2}
-				refreshControl={<RefreshControl tintColor="#7AC0B4" refreshing={refreshing} onRefresh={handleListRefetch} />}
+				refreshControl={<RefreshControl tintColor="#ff78e5" refreshing={refreshing} onRefresh={handleListRefetch} />}
 				onEndReached={onEndReached}
 				extraData={{ isLoading, refreshing, status, hasSubscription, listItems, freeStories, isFeaturedStoryLoading }}
 				data={listData}
 				keyExtractor={(item) => item._id}
 				renderItem={({ item, index: idx }) => (
-					<StoryCard story={item} onCardPress={() => onCardPress(item)} margin={idx % 2 === 0 ? "right" : "left"} />
+					<EnhancedStoryCard
+						story={item}
+						onCardPress={() => onCardPress(item)}
+						margin={idx % 2 === 0 ? "right" : "left"}
+					/>
 				)}
 				contentContainerStyle={{
 					paddingBottom: 80,
@@ -129,7 +135,7 @@ StoryList.displayName = "StoryList";
 const AnonymousHomePage = () => {
 	const { setStory } = useAudio();
 	return (
-		<View style={{ flex: 1 }} className="relative bg-[#036aa1cc] flex flex-col">
+		<View style={{ flex: 1 }} className="relative bg-[#fffbf3] flex flex-col">
 			<View className="w-full px-2" style={{ marginTop: 46, paddingTop: 12, paddingBottom: 12 }}>
 				<CategoriesSelector />
 			</View>

@@ -4,6 +4,7 @@ import { verifyAccess } from "@/convex/common";
 import { StoryExtended, StoryPreview } from "@/convex/stories/schema";
 import { zid, zodToConvex } from "convex-helpers/server/zod";
 import { paginationOptsValidator, PaginationResult } from "convex/server";
+import { v } from "convex/values";
 
 export const getImageUrl = async (ctx: QueryCtx, imageId: Id<"images">) => {
 	const image = await ctx.db.get(imageId);
@@ -29,10 +30,67 @@ export const getAudioUrl = async (ctx: QueryCtx, audioId: Id<"audio">) => {
 };
 
 export const getStories = query({
-	args: { paginationOpts: paginationOptsValidator },
-	handler: async (ctx, { paginationOpts }): Promise<PaginationResult<StoryPreview>> => {
+	args: {
+		paginationOpts: paginationOptsValidator,
+		categoryId: v.optional(v.id("categories")),
+	},
+	handler: async (ctx, { paginationOpts, categoryId }): Promise<PaginationResult<StoryPreview>> => {
 		try {
 			const { hasSubscription } = await verifyAccess(ctx, { validateSubscription: false });
+			if (categoryId) {
+				// first paginate join table
+				const storyCategories = await ctx.db
+					.query("storyCategories")
+					.withIndex("by_category", (q) => q.eq("categoryId", categoryId))
+					.paginate(paginationOpts);
+
+				const storiesInit = await Promise.all(
+					storyCategories.page.map(async (storyCategory) => {
+						const story = await ctx.db.get(storyCategory.storyId);
+						if (story?.enabled) {
+							return story;
+						}
+						return null;
+					}),
+				);
+
+				const storiesPage = storiesInit.filter((story): story is NonNullable<typeof story> => Boolean(story));
+				const stories = await Promise.all(
+					storiesPage.map(async (story) => {
+						const promises: Promise<{ url: string | null; blurHash?: string | null }>[] = [
+							getImageUrl(ctx, story.imageId),
+						];
+						if (story.subscription_required) {
+							if (hasSubscription) {
+								promises.push(getAudioUrl(ctx, story.audioId));
+							} else {
+								promises.push(Promise.resolve({ url: null }));
+							}
+						} else {
+							promises.push(getAudioUrl(ctx, story.audioId));
+						}
+						const [imageData, audioData] = await Promise.all(promises);
+						const duration = Math.ceil(story.transcript[story.transcript.length - 1].end_time);
+						return {
+							_id: story._id,
+							title: story.title,
+							imageUrl: imageData.url,
+							audioUrl: audioData.url,
+							blurHash: imageData.blurHash,
+							duration,
+							updatedAt: story.updatedAt,
+							subscription_required: !!story.subscription_required,
+							featured: !!story.featured,
+						};
+					}),
+				);
+
+				return {
+					...storyCategories,
+					page: stories,
+				};
+			}
+
 			const storiesPage = await ctx.db
 				.query("stories")
 				.withIndex("by_featured_enabled", (q) => q.eq("featured", false).eq("enabled", true))
@@ -223,5 +281,19 @@ export const getFeaturedStory = query({
 			subscription_required: !!story.subscription_required,
 			featured: !!story.featured,
 		};
+	},
+});
+
+export const getFeaturedCategories = query({
+	args: {
+		take: v.optional(v.number()),
+	},
+	handler: async (ctx, { take = 3 }) => {
+		await verifyAccess(ctx, { validateSubscription: false });
+		const categories = await ctx.db
+			.query("categories")
+			.withIndex("by_featured", (q) => q.eq("featured", true))
+			.take(take);
+		return categories;
 	},
 });

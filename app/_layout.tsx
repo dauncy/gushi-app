@@ -61,6 +61,7 @@ export default function RootLayout() {
 			try {
 				await Font.loadAsync({
 					SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+					Baloo: require("../assets/fonts/baloo-bold.ttf"),
 				});
 				const customerInfo = await initRevenueCat((updates) => {
 					setCustomerInfo(updates);

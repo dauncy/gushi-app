@@ -1,3 +1,4 @@
+import { NAV_THEME } from "@/lib/constants";
 import { useConvexAuth } from "convex/react";
 import { Stack } from "expo-router";
 import { ReactNode } from "react";
@@ -59,8 +60,8 @@ const RenderLayout = ({ children }: { children: ReactNode }) => {
 	const { isAuthenticated, isLoading } = useConvexAuth();
 	if (isLoading && !isAuthenticated) {
 		return (
-			<View className="flex-1 items-center justify-center">
-				<ActivityIndicator size="large" color="#7AC0B4" />
+			<View className="flex-1 items-center justify-center bg-background">
+				<ActivityIndicator size="large" color={NAV_THEME.dark.primary} />
 			</View>
 		);
 	}

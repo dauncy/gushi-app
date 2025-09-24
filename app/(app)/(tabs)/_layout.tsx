@@ -8,7 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TabsLayout() {
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: "#036aa1cc", padding: 0 }} edges={["top", "bottom"]}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: "#fffbf3", padding: 0 }} edges={["top", "bottom"]}>
 			<StatusBar style={"dark"} />
 			<Tabs
 				screenOptions={() => ({
@@ -40,7 +40,7 @@ export default function TabsLayout() {
 						title: "Home",
 						tabBarAccessibilityLabel: "Home",
 						tabBarIcon: ({ color, size, focused }) => (
-							<Home size={size} className={focused ? " text-sky-50" : "text-[#e0f2fe]/50"} />
+							<Home size={size} className={focused ? "text-[#0395ff]" : "text-black/30"} />
 						),
 					}}
 				/>
@@ -50,7 +50,7 @@ export default function TabsLayout() {
 						title: "Favorites",
 						tabBarAccessibilityLabel: "Favorites",
 						tabBarIcon: ({ color, size, focused }) => (
-							<Star size={size} className={focused ? " text-sky-50 fill-sky-50" : "text-[#e0f2fe]/50"} />
+							<Star size={size} className={focused ? "text-[#0395ff] fill-[#0395ff]" : "text-black/30"} />
 						),
 					}}
 				/>
@@ -60,7 +60,7 @@ export default function TabsLayout() {
 						title: "Settings",
 						tabBarAccessibilityLabel: "Settings",
 						tabBarIcon: ({ color, size, focused }) => (
-							<Settings size={size} className={focused ? " text-sky-50" : "text-[#e0f2fe]/50"} />
+							<Settings size={size} className={focused ? "text-[#ff2d01]" : "text-black/30"} />
 						),
 					}}
 				/>

@@ -43,6 +43,7 @@ const segmentTranscriptSchema = z.object({
 const storiesSchema = z.object({
 	title: z.string(),
 	body: z.string(),
+	description: z.string().optional(),
 	transcript: z.array(segmentTranscriptSchema),
 	enabled: z.boolean().default(false),
 	subscription_required: z.boolean().default(true),
@@ -98,9 +99,10 @@ export const categories = defineTable(
 			name: z.string(),
 			createdAt: z.string().datetime(),
 			updatedAt: z.string().datetime(),
+			featured: z.boolean().default(false),
 		}),
 	),
-);
+).index("by_featured", ["featured"]);
 
 export const storyCategories = defineTable(
 	zodToConvex(
