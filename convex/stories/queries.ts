@@ -81,6 +81,7 @@ export const getStories = query({
 							updatedAt: story.updatedAt,
 							subscription_required: !!story.subscription_required,
 							featured: !!story.featured,
+							description: story.description,
 						};
 					}),
 				);
@@ -122,6 +123,7 @@ export const getStories = query({
 						updatedAt: story.updatedAt,
 						subscription_required: !!story.subscription_required,
 						featured: !!story.featured,
+						description: story.description,
 					};
 				}),
 			);

@@ -1,11 +1,11 @@
-import { useSelectedCategory } from "@/context/SelectedCategoryContext";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
 import { cn } from "@/lib/utils";
+import { selectedCategoryState, useSelectedCategory } from "@/stores/category-store";
 import * as Haptics from "expo-haptics";
 import { LucideIcon } from "lucide-react-native";
-import { useCallback, useMemo } from "react";
+import { memo, useCallback, useMemo } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { BedSingle } from "../ui/icons/bed-single";
 import { Circle } from "../ui/icons/circle-icon";
@@ -28,7 +28,7 @@ const NameToIcon = {
 	"create-your-own": Grid2X2Plus,
 };
 
-export const CategoriesSelector = () => {
+export const CategoriesSelector = memo(() => {
 	const { data: categories, isLoading } = useConvexQuery(api.stories.queries.getFeaturedCategories, {});
 	const sanitizedCatgeories = useMemo(() => {
 		if (!categories || categories.length === 0) {
@@ -82,7 +82,9 @@ export const CategoriesSelector = () => {
 			)}
 		</ScrollView>
 	);
-};
+});
+
+CategoriesSelector.displayName = "CategoriesSelector";
 
 const LoadingCategory = () => {
 	return (
@@ -93,26 +95,25 @@ const LoadingCategory = () => {
 	);
 };
 
-const CategoryPill = ({ categoryData }: { categoryData: Category }) => {
-	const { categoryId, setCategoryId } = useSelectedCategory();
+const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
+	const { categoryId } = useSelectedCategory();
+	const selected = categoryId === categoryData.id;
 
-	const selected = useMemo(() => {
-		return categoryId === categoryData.id;
-	}, [categoryId, categoryData.id]);
-
-	const handlePress = useCallback(() => {
-		setCategoryId(categoryData.id as Id<"categories">);
-		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-	}, [setCategoryId, categoryData.id]);
+	const handleSelect = useCallback(() => {
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+		selectedCategoryState.categoryId = categoryData.id as Id<"categories">;
+	}, [categoryData.id]);
 
 	return (
 		<TouchableOpacity
 			disabled={categoryData.soon}
 			activeOpacity={0.8}
-			onPress={handlePress}
+			onPress={() => {
+				handleSelect();
+			}}
 			key={categoryData.id}
 			className={cn(
-				"flex flex-col gap-y-1 items-center p-2 px-4 rounded-3xl border-2 border-transparent",
+				"flex flex-col gap-y-1 items-center p-2 px-4 rounded-3xl border-2 border-transparent active:bg-[#ceef32] active:border-[#0395ff] active:border-2",
 				selected && "bg-[#ceef32] border-[#0395ff] border-2",
 			)}
 		>
@@ -147,4 +148,6 @@ const CategoryPill = ({ categoryData }: { categoryData: Category }) => {
 			)}
 		</TouchableOpacity>
 	);
-};
+});
+
+CategoryPill.displayName = "CategoryPill";

@@ -15,7 +15,7 @@ import { Stop } from "../ui/icons/stop-icon";
 import { StoryImagePreview } from "./story-image";
 
 export const StoryCardLoading = () => {
-	const [cardDimensions, setCardDimensions] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
+	const [cardDimensions, setCardDimensions] = useState<{ width: number; height: number }>({ width: 168, height: 140 });
 	return (
 		<View
 			style={{
@@ -57,7 +57,7 @@ export const StoryCard = ({
 	onCardPress: () => void;
 	margin?: "right" | "left";
 }) => {
-	const [cardDimensions, setCardDimensions] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
+	const [cardDimensions, setCardDimensions] = useState<{ width: number; height: number }>({ width: 168, height: 140 });
 	const pressableRef = useRef<boolean>(true);
 	const { hasSubscription } = useSubscription();
 	const router = useRouter();

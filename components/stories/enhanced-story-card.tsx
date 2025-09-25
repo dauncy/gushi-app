@@ -21,6 +21,11 @@ import Animated, {
 	withSpring,
 	withTiming,
 } from "react-native-reanimated";
+import { Carrot } from "../ui/icons/carrot-icon";
+import { Fullscreen } from "../ui/icons/full-screen-icon";
+import { Share } from "../ui/icons/share-icon";
+import { Star } from "../ui/icons/star-icon";
+import { Separator } from "../ui/separator";
 import { StoryCard } from "./story-card";
 import { StoryImagePreview } from "./story-image";
 
@@ -41,30 +46,40 @@ const LongPressModal: React.FC<LongPressModalProps> = ({ visible, story, onClose
 		} else if (shouldRender) {
 			// Unmount after animation completes
 			setTimeout(() => {
-				Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 				setShouldRender(false);
 			}, 600); // Match your longest exit animation duration
 		}
 	}, [visible, shouldRender, setShouldRender]);
+
+	const requestClose = useCallback(async () => {
+		await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+		onClose();
+	}, [onClose]);
 
 	if (!story) {
 		return null;
 	}
 
 	return (
-		<Modal animationType="none" transparent={true} visible={shouldRender} onRequestClose={onClose} statusBarTranslucent>
+		<Modal
+			animationType="none"
+			transparent={true}
+			visible={shouldRender}
+			onRequestClose={requestClose}
+			statusBarTranslucent
+		>
 			<View className="flex-1 flex relative">
 				<BlurView intensity={30} tint="light" className="absolute inset-0" />
 				<View className="flex-1 z-20">
 					{visible && (
-						<TouchableWithoutFeedback onPress={onClose}>
-							<View className="flex-1 flex flex-col items-center justify-center gap-y-1">
+						<TouchableWithoutFeedback onPress={requestClose}>
+							<View className="flex-1 flex flex-col items-center justify-center">
 								<Animated.View
 									entering={SlideInDown.easing(Easing.bezier(0.25, 0.1, 0.25, 1.0)).duration(300)}
 									exiting={SlideOutDown.easing(Easing.bezier(0.25, 0.1, 0.25, 1.0))
 										.duration(300)
 										.delay(300)}
-									className="w-full max-w-[51%] h-[300px]"
+									className="w-full max-w-[51%] h-[276px]"
 									style={{ paddingLeft: 6, paddingRight: 6 }}
 								>
 									<StoryCard story={story} onCardPress={onClose} />
@@ -74,10 +89,41 @@ const LongPressModal: React.FC<LongPressModalProps> = ({ visible, story, onClose
 										.duration(300)
 										.delay(300)}
 									exiting={SlideOutDown.easing(Easing.bezier(0.25, 0.1, 0.25, 1.0)).duration(300)}
-									className="w-full max-w-[51%]"
-									style={{ paddingLeft: 6, paddingRight: 6 }}
+									className="w-full max-w-[66%]"
+									style={{
+										shadowColor: "#000000",
+										shadowOffset: {
+											width: 0.5,
+											height: 0.85,
+										},
+										shadowOpacity: 0.5,
+										shadowRadius: 8,
+									}}
 								>
-									<View className="bg-background w-ful h-24 rounded-xl border border-border"></View>
+									<View className="bg-background w-full rounded-xl border-2 border-border">
+										<View className="p-2 w-full flex flex-col gap-y-0.5">
+											<View className="flex flex-row items-center gap-x-2">
+												<Carrot className="size-4 text-foreground" size={16} />
+												<Text className="text-foreground text-sm font-medium">Story seed</Text>
+											</View>
+											<Text className="text-foreground/60 text-sm font-normal pl-6">{story.description}</Text>
+										</View>
+										<Separator className="h-[2px]" />
+										<View className="p-3 px-4 w-full flex flex-row items-center gap-x-2">
+											<Share className="size-4 text-foreground" size={16} />
+											<Text className="text-foreground text-sm font-medium">Share story</Text>
+										</View>
+										<Separator className="h-[2px]" />
+										<View className="p-3 px-4 w-full flex flex-row items-center gap-x-2">
+											<Star className="size-4 text-foreground" size={16} />
+											<Text className="text-foreground text-sm font-medium">Add to favorites</Text>
+										</View>
+										<Separator className="h-[2px]" />
+										<View className="p-3 px-4 w-ful flex-row items-center gap-x-2">
+											<Fullscreen className="size-4 text-foreground" size={16} />
+											<Text className="text-foreground text-sm font-medium">Fullscreen</Text>
+										</View>
+									</View>
 								</Animated.View>
 							</View>
 						</TouchableWithoutFeedback>
@@ -120,14 +166,10 @@ export const EnhancedStoryCard = ({
 		.minDuration(500)
 		.onStart(() => {
 			"worklet";
-			// Initial press animation
-
-			console.log("onStart");
 			handleLongPress();
 		})
 		.onBegin(() => {
 			"worklet";
-			console.log("onBegin");
 			scale.value = withSequence(
 				withTiming(0.95, { duration: 100 }),
 				withSpring(0.95, { damping: 10, stiffness: 200 }),
