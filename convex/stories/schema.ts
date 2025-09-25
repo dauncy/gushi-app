@@ -1,4 +1,4 @@
-import { Id } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 import { Nullable } from "@/lib/types";
 import { zid, zodToConvex } from "convex-helpers/server/zod";
 import { defineTable } from "convex/server";
@@ -69,6 +69,7 @@ export type StoryPreview = Omit<
 	duration: number;
 	blurHash?: Nullable<string>;
 	_id: Id<"stories">;
+	categories: { _id: Id<"categories">; name: string }[];
 };
 
 export type StoryExtended = Omit<
@@ -116,3 +117,20 @@ export const storyCategories = defineTable(
 )
 	.index("by_story", ["storyId"])
 	.index("by_category", ["categoryId"]);
+
+type CategoryPromise = {
+	type: "categories";
+	data: Doc<"categories">[];
+};
+
+type AudioPromise = {
+	type: "audio";
+	data: { url: string | null };
+};
+
+type ImagePromise = {
+	type: "image";
+	data: { url: string | null; blurHash: string | null };
+};
+
+export type StorySubDataPromise = CategoryPromise | AudioPromise | ImagePromise;

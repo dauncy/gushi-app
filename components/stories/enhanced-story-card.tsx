@@ -22,10 +22,12 @@ import Animated, {
 	withTiming,
 } from "react-native-reanimated";
 import { Carrot } from "../ui/icons/carrot-icon";
+import { Circle } from "../ui/icons/circle-icon";
 import { Fullscreen } from "../ui/icons/full-screen-icon";
 import { Share } from "../ui/icons/share-icon";
 import { Star } from "../ui/icons/star-icon";
 import { Separator } from "../ui/separator";
+import { CategoryToColor, CategoryToIcon } from "./category-utils";
 import { StoryCard } from "./story-card";
 import { StoryImagePreview } from "./story-image";
 
@@ -73,14 +75,22 @@ const LongPressModal: React.FC<LongPressModalProps> = ({ visible, story, onClose
 				<View className="flex-1 z-20">
 					{visible && (
 						<TouchableWithoutFeedback onPress={requestClose}>
-							<View className="flex-1 flex flex-col items-center justify-center">
+							<View className="flex-1 flex flex-col items-center justify-center gap-y-4">
 								<Animated.View
 									entering={SlideInDown.easing(Easing.bezier(0.25, 0.1, 0.25, 1.0)).duration(150)}
 									exiting={SlideOutDown.easing(Easing.bezier(0.25, 0.1, 0.25, 1.0))
 										.duration(150)
 										.delay(150)}
-									className="w-full max-w-[51%] h-[276px]"
-									style={{ paddingLeft: 6, paddingRight: 6 }}
+									className="w-full max-w-[51%] h-[282px] rounded-xl bg-background"
+									style={{
+										shadowColor: "#000000",
+										shadowOffset: {
+											width: 0.5,
+											height: 0.85,
+										},
+										shadowOpacity: 0.5,
+										shadowRadius: 8,
+									}}
 								>
 									<StoryCard story={story} onCardPress={onClose} />
 								</Animated.View>
@@ -263,11 +273,12 @@ export const EnhancedStoryCard = ({
 								</View>
 							)}
 						</View>
-						<View className="w-full flex flex-row gap-x-2 p-2 pb-4 items-start">
+						<View className="w-full flex flex-row gap-x-2 p-2  items-start">
 							<View className="flex-1 flex flex-col gap-y-1">
 								<Text className="text-[#0D3311] text-lg font-medium" style={{ fontSize: 16, lineHeight: 20 }}>
 									{story.title}
 								</Text>
+
 								<View className="flex flex-row items-center gap-x-2">
 									<Clock className="size-4 text-[#0D3311]/50" size={16} />
 									<Text className="text-[#0D3311]/50 text-sm font-medium">{secondsToMinuteString(story.duration)}</Text>
@@ -293,6 +304,30 @@ export const EnhancedStoryCard = ({
 									<Play className="text-white fill-white" size={20} />
 								</AnimatedPressable>
 							</View>
+						</View>
+						<View
+							className="flex items-center gap-x-2 flex-row flex-wrap w-full pb-4 p-2"
+							style={{ flexWrap: "wrap", flexDirection: "row" }}
+						>
+							{story.categories.map((category) => {
+								const color = CategoryToColor[category.name.toLowerCase() as keyof typeof CategoryToColor] ?? {
+									background: "#0395ff",
+									foreground: "#fffbf3",
+								};
+								const Icon = CategoryToIcon[category.name.toLowerCase() as keyof typeof CategoryToIcon] ?? Circle;
+								return (
+									<View
+										key={category._id}
+										className="flex flex-row items-center gap-x-1 py-0.5 px-1 rounded-md"
+										style={{ backgroundColor: color.background, borderColor: color.foreground, borderWidth: 1 }}
+									>
+										<Icon color={color.foreground} size={16} />
+										<Text key={category._id} className="text-sm font-medium" style={{ color: color.foreground }}>
+											{category.name}
+										</Text>
+									</View>
+								);
+							})}
 						</View>
 					</View>
 				</Animated.View>

@@ -1,7 +1,7 @@
 import { Id } from "@/convex/_generated/dataModel";
 import { internalQuery, query, QueryCtx } from "@/convex/_generated/server";
 import { verifyAccess } from "@/convex/common";
-import { StoryExtended, StoryPreview } from "@/convex/stories/schema";
+import { StoryExtended, StoryPreview, StorySubDataPromise } from "@/convex/stories/schema";
 import { zid, zodToConvex } from "convex-helpers/server/zod";
 import { paginationOptsValidator, PaginationResult } from "convex/server";
 import { v } from "convex/values";
@@ -27,6 +27,19 @@ export const getAudioUrl = async (ctx: QueryCtx, audioId: Id<"audio">) => {
 	return {
 		url,
 	};
+};
+
+export const getStoryCategories = async (ctx: QueryCtx, storyId: Id<"stories">) => {
+	const storyCategories = await ctx.db
+		.query("storyCategories")
+		.withIndex("by_story", (q) => q.eq("storyId", storyId))
+		.collect();
+	const categories = await Promise.all(
+		storyCategories.map(async (storyCategory) => {
+			return await ctx.db.get(storyCategory.categoryId);
+		}),
+	);
+	return categories.filter((category): category is NonNullable<typeof category> => Boolean(category));
 };
 
 export const getStories = query({
@@ -57,20 +70,27 @@ export const getStories = query({
 				const storiesPage = storiesInit.filter((story): story is NonNullable<typeof story> => Boolean(story));
 				const stories = await Promise.all(
 					storiesPage.map(async (story) => {
-						const promises: Promise<{ url: string | null; blurHash?: string | null }>[] = [
-							getImageUrl(ctx, story.imageId),
+						const promises: Promise<StorySubDataPromise>[] = [
+							getImageUrl(ctx, story.imageId).then((data) => ({ type: "image", data })),
+							getStoryCategories(ctx, story._id).then((data) => ({ type: "categories", data })),
 						];
 						if (story.subscription_required) {
 							if (hasSubscription) {
-								promises.push(getAudioUrl(ctx, story.audioId));
+								promises.push(getAudioUrl(ctx, story.audioId).then((data) => ({ type: "audio", data })));
 							} else {
-								promises.push(Promise.resolve({ url: null }));
+								promises.push(Promise.resolve({ type: "audio", data: { url: null } }));
 							}
 						} else {
-							promises.push(getAudioUrl(ctx, story.audioId));
+							promises.push(getAudioUrl(ctx, story.audioId).then((data) => ({ type: "audio", data })));
 						}
-						const [imageData, audioData] = await Promise.all(promises);
+						const resolvedPromises = await Promise.all(promises);
 						const duration = Math.ceil(story.transcript[story.transcript.length - 1].end_time);
+						const categories = resolvedPromises.find((promise) => promise.type === "categories")?.data ?? [];
+						const imageData = resolvedPromises.find((promise) => promise.type === "image")?.data ?? {
+							url: null,
+							blurHash: null,
+						};
+						const audioData = resolvedPromises.find((promise) => promise.type === "audio")?.data ?? { url: null };
 						return {
 							_id: story._id,
 							title: story.title,
@@ -82,6 +102,7 @@ export const getStories = query({
 							subscription_required: !!story.subscription_required,
 							featured: !!story.featured,
 							description: story.description,
+							categories: categories.map((category) => ({ _id: category._id, name: category.name })),
 						};
 					}),
 				);
@@ -99,19 +120,26 @@ export const getStories = query({
 
 			const stories = await Promise.all(
 				storiesPage.page.map(async (story) => {
-					const promises: Promise<{ url: string | null; blurHash?: string | null }>[] = [
-						getImageUrl(ctx, story.imageId),
+					const promises: Promise<StorySubDataPromise>[] = [
+						getImageUrl(ctx, story.imageId).then((data) => ({ type: "image", data })),
+						getStoryCategories(ctx, story._id).then((data) => ({ type: "categories", data })),
 					];
 					if (story.subscription_required) {
 						if (hasSubscription) {
-							promises.push(getAudioUrl(ctx, story.audioId));
+							promises.push(getAudioUrl(ctx, story.audioId).then((data) => ({ type: "audio", data })));
 						} else {
-							promises.push(Promise.resolve({ url: null }));
+							promises.push(Promise.resolve({ type: "audio", data: { url: null } }));
 						}
 					} else {
-						promises.push(getAudioUrl(ctx, story.audioId));
+						promises.push(getAudioUrl(ctx, story.audioId).then((data) => ({ type: "audio", data })));
 					}
-					const [imageData, audioData] = await Promise.all(promises);
+					const resolvedPromises = await Promise.all(promises);
+					const categories = resolvedPromises.find((promise) => promise.type === "categories")?.data ?? [];
+					const imageData = resolvedPromises.find((promise) => promise.type === "image")?.data ?? {
+						url: null,
+						blurHash: null,
+					};
+					const audioData = resolvedPromises.find((promise) => promise.type === "audio")?.data ?? { url: null };
 					const duration = Math.ceil(story.transcript[story.transcript.length - 1].end_time);
 					return {
 						_id: story._id,
@@ -124,6 +152,7 @@ export const getStories = query({
 						subscription_required: !!story.subscription_required,
 						featured: !!story.featured,
 						description: story.description,
+						categories: categories.map((category) => ({ _id: category._id, name: category.name })),
 					};
 				}),
 			);
@@ -260,17 +289,26 @@ export const getFeaturedStory = query({
 			return null;
 		}
 
-		const promises: Promise<{ url: string | null; blurHash?: string | null }>[] = [getImageUrl(ctx, story.imageId)];
+		const promises: Promise<StorySubDataPromise>[] = [
+			getImageUrl(ctx, story.imageId).then((data) => ({ type: "image", data })),
+			getStoryCategories(ctx, story._id).then((data) => ({ type: "categories", data })),
+		];
 		if (story.subscription_required) {
 			if (hasSubscription) {
-				promises.push(getAudioUrl(ctx, story.audioId));
+				promises.push(getAudioUrl(ctx, story.audioId).then((data) => ({ type: "audio", data })));
 			} else {
-				promises.push(Promise.resolve({ url: null }));
+				promises.push(Promise.resolve({ type: "audio", data: { url: null } }));
 			}
 		} else {
-			promises.push(getAudioUrl(ctx, story.audioId));
+			promises.push(getAudioUrl(ctx, story.audioId).then((data) => ({ type: "audio", data })));
 		}
-		const [imageData, audioData] = await Promise.all(promises);
+		const resolvedPromises = await Promise.all(promises);
+		const imageData = resolvedPromises.find((promise) => promise.type === "image")?.data ?? {
+			url: null,
+			blurHash: null,
+		};
+		const audioData = resolvedPromises.find((promise) => promise.type === "audio")?.data ?? { url: null };
+		const categories = resolvedPromises.find((promise) => promise.type === "categories")?.data ?? [];
 		const duration = Math.ceil(story.transcript[story.transcript.length - 1].end_time);
 		return {
 			_id: story._id,
@@ -282,6 +320,7 @@ export const getFeaturedStory = query({
 			updatedAt: story.updatedAt,
 			subscription_required: !!story.subscription_required,
 			featured: !!story.featured,
+			categories: categories.map((category) => ({ _id: category._id, name: category.name })),
 		};
 	},
 });

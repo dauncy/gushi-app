@@ -11,7 +11,9 @@ import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Pressable, Text, TouchableOpacity, View } from "react-native";
+import { Circle } from "../ui/icons/circle-icon";
 import { Stop } from "../ui/icons/stop-icon";
+import { CategoryToColor, CategoryToIcon } from "./category-utils";
 import { StoryImagePreview } from "./story-image";
 
 export const StoryCardLoading = () => {
@@ -47,6 +49,8 @@ export const StoryCardLoading = () => {
 		</View>
 	);
 };
+
+const LockedStoryCard = () => {};
 
 export const StoryCard = ({
 	story,
@@ -186,7 +190,7 @@ export const StoryCard = ({
 			}}
 		>
 			<View
-				className="flex flex-col rounded-xl w-full bg-[#fffbf3]/60 border-2 border-[#0395ff] h-full"
+				className="flex flex-col rounded-xl w-full bg-[#fffbf3]/60 border-2 border-[#0395ff]"
 				onLayout={(e) => {
 					setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.width });
 				}}
@@ -220,6 +224,29 @@ export const StoryCard = ({
 						<Text className="text-[#0D3311] text-lg font-medium" style={{ fontSize: 16, lineHeight: 20 }}>
 							{story.title}
 						</Text>
+						<View className="flex flex-row items-center gap-x-2">
+							<View className="flex flex-row items-center gap-x-1">
+								{story.categories.map((category) => {
+									const color = CategoryToColor[category.name.toLowerCase() as keyof typeof CategoryToColor] ?? {
+										background: "#0395ff",
+										foreground: "#fffbf3",
+									};
+									const Icon = CategoryToIcon[category.name.toLowerCase() as keyof typeof CategoryToIcon] ?? Circle;
+									return (
+										<View
+											key={category._id}
+											className="flex flex-row items-center gap-x-1 py-0.5 px-2 rounded-md shadow"
+											style={{ backgroundColor: color.background, borderColor: color.foreground, borderWidth: 1 }}
+										>
+											<Icon color={color.foreground} size={16} />
+											<Text key={category._id} className="text-sm font-medium" style={{ color: color.foreground }}>
+												{category.name}
+											</Text>
+										</View>
+									);
+								})}
+							</View>
+						</View>
 						<View className="flex flex-row items-center gap-x-2">
 							<Clock className="size-4 text-[#0D3311]/50" size={16} />
 							<Text className="text-[#0D3311]/50 text-sm font-medium">{secondsToMinuteString(story.duration)}</Text>

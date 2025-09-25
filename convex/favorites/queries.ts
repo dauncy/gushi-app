@@ -3,7 +3,7 @@ import { verifyAccess } from "@/convex/common/utils";
 import { StoryPreview } from "@/convex/stories";
 import { paginationOptsValidator, PaginationResult } from "convex/server";
 import { v } from "convex/values";
-import { getAudioUrl, getImageUrl } from "../stories/queries";
+import { getAudioUrl, getImageUrl, getStoryCategories } from "../stories/queries";
 
 export const getUserFavorites = query({
 	args: {
@@ -23,9 +23,10 @@ export const getUserFavorites = query({
 						return null;
 					}
 
-					const [imageData, audioData] = await Promise.all([
+					const [imageData, audioData, categories] = await Promise.all([
 						getImageUrl(ctx, story.imageId),
 						getAudioUrl(ctx, story.audioId),
+						getStoryCategories(ctx, story._id),
 					]);
 
 					if (!imageData.url || !audioData.url) {
@@ -46,6 +47,7 @@ export const getUserFavorites = query({
 							_createdAt: fav.createdAt,
 						},
 						featured: !!story.featured,
+						categories: categories.map((category) => ({ _id: category._id, name: category.name })),
 					};
 				}),
 			);

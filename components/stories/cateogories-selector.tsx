@@ -6,13 +6,11 @@ import { selectedCategoryState, useSelectedCategory } from "@/stores/category-st
 import * as Haptics from "expo-haptics";
 import { LucideIcon } from "lucide-react-native";
 import { memo, useCallback, useMemo } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { BedSingle } from "../ui/icons/bed-single";
+import { Text, TouchableOpacity, View } from "react-native";
 import { Circle } from "../ui/icons/circle-icon";
-import { GraduationCap } from "../ui/icons/graduation-cap-icon";
 import { Grid2X2Plus } from "../ui/icons/grid-2-plus-icon";
-import { Rocket } from "../ui/icons/rocket-icon";
 import { Skeleton } from "../ui/skeleton";
+import { CategoryToIcon } from "./category-utils";
 
 interface Category {
 	name: string;
@@ -21,13 +19,6 @@ interface Category {
 	soon?: boolean;
 }
 
-const NameToIcon = {
-	bedtime: BedSingle,
-	lesson: GraduationCap,
-	adventure: Rocket,
-	"create-your-own": Grid2X2Plus,
-};
-
 export const CategoriesSelector = memo(() => {
 	const { data: categories, isLoading } = useConvexQuery(api.stories.queries.getFeaturedCategories, {});
 	const sanitizedCatgeories = useMemo(() => {
@@ -35,7 +26,7 @@ export const CategoriesSelector = memo(() => {
 			return [];
 		}
 		const sanitized = categories?.map((category) => {
-			const icon = NameToIcon[category.name.toLowerCase() as keyof typeof NameToIcon] ?? Circle;
+			const icon = CategoryToIcon[category.name.toLowerCase() as keyof typeof CategoryToIcon] ?? Circle;
 			return {
 				name: category.name,
 				id: category._id,
@@ -55,15 +46,11 @@ export const CategoriesSelector = memo(() => {
 	}, [categories]);
 
 	return (
-		<ScrollView
-			horizontal
-			showsHorizontalScrollIndicator={false}
-			alwaysBounceHorizontal={false}
-			contentContainerStyle={{
+		<View
+			style={{
 				flexDirection: "row",
 				justifyContent: "space-between",
 				display: "flex",
-				gap: 2,
 			}}
 			className="w-full p-1 bg-black/20 rounded-3xl "
 		>
@@ -80,7 +67,7 @@ export const CategoriesSelector = memo(() => {
 					))}
 				</>
 			)}
-		</ScrollView>
+		</View>
 	);
 });
 
@@ -88,7 +75,7 @@ CategoriesSelector.displayName = "CategoriesSelector";
 
 const LoadingCategory = () => {
 	return (
-		<View className="flex flex-col p-2 px-4 items-center gap-y-1">
+		<View className="flex flex-col p-2 px-3.5 items-center gap-y-1">
 			<Skeleton className="w-10 h-10 rounded-full bg-black/30" />
 			<Skeleton className="w-16 h-4 rounded-md bg-black/30" />
 		</View>
@@ -113,14 +100,14 @@ const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
 			}}
 			key={categoryData.id}
 			className={cn(
-				"flex flex-col gap-y-1 items-center p-2 px-4 rounded-3xl border-2 border-transparent active:bg-[#ceef32] active:border-[#0395ff] active:border-2",
+				"flex flex-col gap-y-1 items-center p-2 px-3.5 rounded-3xl border-2 border-transparent active:bg-[#ceef32] active:border-[#0395ff] active:border-2",
 				selected && "bg-[#ceef32] border-[#0395ff] border-2",
 			)}
 		>
 			<categoryData.icon className={cn("text-[#0395ff]", categoryData.soon && "opacity-50")} size={28} />
 			<Text
 				className={cn(
-					"text-[#0395ff] text-sm font-medium mt-auto",
+					"text-[#0395ff] text-sm font-medium mt-auto capitalize",
 					selected && "font-semibold",
 					categoryData.soon && "opacity-50",
 				)}
