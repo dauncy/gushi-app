@@ -75,10 +75,10 @@ const LongPressModal: React.FC<LongPressModalProps> = ({ visible, story, onClose
 						<TouchableWithoutFeedback onPress={requestClose}>
 							<View className="flex-1 flex flex-col items-center justify-center">
 								<Animated.View
-									entering={SlideInDown.easing(Easing.bezier(0.25, 0.1, 0.25, 1.0)).duration(300)}
+									entering={SlideInDown.easing(Easing.bezier(0.25, 0.1, 0.25, 1.0)).duration(150)}
 									exiting={SlideOutDown.easing(Easing.bezier(0.25, 0.1, 0.25, 1.0))
-										.duration(300)
-										.delay(300)}
+										.duration(150)
+										.delay(150)}
 									className="w-full max-w-[51%] h-[276px]"
 									style={{ paddingLeft: 6, paddingRight: 6 }}
 								>
@@ -86,9 +86,9 @@ const LongPressModal: React.FC<LongPressModalProps> = ({ visible, story, onClose
 								</Animated.View>
 								<Animated.View
 									entering={SlideInDown.easing(Easing.bezier(0.25, 0.1, 0.25, 1.0))
-										.duration(300)
-										.delay(300)}
-									exiting={SlideOutDown.easing(Easing.bezier(0.25, 0.1, 0.25, 1.0)).duration(300)}
+										.duration(150)
+										.delay(150)}
+									exiting={SlideOutDown.easing(Easing.bezier(0.25, 0.1, 0.25, 1.0)).duration(150)}
 									className="w-full max-w-[66%]"
 									style={{
 										shadowColor: "#000000",
