@@ -335,11 +335,16 @@ export const getFeaturedCategories = query({
 		take: v.optional(v.number()),
 	},
 	handler: async (ctx, { take = 3 }) => {
-		await verifyAccess(ctx, { validateSubscription: false });
-		const categories = await ctx.db
-			.query("categories")
-			.withIndex("by_featured", (q) => q.eq("featured", true))
-			.take(take);
-		return categories;
+		try {
+			await verifyAccess(ctx, { validateSubscription: false });
+			const categories = await ctx.db
+				.query("categories")
+				.withIndex("by_featured", (q) => q.eq("featured", true))
+				.take(take);
+			return categories;
+		} catch (error) {
+			console.warn("[convex/stories/queries.ts]: getFeaturedCategories() => --- ERROR --- ", error);
+			return [];
+		}
 	},
 });

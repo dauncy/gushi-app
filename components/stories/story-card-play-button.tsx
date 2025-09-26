@@ -57,7 +57,7 @@ export const StoryCardPlayButton = memo(({ story }: { story: StoryPreview }) => 
 				<Button
 					onPress={handleStop}
 					size="icon"
-					className="bg-transparent border-transparent active:bg-[#0D3311]/20 rounded-full"
+					className="bg-transparent border-transparent active:bg-[#0D3311]/20 rounded-full z-20"
 				>
 					<Stop className="text-[#ff78e5] fill-[#ff78e5]" size={20} />
 				</Button>

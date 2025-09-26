@@ -2,13 +2,13 @@ import { AudioPreviewPlayer } from "@/components/audio/audio-preview";
 import { CategoriesSelector } from "@/components/stories/cateogories-selector";
 import { EnhancedStoryCard } from "@/components/stories/enhanced-story-card";
 import { StoryCardLoading } from "@/components/stories/story-card";
-import { useAudio } from "@/context/AudioContext";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { api } from "@/convex/_generated/api";
 import { StoryPreview } from "@/convex/stories";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
-import { sanitizeStorageUrl } from "@/lib/utils";
+import { usePlayInFullscreen } from "@/hooks/use-play-in-fullscreen";
+import { usePresentPaywall } from "@/hooks/use-present-paywall";
 import { useSelectedCategory } from "@/stores/category-store";
 import { FlashList } from "@shopify/flash-list";
 import { memo, useCallback, useMemo } from "react";
@@ -37,8 +37,7 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 		api.stories.queries.getFeaturedStory,
 		{},
 		{
-			enabled: false,
-			staleTime: !categoryId ? 0 : undefined,
+			enabled: !categoryId,
 		},
 	);
 
@@ -66,19 +65,28 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 	const listData = useMemo(() => {
 		const data: StoryPreview[] = [];
 		if (hasSubscription) {
-			if (featuredStory && !isFeaturedStoryLoading && !isLoading && !refreshing) {
+			if (featuredStory && !isFeaturedStoryLoading && !isLoading && !refreshing && !categoryId) {
 				data.push(featuredStory);
 			}
 			data.push(...listItems);
 		} else {
 			data.push(...freeStories);
-			if (featuredStory && !isFeaturedStoryLoading && !isLoading && !refreshing) {
+			if (featuredStory && !isFeaturedStoryLoading && !isLoading && !refreshing && !categoryId) {
 				data.push(featuredStory);
 			}
 			data.push(...listItems);
 		}
 		return data;
-	}, [hasSubscription, featuredStory, isFeaturedStoryLoading, isLoading, refreshing, listItems, freeStories]);
+	}, [
+		hasSubscription,
+		featuredStory,
+		isFeaturedStoryLoading,
+		isLoading,
+		refreshing,
+		listItems,
+		freeStories,
+		categoryId,
+	]);
 
 	return (
 		<View className="flex-1 bg-black/10 px-2">
@@ -135,7 +143,21 @@ const StoryList = memo(StoryListComp);
 StoryList.displayName = "StoryList";
 
 const HomePage = () => {
-	const { setStory } = useAudio();
+	const { playInFullscreen } = usePlayInFullscreen();
+	const { hasSubscription } = useSubscription();
+	const unlocked = ({
+		subscription_required,
+		audioUrl,
+	}: {
+		subscription_required: boolean;
+		audioUrl: string | null;
+	}) => {
+		if (hasSubscription) {
+			return !!audioUrl;
+		}
+		return !subscription_required && !!audioUrl;
+	};
+	const { presentPaywall } = usePresentPaywall();
 	return (
 		<View style={{ flex: 1 }} className="relative bg-[#fffbf3] flex flex-col">
 			<View className="w-full px-2" style={{ marginTop: 46, paddingTop: 12, paddingBottom: 12 }}>
@@ -143,14 +165,12 @@ const HomePage = () => {
 			</View>
 			<StoryList
 				onCardPress={(story) => {
-					if (story.audioUrl) {
-						setStory({
-							storyUrl: sanitizeStorageUrl(story.audioUrl),
-							storyId: story._id,
-							storyImage: sanitizeStorageUrl(story.imageUrl ?? ""),
-							storyTitle: story.title,
-							autoPlay: true,
+					if (unlocked(story)) {
+						playInFullscreen({
+							storyData: { _id: story._id, title: story.title, imageUrl: story.imageUrl, audioUrl: story.audioUrl },
 						});
+					} else {
+						presentPaywall();
 					}
 				}}
 			/>
