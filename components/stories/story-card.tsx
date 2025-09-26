@@ -1,18 +1,13 @@
-import { Button } from "@/components/ui/button";
 import { LockKeyhole } from "@/components/ui/icons/lock-icon";
-import { Play } from "@/components/ui/icons/play-icon";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAudio } from "@/context/AudioContext";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { StoryPreview } from "@/convex/stories/schema";
-import { sanitizeStorageUrl } from "@/lib/utils";
 import { BlurView } from "expo-blur";
-import { useRouter } from "expo-router";
-import { useCallback, useMemo, useRef, useState } from "react";
-import { Pressable, TouchableOpacity, View } from "react-native";
-import { Stop } from "../ui/icons/stop-icon";
+import { useMemo, useState } from "react";
+import { View } from "react-native";
 import { FeaturedBadge } from "./featured-badge";
 import { StoryCardHeader } from "./story-card-header";
+import { StoryCardPlayButton } from "./story-card-play-button";
 import { StoryImagePreview } from "./story-image";
 
 export const StoryCardLoading = () => {
@@ -49,199 +44,108 @@ export const StoryCardLoading = () => {
 	);
 };
 
-const LockedStoryCard = ({
+export const LockedStoryCard = ({
 	story,
-	margin,
 	cardDimensions,
 	setCardDimensions,
 }: {
 	story: StoryPreview;
-	margin?: "right" | "left";
 	cardDimensions: { width: number; height: number };
 	setCardDimensions: (dimensions: { width: number; height: number }) => void;
 }) => {
-	const pressableRef = useRef<boolean>(true);
-	const router = useRouter();
-
-	const presentPaywall = useCallback(() => {
-		if (pressableRef.current) {
-			pressableRef.current = false;
-			router.push("/upgrade");
-			setTimeout(() => {
-				pressableRef.current = true;
-			}, 300);
-		}
-	}, [router, pressableRef]);
-
 	return (
-		<TouchableOpacity
-			activeOpacity={1}
-			onPress={presentPaywall}
-			style={{
-				marginRight: margin === "right" ? 6 : 0,
-				marginBottom: 12,
-				marginLeft: margin === "left" ? 6 : 0,
+		<View
+			onLayout={(e) => {
+				setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.width });
 			}}
+			className="flex flex-col rounded-xl w-full bg-[#fffbf3]/60 border-2 border-[#0395ff] w-full h-full relative"
 		>
-			<View
-				onLayout={(e) => {
-					setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.width });
-				}}
-				className="flex flex-col rounded-xl w-full bg-[#fffbf3]/60 border-2 border-[#0395ff] w-full h-full relative"
-			>
-				<View className="w-full rounded-t-xl w-full relative" style={{ height: cardDimensions.width }}>
-					{story.featured && <FeaturedBadge />}
-					<StoryImagePreview imageUrl={story.imageUrl} blurHash={story.blurHash ?? undefined} size={"featured"} />
-				</View>
-				<StoryCardHeader title={story.title} duration={story.duration} />
-
-				<View className="absolute inset-0 rounded-xl bg-black opacity-40 overflow-hidden" style={{ zIndex: 1 }} />
-				<View className="absolute inset-0 items-center justify-center rounded-xl overflow-hidden" style={{ zIndex: 3 }}>
-					<View
-						style={{
-							shadowColor: "#ffffff",
-							shadowOffset: {
-								width: 0.5,
-								height: 1.5,
-							},
-							shadowOpacity: 0.5,
-							shadowRadius: 14,
-						}}
-						className="flex flex-row items-center justify-center size-12 rounded-full bg-slate-800 p-1"
-					>
-						<LockKeyhole className="text-slate-200" size={24} />
-					</View>
-				</View>
-				<BlurView
-					intensity={8}
-					tint="dark"
-					className="absolute inset-0 rounded-xl bg-black overflow-hidden"
-					style={{ zIndex: 2, borderRadius: 12 }}
-				/>
+			<View className="w-full rounded-t-xl w-full relative" style={{ height: cardDimensions.width }}>
+				{story.featured && <FeaturedBadge />}
+				<StoryImagePreview imageUrl={story.imageUrl} blurHash={story.blurHash ?? undefined} size={"featured"} />
 			</View>
-		</TouchableOpacity>
+			<View className="w-full flex flex-row gap-x-2 p-2 pb-4 items-start">
+				<StoryCardHeader title={story.title} duration={story.duration} />
+			</View>
+
+			<View className="absolute inset-0 rounded-xl bg-black opacity-40 overflow-hidden" style={{ zIndex: 1 }} />
+			<View className="absolute inset-0 items-center justify-center rounded-xl overflow-hidden" style={{ zIndex: 3 }}>
+				<View
+					style={{
+						shadowColor: "#ffffff",
+						shadowOffset: {
+							width: 0.5,
+							height: 1.5,
+						},
+						shadowOpacity: 0.5,
+						shadowRadius: 14,
+					}}
+					className="flex flex-row items-center justify-center size-12 rounded-full bg-slate-800 p-1"
+				>
+					<LockKeyhole className="text-slate-200" size={24} />
+				</View>
+			</View>
+			<BlurView
+				intensity={8}
+				tint="dark"
+				className="absolute inset-0 rounded-xl bg-black overflow-hidden"
+				style={{ zIndex: 2, borderRadius: 12 }}
+			/>
+		</View>
 	);
 };
 
-const UnlockedStoryCard = ({
+export const UnlockedStoryCard = ({
 	story,
-	margin,
 	cardDimensions,
 	setCardDimensions,
-	onCardPress,
+	active = false,
+	hasPlayButton = true,
 }: {
 	story: StoryPreview;
-	margin?: "right" | "left";
 	cardDimensions: { width: number; height: number };
 	setCardDimensions: (dimensions: { width: number; height: number }) => void;
-	onCardPress: () => void;
+	active?: boolean;
+	hasPlayButton?: boolean;
 }) => {
-	const pressableRef = useRef<boolean>(true);
-	const { play, setStory, isPlaying, storyId, stop } = useAudio();
-
-	const isCurrentStory = useMemo(() => {
-		return storyId === story._id;
-	}, [storyId, story._id]);
-
 	return (
-		<Pressable
-			onPress={() => {
-				if (!pressableRef.current) {
-					return;
-				}
-				pressableRef.current = false;
-				onCardPress();
-				setTimeout(() => {
-					pressableRef.current = true;
-				}, 300);
-			}}
-			style={{
-				marginRight: margin === "right" ? 6 : 0,
-				marginBottom: 12,
-				marginLeft: margin === "left" ? 6 : 0,
+		<View
+			className="flex flex-col rounded-xl w-full bg-[#fffbf3]/60 border-2 border-[#0395ff]"
+			onLayout={(e) => {
+				setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.width });
 			}}
 		>
-			<View
-				className="flex flex-col rounded-xl w-full bg-[#fffbf3]/60 border-2 border-[#0395ff]"
-				onLayout={(e) => {
-					setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.width });
-				}}
-			>
-				<View className="w-full rounded-t-xl w-full relative" style={{ height: cardDimensions.width }}>
-					<StoryImagePreview
-						imageUrl={story.imageUrl}
-						blurHash={story.blurHash ?? undefined}
-						size={"featured"}
-						active={isCurrentStory}
-					/>
-					{story.featured && <FeaturedBadge />}
-				</View>
-				<View className="w-full flex flex-row gap-x-2 p-2 pb-4 items-start">
-					<StoryCardHeader title={story.title} duration={story.duration} />
-					<View className="flex items-center justify-center mt-0.5">
-						{isPlaying && isCurrentStory ? (
-							<Button
-								onPress={() => {
-									stop();
-								}}
-								size="icon"
-								className="bg-transparent border-transparent active:bg-[#0D3311]/20 rounded-full"
-							>
-								<Stop className="text-white fill-white" size={20} />
-							</Button>
-						) : isCurrentStory ? (
-							<Button
-								onPress={() => {
-									play();
-								}}
-								size="icon"
-								className="bg-transparent border-transparent active:bg-[#0D3311]/20 rounded-full"
-							>
-								<Play className="text-white fill-white" size={20} />
-							</Button>
-						) : (
-							<Button
-								size="icon"
-								className="bg-[#ff78e5] active:bg-[#ff78e5]/80 border-white border rounded-full p-1"
-								onPress={(e) => {
-									e.stopPropagation();
-									if (!story.audioUrl) {
-										return;
-									}
-									if (!pressableRef.current) {
-										return;
-									}
-									pressableRef.current = false;
-									setStory({
-										storyUrl: sanitizeStorageUrl(story.audioUrl),
-										storyId: story._id,
-										storyImage: sanitizeStorageUrl(story.imageUrl ?? ""),
-										storyTitle: story.title,
-										autoPlay: true,
-									});
-									setTimeout(() => {
-										pressableRef.current = true;
-									}, 300);
-								}}
-							>
-								<Play className="text-white fill-white" size={20} />
-							</Button>
-						)}
-					</View>
-				</View>
+			<View className="w-full rounded-t-xl w-full relative" style={{ height: cardDimensions.width }}>
+				<StoryImagePreview
+					imageUrl={story.imageUrl}
+					blurHash={story.blurHash ?? undefined}
+					size={"featured"}
+					active={active}
+				/>
+				{story.featured && <FeaturedBadge />}
 			</View>
-		</Pressable>
+			<View className="w-full flex flex-row gap-x-2 p-2 pb-4 items-start">
+				<StoryCardHeader title={story.title} duration={story.duration} />
+				{hasPlayButton && (
+					<View className="flex items-center justify-center mt-0.5">
+						<StoryCardPlayButton story={story} />
+					</View>
+				)}
+			</View>
+		</View>
 	);
 };
 
 export const StoryCard = ({
 	story,
-	onCardPress,
 	margin,
+	active = false,
+	hasPlayButton = true,
 }: {
 	story: StoryPreview;
-	onCardPress: () => void;
 	margin?: "right" | "left";
+	active?: boolean;
+	hasPlayButton?: boolean;
 }) => {
 	const [cardDimensions, setCardDimensions] = useState<{ width: number; height: number }>({ width: 168, height: 140 });
 	const { hasSubscription } = useSubscription();
@@ -257,23 +161,16 @@ export const StoryCard = ({
 	}, [hasSubscription, story.subscription_required, story.audioUrl]);
 
 	if (locked) {
-		return (
-			<LockedStoryCard
-				story={story}
-				margin={margin}
-				cardDimensions={cardDimensions}
-				setCardDimensions={setCardDimensions}
-			/>
-		);
+		return <LockedStoryCard story={story} cardDimensions={cardDimensions} setCardDimensions={setCardDimensions} />;
 	}
 
 	return (
 		<UnlockedStoryCard
 			story={story}
-			margin={margin}
 			cardDimensions={cardDimensions}
 			setCardDimensions={setCardDimensions}
-			onCardPress={onCardPress}
+			active={active}
+			hasPlayButton={hasPlayButton}
 		/>
 	);
 };

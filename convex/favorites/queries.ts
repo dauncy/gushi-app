@@ -1,6 +1,6 @@
 import { internalQuery, query } from "@/convex/_generated/server";
 import { verifyAccess } from "@/convex/common/utils";
-import { StoryPreview } from "@/convex/stories";
+import { StoryPreview, StorySubDataPromise } from "@/convex/stories";
 import { paginationOptsValidator, PaginationResult } from "convex/server";
 import { v } from "convex/values";
 import { getAudioUrl, getImageUrl, getStoryCategories } from "../stories/queries";
@@ -11,7 +11,7 @@ export const getUserFavorites = query({
 	},
 	handler: async (ctx, { paginationOpts }): Promise<PaginationResult<StoryPreview>> => {
 		try {
-			const { dbUser } = await verifyAccess(ctx, { validateSubscription: true });
+			const { dbUser, hasSubscription } = await verifyAccess(ctx, { validateSubscription: false });
 			const userFavorites = await ctx.db
 				.query("favorites")
 				.withIndex("by_user", (q) => q.eq("userId", dbUser._id))
@@ -22,16 +22,28 @@ export const getUserFavorites = query({
 					if (!story) {
 						return null;
 					}
+					const promises: Promise<StorySubDataPromise>[] = [
+						getImageUrl(ctx, story.imageId).then((data) => ({ type: "image", data })),
+						getStoryCategories(ctx, story._id).then((data) => ({ type: "categories", data })),
+					];
 
-					const [imageData, audioData, categories] = await Promise.all([
-						getImageUrl(ctx, story.imageId),
-						getAudioUrl(ctx, story.audioId),
-						getStoryCategories(ctx, story._id),
-					]);
-
-					if (!imageData.url || !audioData.url) {
-						return null;
+					if (story.subscription_required) {
+						if (hasSubscription) {
+							promises.push(getAudioUrl(ctx, story.audioId).then((data) => ({ type: "audio", data })));
+						} else {
+							promises.push(Promise.resolve({ type: "audio", data: { url: null } }));
+						}
+					} else {
+						promises.push(getAudioUrl(ctx, story.audioId).then((data) => ({ type: "audio", data })));
 					}
+
+					const resolvedPromises = await Promise.all(promises);
+					const categories = resolvedPromises.find((promise) => promise.type === "categories")?.data ?? [];
+					const imageData = resolvedPromises.find((promise) => promise.type === "image")?.data ?? {
+						url: null,
+						blurHash: null,
+					};
+					const audioData = resolvedPromises.find((promise) => promise.type === "audio")?.data ?? { url: null };
 
 					return {
 						_id: story._id,
@@ -77,5 +89,19 @@ export const getfavoritesForUserId = internalQuery({
 			.withIndex("by_user", (q) => q.eq("userId", dbUserId))
 			.collect();
 		return favorites;
+	},
+});
+
+export const getFavoriteStatusByStoryId = query({
+	args: {
+		storyId: v.id("stories"),
+	},
+	handler: async (ctx, { storyId }) => {
+		const { dbUser } = await verifyAccess(ctx, { validateSubscription: false });
+		const favorite = await ctx.db
+			.query("favorites")
+			.withIndex("by_user_story", (q) => q.eq("userId", dbUser._id).eq("storyId", storyId))
+			.first();
+		return favorite;
 	},
 });

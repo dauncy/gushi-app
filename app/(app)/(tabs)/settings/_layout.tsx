@@ -15,7 +15,6 @@ export default function SettingsLayout() {
 					animationDuration: 300,
 					contentStyle: {
 						height: "100%",
-						backgroundColor: "#0f172a",
 					},
 				}}
 			/>
