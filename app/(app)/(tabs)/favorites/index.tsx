@@ -14,7 +14,7 @@ import { ActivityIndicator, RefreshControl, Text, View } from "react-native";
 export default function FavoritesListPage() {
 	const router = useRouter();
 	return (
-		<View style={{ flex: 1 }} className="relative px-2">
+		<View style={{ flex: 1 }} className="relative">
 			<FavoritesList />
 			<AudioPreviewPlayer
 				className="bottom-2"
@@ -45,7 +45,7 @@ const FavoritesList = () => {
 	const { playInFullscreen } = usePlayInFullscreen();
 
 	return (
-		<View style={{ flex: 1 }} className="relative bg-[#fffbf3] flex flex-col">
+		<View style={{ flex: 1 }} className="relative bg-[#fffbf3] flex flex-col px-0 pt-4">
 			<View className="flex-1 bg-black/10 px-2" style={{ marginTop: 46, paddingTop: 12, paddingBottom: 12 }}>
 				<FlashList
 					showsVerticalScrollIndicator={false}
@@ -79,7 +79,7 @@ const FavoritesList = () => {
 									))}
 								</View>
 							) : (
-								<View className="flex flex-col flex-1 items-center justify-center px-4 bg-red-30 mt-64">
+								<View className="flex flex-col flex-1 items-center justify-center px-4 mt-60">
 									<View className="flex w-full border-2 border-[#ff2d01] bg-background rounded-xl p-4 flex flex-col gap-y-2">
 										<View className="flex w-full flex flex-row items-center gap-x-2">
 											<Sparkles size={20} className="text-[#ff2d01]" />

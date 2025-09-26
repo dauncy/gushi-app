@@ -33,7 +33,14 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 		data: featuredStory,
 		isLoading: isFeaturedStoryLoading,
 		refetch: refetchFeaturedStory,
-	} = useConvexQuery(api.stories.queries.getFeaturedStory, {}, {});
+	} = useConvexQuery(
+		api.stories.queries.getFeaturedStory,
+		{},
+		{
+			enabled: false,
+			staleTime: !categoryId ? 0 : undefined,
+		},
+	);
 
 	const onEndReached = useCallback(() => {
 		if (status === "CanLoadMore") {

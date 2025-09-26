@@ -60,7 +60,7 @@ export default function TabsLayout() {
 						title: "Settings",
 						tabBarAccessibilityLabel: "Settings",
 						tabBarIcon: ({ color, size, focused }) => (
-							<Settings size={size} className={focused ? "text-[#ff2d01]" : "text-black/30"} />
+							<Settings size={size} className={focused ? "text-[#0395ff]" : "text-black/30"} />
 						),
 					}}
 				/>
