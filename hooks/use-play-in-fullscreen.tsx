@@ -1,11 +1,14 @@
-import { useAudio } from "@/context/AudioContext";
+import { audioStore, setAudioStoryData, setAudioUrl, useAudio, useIsPlaying } from "@/context/AudioContext";
 import { Id } from "@/convex/_generated/dataModel";
 import { sanitizeStorageUrl } from "@/lib/utils";
+import { useStore } from "@tanstack/react-store";
 import { useRouter } from "expo-router";
 import { useCallback } from "react";
 
 export const usePlayInFullscreen = () => {
-	const { storyId, isPlaying, play, setStory } = useAudio();
+	const { play, loadAudio } = useAudio();
+	const isPlaying = useIsPlaying();
+	const storyId = useStore(audioStore, (state) => state.story.id);
 	const router = useRouter();
 
 	const playInFullscreen = useCallback(
@@ -32,16 +35,19 @@ export const usePlayInFullscreen = () => {
 				return;
 			}
 
-			setStory({
-				storyUrl: sanitizeStorageUrl(audioUrl),
-				storyId: _id,
-				storyImage: sanitizeStorageUrl(imageUrl ?? ""),
-				storyTitle: title,
-				autoPlay: true,
+			setAudioStoryData({
+				id: _id,
+				title,
+				imageUrl,
 			});
-			router.push(`/stories/${_id}`);
+			setAudioUrl({
+				url: sanitizeStorageUrl(audioUrl),
+			});
+			loadAudio(true).then(() => {
+				router.push(`/stories/${_id}`);
+			});
 		},
-		[isPlaying, play, router, setStory, storyId],
+		[isPlaying, loadAudio, play, router, storyId],
 	);
 
 	return {

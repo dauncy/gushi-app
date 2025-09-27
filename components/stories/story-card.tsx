@@ -1,5 +1,6 @@
 import { LockKeyhole } from "@/components/ui/icons/lock-icon";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useIsStoryActive } from "@/context/AudioContext";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { StoryPreview } from "@/convex/stories/schema";
 import { BlurView } from "expo-blur";
@@ -99,15 +100,20 @@ export const UnlockedStoryCard = ({
 	story,
 	cardDimensions,
 	setCardDimensions,
-	active = false,
 	hasPlayButton = true,
 }: {
 	story: StoryPreview;
 	cardDimensions: { width: number; height: number };
 	setCardDimensions: (dimensions: { width: number; height: number }) => void;
-	active?: boolean;
 	hasPlayButton?: boolean;
 }) => {
+	const currentPlaying = useIsStoryActive({ storyId: story._id });
+	const active = useMemo(() => {
+		if (!hasPlayButton) {
+			return false;
+		}
+		return currentPlaying;
+	}, [hasPlayButton, currentPlaying]);
 	return (
 		<View
 			className="flex flex-col rounded-xl w-full bg-[#fffbf3]/60 border-2 border-[#0395ff]"
@@ -139,12 +145,10 @@ export const UnlockedStoryCard = ({
 export const StoryCard = ({
 	story,
 	margin,
-	active = false,
 	hasPlayButton = true,
 }: {
 	story: StoryPreview;
 	margin?: "right" | "left";
-	active?: boolean;
 	hasPlayButton?: boolean;
 }) => {
 	const [cardDimensions, setCardDimensions] = useState<{ width: number; height: number }>({ width: 168, height: 140 });
@@ -169,7 +173,6 @@ export const StoryCard = ({
 			story={story}
 			cardDimensions={cardDimensions}
 			setCardDimensions={setCardDimensions}
-			active={active}
 			hasPlayButton={hasPlayButton}
 		/>
 	);

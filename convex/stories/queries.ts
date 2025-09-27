@@ -181,7 +181,7 @@ export const getStory = query({
 			return null;
 		}
 		try {
-			const { hasSubscription, dbUser } = await verifyAccess(ctx, { validateSubscription: true });
+			const { hasSubscription, dbUser } = await verifyAccess(ctx, { validateSubscription: false });
 			const maybeStory = await ctx.db.get(storyId);
 			if (!maybeStory) {
 				return null;

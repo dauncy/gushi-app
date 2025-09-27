@@ -1,4 +1,3 @@
-import { useAudio } from "@/context/AudioContext";
 import { StoryPreview } from "@/convex/stories/schema";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
@@ -82,7 +81,7 @@ const LongPressModal: React.FC<LongPressModalProps> = ({ visible, story, onClose
 										shadowRadius: 8,
 									}}
 								>
-									<StoryCard story={story} active={false} hasPlayButton={false} />
+									<StoryCard story={story} hasPlayButton={false} />
 								</Animated.View>
 								<Animated.View
 									entering={SlideInDown.easing(Easing.bezier(0.25, 0.1, 0.25, 1.0))
@@ -148,9 +147,6 @@ const EnhancedStoryCardComp = ({
 	});
 	const [showModal, setShowModal] = useState(false);
 	const scale = useSharedValue(1);
-	const rotation = useSharedValue(0);
-	const { storyId } = useAudio();
-	const isActive = storyId === story._id;
 
 	const handleLongPress = useCallback(() => {
 		"worklet";
@@ -189,7 +185,7 @@ const EnhancedStoryCardComp = ({
 	const composedGesture = Gesture.Simultaneous(tapGesture, longPressGesture);
 
 	const animatedStyle = useAnimatedStyle(() => ({
-		transform: [{ scale: scale.value }, { rotate: `${rotation.value}deg` }],
+		transform: [{ scale: scale.value }],
 	}));
 
 	return (
@@ -206,7 +202,7 @@ const EnhancedStoryCardComp = ({
 						},
 					]}
 				>
-					<StoryCard story={story} active={isActive} hasPlayButton={true} />
+					<StoryCard story={story} hasPlayButton={true} />
 				</Animated.View>
 			</GestureDetector>
 

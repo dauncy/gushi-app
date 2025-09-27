@@ -1,20 +1,61 @@
-import { useAudio } from "@/context/AudioContext";
+import { setAudioStoryData, setAudioUrl, useAudio, useIsPlaying, useIsStoryActive } from "@/context/AudioContext";
 import { StoryPreview } from "@/convex/stories/schema";
-import { usePlayButtonTap } from "@/hooks/use-play-button-tap";
-import { memo } from "react";
+import { sanitizeStorageUrl } from "@/lib/utils";
+import { memo, useCallback, useMemo } from "react";
 import { Pressable } from "react-native";
-import { GestureDetector } from "react-native-gesture-handler";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { runOnJS } from "react-native-reanimated";
 import { Play } from "../ui/icons/play-icon";
 import { Stop } from "../ui/icons/stop-icon";
 
 export const StoryCardPlayButton = memo(({ story }: { story: StoryPreview }) => {
-	const { storyId: currentPlayingStoryId, isPlaying } = useAudio();
-
+	const { play, stop, loadAudio } = useAudio();
+	const isPlaying = useIsPlaying();
+	const storyActive = useIsStoryActive({ storyId: story._id });
+	const storyIsPlaying = isPlaying && storyActive;
 	const { _id: storyId, audioUrl, title, imageUrl } = story;
 
-	const isActive = currentPlayingStoryId === storyId;
-	const storyIsPlaying = isActive && isPlaying;
-	const { playButtonTapGesture } = usePlayButtonTap({ storyId, audioUrl, imageUrl, title });
+	const handleStop = useCallback(() => {
+		stop();
+	}, [stop]);
+
+	const handleResume = useCallback(() => {
+		play();
+	}, [play]);
+
+	const handleStartAndPlay = useCallback(async () => {
+		if (!audioUrl) {
+			return;
+		}
+		setAudioStoryData({
+			id: storyId,
+			title,
+			imageUrl: sanitizeStorageUrl(imageUrl ?? ""),
+		});
+		setAudioUrl({
+			url: sanitizeStorageUrl(audioUrl),
+		});
+		await loadAudio(true);
+	}, [audioUrl, storyId, title, imageUrl, loadAudio]);
+
+	const playButtonTapGesture = useMemo(() => {
+		return Gesture.Tap()
+			.onStart(() => {
+				"worklet";
+				if (storyIsPlaying) {
+					console.log("StoryCardPlayButton: --- handleStop --- ");
+					runOnJS(handleStop)();
+				} else if (storyActive) {
+					console.log("StoryCardPlayButton: --- handleResume --- ");
+					runOnJS(handleResume)();
+				} else {
+					console.log("StoryCardPlayButton: --- handleStartAndPlay --- ");
+					runOnJS(handleStartAndPlay)();
+				}
+			})
+			.shouldCancelWhenOutside(false)
+			.runOnJS(true);
+	}, [storyIsPlaying, storyActive, handleStop, handleResume, handleStartAndPlay]);
 
 	return (
 		<GestureDetector gesture={playButtonTapGesture}>
@@ -22,7 +63,7 @@ export const StoryCardPlayButton = memo(({ story }: { story: StoryPreview }) => 
 				<Pressable className="bg-transparent border-transparent active:bg-[#0D3311]/20 rounded-full z-20 size-10 flex items-center justify-center">
 					<Stop className="text-[#ff78e5] fill-[#ff78e5]" size={20} />
 				</Pressable>
-			) : isActive ? (
+			) : storyActive ? (
 				<Pressable className="bg-transparent border-transparent active:bg-[#0D3311]/20 rounded-full size-10 flex items-center justify-center">
 					<Play className="text-[#ff78e5] fill-[#ff78e5]" size={20} />
 				</Pressable>

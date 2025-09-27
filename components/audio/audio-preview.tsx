@@ -1,11 +1,12 @@
 import { Pause } from "@/components/ui/icons/pause-icon";
 import { Play } from "@/components/ui/icons/play-icon";
 import { Stop } from "@/components/ui/icons/stop-icon";
-import { useAudio } from "@/context/AudioContext";
+import { audioStore, useAudio, useIsPlaying } from "@/context/AudioContext";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
 import { cn } from "@/lib/utils";
+import { useStore } from "@tanstack/react-store";
 import { useCallback } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
@@ -18,7 +19,9 @@ export const AudioPreviewPlayer = ({
 	onCardPress?: (storyId: Id<"stories">) => void;
 	className?: string;
 }) => {
-	const { isPlaying, play, pause, stop, storyId } = useAudio();
+	const { play, pause, stop } = useAudio();
+	const isPlaying = useIsPlaying();
+	const storyId = useStore(audioStore, (state) => state.story.id);
 
 	const { data: story } = useConvexQuery(
 		api.stories.queries.getStory,

@@ -10,7 +10,7 @@ import { Star } from "@/components/ui/icons/star-icon";
 import { Image } from "@/components/ui/image";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAudio } from "@/context/AudioContext";
+import { useAudio, useAudioCurrentTime, useAudioDuration, useIsPlaying } from "@/context/AudioContext";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { SegmentTranscript, StoryExtended } from "@/convex/stories/schema";
@@ -46,20 +46,11 @@ import Animated, {
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-/**
- * Helpers
- */
 const formatTime = (seconds: number) => {
 	const minutes = Math.floor(seconds / 60);
 	const remainingSeconds = Math.floor(seconds % 60);
 	return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
 };
-
-/**
- * ────────────────────────────────────────────────────────────────────────────────
- * PAGE
- * ────────────────────────────────────────────────────────────────────────────────
- */
 
 export default function StoryPage() {
 	const { storyId } = useLocalSearchParams();
@@ -95,16 +86,18 @@ export default function StoryPage() {
 	);
 }
 
-/**
- * ────────────────────────────────────────────────────────────────────────────────
- * STORY CONTENT
- * ────────────────────────────────────────────────────────────────────────────────
- */
-
 const StoryContent = ({ story }: { story: StoryExtended }) => {
 	const [showClosedCaption, setShowClosedCaption] = useState(false);
-	const { pause, play, isPlaying, currentTime, duration } = useAudio();
+	const { pause, play } = useAudio();
 	const [uiTime, setUiTime] = useState(0);
+	const currentTime = useSharedValue(0);
+	const audioCurrentTime = useAudioCurrentTime();
+	const isPlaying = useIsPlaying();
+	const duration = useAudioDuration();
+
+	useEffect(() => {
+		currentTime.value = audioCurrentTime;
+	}, [audioCurrentTime, currentTime]);
 
 	useAnimatedReaction(
 		() => currentTime.value,
@@ -172,15 +165,10 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 	);
 };
 
-/**
- * ────────────────────────────────────────────────────────────────────────────────
- * CLOSED CAPTION (virtualised + memoised)
- * ────────────────────────────────────────────────────────────────────────────────
- */
 const ClosedCaption = ({ transcript, currentTime }: { transcript: SegmentTranscript[]; currentTime: number }) => {
 	const listRef = useRef<FlashListRef<SegmentTranscript>>(null);
 	const lastKnownIndex = useRef(-1);
-	const { duration } = useAudio();
+	const duration = useAudioDuration();
 
 	/** Determine the active segment */
 	const currentIndex = useMemo(() => {
@@ -373,8 +361,6 @@ const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed
 		};
 	});
 
-	// ... sharing & favourite handlers remain the same
-
 	return (
 		<Animated.View
 			layout={LinearTransition.springify().duration(250).stiffness(150).damping(12)}
@@ -462,11 +448,6 @@ const FavoriteButton = ({ story }: { story: StoryExtended }) => {
 	);
 };
 
-/**
- * ────────────────────────────────────────────────────────────────────────────────
- * STORY IMAGE (simpler shadow, single blur)
- * ────────────────────────────────────────────────────────────────────────────────
- */
 const StoryImage = ({
 	imageUrl,
 	disableAnimation,
@@ -478,7 +459,7 @@ const StoryImage = ({
 }) => {
 	const [error, setError] = useState(false);
 	const showFallback = error || !imageUrl;
-	const { isPlaying } = useAudio();
+	const isPlaying = useIsPlaying();
 
 	const scale = useSharedValue(1);
 
@@ -518,11 +499,6 @@ const StoryImage = ({
 	);
 };
 
-/**
- * ────────────────────────────────────────────────────────────────────────────────
- * LOADING SKELETON (unchanged)
- * ────────────────────────────────────────────────────────────────────────────────
- */
 const StoryLoading = () => (
 	<View className="flex flex-1 flex-col items-center">
 		<Skeleton className="aspect-square w-full rounded-xl bg-slate-800" />
@@ -556,8 +532,16 @@ const StoryLoading = () => (
 
 const StoryContentTablet = ({ story }: { story: StoryExtended }) => {
 	const [showClosedCaption, setShowClosedCaption] = useState(false);
-	const { pause, play, isPlaying, currentTime, duration } = useAudio();
+	const { pause, play } = useAudio();
 	const [uiTime, setUiTime] = useState(0);
+	const audioCurrentTime = useAudioCurrentTime();
+	const currentTime = useSharedValue(0);
+	const isPlaying = useIsPlaying();
+	const duration = useAudioDuration();
+
+	useEffect(() => {
+		currentTime.value = audioCurrentTime;
+	}, [audioCurrentTime, currentTime]);
 
 	useAnimatedReaction(
 		() => currentTime.value,

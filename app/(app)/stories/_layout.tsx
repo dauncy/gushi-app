@@ -1,8 +1,10 @@
-import { useAudio } from "@/context/AudioContext";
+import { audioStore, useAudio } from "@/context/AudioContext";
+import { useStore } from "@tanstack/react-store";
 import { Stack } from "expo-router";
 
 export default function StoriesLayout() {
-	const { ended, stop } = useAudio();
+	const { stop } = useAudio();
+	const ended = useStore(audioStore, (state) => state.audioState.ended);
 	return (
 		<Stack
 			screenOptions={{
