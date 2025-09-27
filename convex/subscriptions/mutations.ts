@@ -134,6 +134,7 @@ export const syncAliases = internalMutation({
 					}),
 				);
 				await ctx.db.delete(dbUser._id);
+				return null;
 			}),
 		);
 

@@ -2,9 +2,9 @@ import { useAudio } from "@/context/AudioContext";
 import { StoryPreview } from "@/convex/stories/schema";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import { Modal, Text, TouchableWithoutFeedback, View } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { Gesture, GestureDetector, GestureType } from "react-native-gesture-handler";
 import Animated, {
 	Easing,
 	runOnJS,
@@ -134,7 +134,7 @@ const LongPressModal: React.FC<LongPressModalProps> = ({ visible, story, onClose
 	);
 };
 
-export const EnhancedStoryCard = ({
+const EnhancedStoryCardComp = ({
 	story,
 	onCardPress,
 	margin,
@@ -143,14 +143,16 @@ export const EnhancedStoryCard = ({
 	onCardPress: () => void;
 	margin: "right" | "left";
 }) => {
+	useEffect(() => {
+		console.log("EnhancedStoryCard: --- story ---  initialRender: ", story.title);
+	});
 	const [showModal, setShowModal] = useState(false);
 	const scale = useSharedValue(1);
 	const rotation = useSharedValue(0);
 	const { storyId } = useAudio();
+	const isActive = storyId === story._id;
 
-	const isStoryActive = useMemo(() => {
-		return storyId === story._id;
-	}, [story._id, storyId]);
+	const playTapRef = useRef<GestureType | null>(null);
 
 	const handleLongPress = useCallback(() => {
 		"worklet";
@@ -160,23 +162,27 @@ export const EnhancedStoryCard = ({
 
 	const longPressGesture = Gesture.LongPress()
 		.minDuration(500)
+		.requireExternalGestureToFail(playTapRef?.current ?? Gesture.Tap())
 		.onStart(() => {
-			"worklet";
-			handleLongPress();
-		})
-		.onBegin(() => {
 			"worklet";
 			scale.value = withSequence(
 				withTiming(0.95, { duration: 100 }),
 				withSpring(0.95, { damping: 10, stiffness: 200 }),
 				withSpring(0.95, { damping: 15, stiffness: 150 }),
 			);
+			handleLongPress();
 		});
 
 	const tapGesture = Gesture.Tap()
+		.requireExternalGestureToFail(playTapRef?.current ?? Gesture.Tap())
 		.onStart(() => {
 			"worklet";
-			scale.value = withTiming(0.97, { duration: 100 });
+			console.log("TapGesture: --- onStart --- ");
+			scale.value = withSequence(
+				withTiming(0.95, { duration: 100 }),
+				withSpring(0.95, { damping: 10, stiffness: 200 }),
+				withSpring(0.95, { damping: 15, stiffness: 150 }),
+			);
 		})
 		.onEnd(() => {
 			"worklet";
@@ -204,7 +210,7 @@ export const EnhancedStoryCard = ({
 						},
 					]}
 				>
-					<StoryCard story={story} active={isStoryActive} hasPlayButton={true} />
+					<StoryCard story={story} active={isActive} hasPlayButton={true} />
 				</Animated.View>
 			</GestureDetector>
 
@@ -212,14 +218,26 @@ export const EnhancedStoryCard = ({
 				visible={showModal}
 				story={story}
 				onClose={() => {
-					scale.value = withSequence(
-						withTiming(1, { duration: 100 }),
-						withSpring(1, { damping: 10, stiffness: 200 }),
-						withSpring(1, { damping: 15, stiffness: 150 }),
-					);
 					setShowModal(false);
+					setTimeout(() => {
+						scale.value = withSequence(
+							withTiming(1, { duration: 100 }),
+							withSpring(1, { damping: 10, stiffness: 200 }),
+							withSpring(1, { damping: 15, stiffness: 150 }),
+						);
+					}, 750);
 				}}
 			/>
 		</>
 	);
 };
+
+export const EnhancedStoryCard = memo(EnhancedStoryCardComp, (prevProps, nextProps) => {
+	return (
+		prevProps.story._id === nextProps.story._id &&
+		prevProps.onCardPress === nextProps.onCardPress &&
+		prevProps.margin === nextProps.margin
+	);
+});
+
+EnhancedStoryCard.displayName = "EnhancedStoryCard";

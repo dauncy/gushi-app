@@ -1,85 +1,45 @@
 import { useAudio } from "@/context/AudioContext";
 import { StoryPreview } from "@/convex/stories/schema";
-import { sanitizeStorageUrl } from "@/lib/utils";
-import { memo, useCallback, useMemo } from "react";
-import { GestureResponderEvent } from "react-native";
-import { Button } from "../ui/button";
+import { usePlayButtonTap } from "@/hooks/use-play-button-tap";
+import { memo, RefObject, useMemo } from "react";
+import { Pressable } from "react-native";
+import { GestureDetector, GestureType } from "react-native-gesture-handler";
 import { Play } from "../ui/icons/play-icon";
 import { Stop } from "../ui/icons/stop-icon";
+export const StoryCardPlayButton = memo(
+	({ story, externalTapRef }: { story: StoryPreview; externalTapRef?: RefObject<GestureType | null> }) => {
+		const { storyId: currentPlayingStoryId, isPlaying } = useAudio();
 
-export const StoryCardPlayButton = memo(({ story }: { story: StoryPreview }) => {
-	const { play, setStory, isPlaying, storyId: playingId, stop } = useAudio();
-	const { _id: storyId, audioUrl, title, imageUrl } = story;
+		const { _id: storyId, audioUrl, title, imageUrl } = story;
 
-	const isCurrentStory = useMemo(() => {
-		return storyId === playingId;
-	}, [storyId, playingId]);
+		const isActive = currentPlayingStoryId === storyId;
+		const storyIsPlaying = isActive && isPlaying;
+		const { playButtonTapGesture } = usePlayButtonTap({ storyId, audioUrl, imageUrl, title });
 
-	const handleStop = useCallback(
-		(e: GestureResponderEvent) => {
-			e.stopPropagation();
-			e.preventDefault();
-			stop();
-		},
-		[stop],
-	);
+		const buttonGesture = useMemo(
+			// @ts-ignore
+			() => (externalTapRef ? playButtonTapGesture.withRef(externalTapRef) : playButtonTapGesture),
+			[playButtonTapGesture, externalTapRef],
+		);
 
-	const handleResume = useCallback(
-		(e: GestureResponderEvent) => {
-			e.stopPropagation();
-			e.preventDefault();
-			play();
-		},
-		[play],
-	);
-
-	const handleStartAndPlay = useCallback(
-		(e: GestureResponderEvent) => {
-			e.stopPropagation();
-			e.preventDefault();
-			if (!audioUrl) {
-				return;
-			}
-			setStory({
-				storyUrl: sanitizeStorageUrl(audioUrl),
-				storyId,
-				storyImage: sanitizeStorageUrl(imageUrl ?? ""),
-				storyTitle: title,
-				autoPlay: true,
-			});
-		},
-		[setStory, audioUrl, storyId, imageUrl, title],
-	);
-
-	return (
-		<>
-			{isPlaying && isCurrentStory ? (
-				<Button
-					onPress={handleStop}
-					size="icon"
-					className="bg-transparent border-transparent active:bg-[#0D3311]/20 rounded-full z-20"
-				>
-					<Stop className="text-[#ff78e5] fill-[#ff78e5]" size={20} />
-				</Button>
-			) : isCurrentStory ? (
-				<Button
-					onPress={handleResume}
-					size="icon"
-					className="bg-transparent border-transparent active:bg-[#0D3311]/20 rounded-full"
-				>
-					<Play className="text-[#ff78e5] fill-[#ff78e5]" size={20} />
-				</Button>
-			) : (
-				<Button
-					size="icon"
-					className="bg-[#ff78e5] active:bg-[#ff78e5]/80 border-white border rounded-full p-1"
-					onPress={handleStartAndPlay}
-				>
-					<Play className="text-white fill-white" size={20} />
-				</Button>
-			)}
-		</>
-	);
-});
+		return (
+			<GestureDetector gesture={buttonGesture}>
+				{storyIsPlaying ? (
+					<Pressable className="bg-transparent border-transparent active:bg-[#0D3311]/20 rounded-full z-20 size-10 flex items-center justify-center">
+						<Stop className="text-[#ff78e5] fill-[#ff78e5]" size={20} />
+					</Pressable>
+				) : isActive ? (
+					<Pressable className="bg-transparent border-transparent active:bg-[#0D3311]/20 rounded-full size-10 flex items-center justify-center">
+						<Play className="text-[#ff78e5] fill-[#ff78e5]" size={20} />
+					</Pressable>
+				) : (
+					<Pressable className="bg-[#ff78e5] active:bg-[#ff78e5]/80 border-white border rounded-full p-1 size-10 flex items-center justify-center">
+						<Play className="text-white fill-white" size={20} />
+					</Pressable>
+				)}
+			</GestureDetector>
+		);
+	},
+);
 
 StoryCardPlayButton.displayName = "StoryCardPlayButton";

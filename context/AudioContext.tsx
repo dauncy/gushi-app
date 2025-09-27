@@ -1,9 +1,7 @@
 import { Id } from "@/convex/_generated/dataModel";
-// import { AudioStatus, setAudioModeAsync, useAudioPlayer } from "expo-audio";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { SharedValue, useSharedValue } from "react-native-reanimated";
 import TrackPlayer, {
-	// AppKilledPlaybackBehavior,
 	Capability,
 	Event,
 	IOSCategory,

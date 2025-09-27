@@ -84,7 +84,7 @@ export const getStories = query({
 							promises.push(getAudioUrl(ctx, story.audioId).then((data) => ({ type: "audio", data })));
 						}
 						const resolvedPromises = await Promise.all(promises);
-						const duration = Math.ceil(story.transcript[story.transcript.length - 1].end_time);
+						const duration = Math.ceil(story.transcript[story.transcript.length - 1]?.end_time ?? 0);
 						const categories = resolvedPromises.find((promise) => promise.type === "categories")?.data ?? [];
 						const imageData = resolvedPromises.find((promise) => promise.type === "image")?.data ?? {
 							url: null,
@@ -140,7 +140,7 @@ export const getStories = query({
 						blurHash: null,
 					};
 					const audioData = resolvedPromises.find((promise) => promise.type === "audio")?.data ?? { url: null };
-					const duration = Math.ceil(story.transcript[story.transcript.length - 1].end_time);
+					const duration = Math.ceil(story.transcript[story.transcript.length - 1]?.end_time ?? 0);
 					return {
 						_id: story._id,
 						title: story.title,
@@ -243,7 +243,7 @@ export const getStoryMetadata = internalQuery({
 		if (!imageData.url) {
 			return null;
 		}
-		const duration = story.transcript[story.transcript.length - 1].end_time;
+		const duration = story.transcript[story.transcript.length - 1]?.end_time ?? 0;
 		return {
 			title: story.title,
 			imageUrl: imageData.url,
@@ -310,7 +310,7 @@ export const getFeaturedStory = query({
 			};
 			const audioData = resolvedPromises.find((promise) => promise.type === "audio")?.data ?? { url: null };
 			const categories = resolvedPromises.find((promise) => promise.type === "categories")?.data ?? [];
-			const duration = Math.ceil(story.transcript[story.transcript.length - 1].end_time);
+			const duration = Math.ceil(story.transcript[story.transcript.length - 1]?.end_time ?? 0);
 			return {
 				_id: story._id,
 				title: story.title,

@@ -20,7 +20,7 @@ export default function Home() {
 
 const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => void }) => {
 	const { hasSubscription } = useSubscription();
-	const { categoryId } = useSelectedCategory();
+	const categoryId = useSelectedCategory();
 	const { isLoading, refreshing, refresh, loadMore, results, status } = useConvexPaginatedQuery(
 		api.stories.queries.getStories,
 		{ categoryId: categoryId ?? undefined },

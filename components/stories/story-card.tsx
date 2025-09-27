@@ -3,8 +3,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { StoryPreview } from "@/convex/stories/schema";
 import { BlurView } from "expo-blur";
-import { useMemo, useState } from "react";
+import { RefObject, useMemo, useState } from "react";
 import { View } from "react-native";
+import { GestureType } from "react-native-gesture-handler";
 import { FeaturedBadge } from "./featured-badge";
 import { StoryCardHeader } from "./story-card-header";
 import { StoryCardPlayButton } from "./story-card-play-button";
@@ -101,12 +102,14 @@ export const UnlockedStoryCard = ({
 	setCardDimensions,
 	active = false,
 	hasPlayButton = true,
+	playTapRef,
 }: {
 	story: StoryPreview;
 	cardDimensions: { width: number; height: number };
 	setCardDimensions: (dimensions: { width: number; height: number }) => void;
 	active?: boolean;
 	hasPlayButton?: boolean;
+	playTapRef?: RefObject<GestureType | null>;
 }) => {
 	return (
 		<View
@@ -128,7 +131,7 @@ export const UnlockedStoryCard = ({
 				<StoryCardHeader title={story.title} duration={story.duration} />
 				{hasPlayButton && (
 					<View className="flex items-center justify-center mt-0.5">
-						<StoryCardPlayButton story={story} />
+						<StoryCardPlayButton story={story} externalTapRef={playTapRef} />
 					</View>
 				)}
 			</View>
@@ -141,11 +144,13 @@ export const StoryCard = ({
 	margin,
 	active = false,
 	hasPlayButton = true,
+	playTapRef,
 }: {
 	story: StoryPreview;
 	margin?: "right" | "left";
 	active?: boolean;
 	hasPlayButton?: boolean;
+	playTapRef?: RefObject<GestureType | null>;
 }) => {
 	const [cardDimensions, setCardDimensions] = useState<{ width: number; height: number }>({ width: 168, height: 140 });
 	const { hasSubscription } = useSubscription();
@@ -171,6 +176,7 @@ export const StoryCard = ({
 			setCardDimensions={setCardDimensions}
 			active={active}
 			hasPlayButton={hasPlayButton}
+			playTapRef={playTapRef}
 		/>
 	);
 };

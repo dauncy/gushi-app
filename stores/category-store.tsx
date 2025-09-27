@@ -1,12 +1,23 @@
 import { Id } from "@/convex/_generated/dataModel";
-import { proxy, useSnapshot } from "valtio";
+import { Store, useStore } from "@tanstack/react-store";
 
-export const selectedCategoryState = proxy<{
+// You can instantiate the store outside of React components too!
+export const selectedCategoryStore = new Store<{
 	categoryId: Id<"categories"> | null;
 }>({
 	categoryId: null,
 });
 
+export const updateCategoryId = (categoryId: Id<"categories"> | null) => {
+	selectedCategoryStore.setState((state) => {
+		return {
+			...state,
+			categoryId,
+		};
+	});
+};
+
 export const useSelectedCategory = () => {
-	return useSnapshot(selectedCategoryState);
+	const categoryId = useStore(selectedCategoryStore, (state) => state.categoryId);
+	return categoryId;
 };

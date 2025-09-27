@@ -2,7 +2,7 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
 import { cn } from "@/lib/utils";
-import { selectedCategoryState, useSelectedCategory } from "@/stores/category-store";
+import { updateCategoryId, useSelectedCategory } from "@/stores/category-store";
 import * as Haptics from "expo-haptics";
 import { LucideIcon } from "lucide-react-native";
 import { memo, useCallback, useMemo } from "react";
@@ -83,12 +83,12 @@ const LoadingCategory = () => {
 };
 
 const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
-	const { categoryId } = useSelectedCategory();
+	const categoryId = useSelectedCategory();
 	const selected = categoryId === categoryData.id;
 
 	const handleSelect = useCallback(() => {
 		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-		selectedCategoryState.categoryId = categoryData.id as Id<"categories">;
+		updateCategoryId(categoryData.id as Id<"categories">);
 	}, [categoryData.id]);
 
 	return (

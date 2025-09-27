@@ -53,7 +53,7 @@ export const getUserFavorites = query({
 						audioUrl: audioData.url,
 						blurHash: imageData.blurHash,
 						updatedAt: story.updatedAt,
-						duration: story.transcript[story.transcript.length - 1].end_time,
+						duration: story.transcript[story.transcript.length - 1]?.end_time ?? 0,
 						favorite: {
 							_id: fav._id,
 							_createdAt: fav.createdAt,
