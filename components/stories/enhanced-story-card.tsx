@@ -2,9 +2,9 @@ import { useAudio } from "@/context/AudioContext";
 import { StoryPreview } from "@/convex/stories/schema";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
-import React, { memo, useCallback, useEffect, useRef, useState } from "react";
+import React, { memo, useCallback, useEffect, useState } from "react";
 import { Modal, Text, TouchableWithoutFeedback, View } from "react-native";
-import { Gesture, GestureDetector, GestureType } from "react-native-gesture-handler";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
 	Easing,
 	runOnJS,
@@ -152,8 +152,6 @@ const EnhancedStoryCardComp = ({
 	const { storyId } = useAudio();
 	const isActive = storyId === story._id;
 
-	const playTapRef = useRef<GestureType | null>(null);
-
 	const handleLongPress = useCallback(() => {
 		"worklet";
 		runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
@@ -162,7 +160,6 @@ const EnhancedStoryCardComp = ({
 
 	const longPressGesture = Gesture.LongPress()
 		.minDuration(500)
-		.requireExternalGestureToFail(playTapRef?.current ?? Gesture.Tap())
 		.onStart(() => {
 			"worklet";
 			scale.value = withSequence(
@@ -174,7 +171,6 @@ const EnhancedStoryCardComp = ({
 		});
 
 	const tapGesture = Gesture.Tap()
-		.requireExternalGestureToFail(playTapRef?.current ?? Gesture.Tap())
 		.onStart(() => {
 			"worklet";
 			console.log("TapGesture: --- onStart --- ");
