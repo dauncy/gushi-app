@@ -93,7 +93,7 @@ const FormLabel = React.forwardRef<
 	return (
 		<Label
 			ref={ref}
-			className={cn("pb-1 native:pb-2 px-px", error && "text-red-500", className)}
+			className={cn("pb-1 native:pb-2 px-px", error && "text-destructive", className)}
 			nativeID={formItemNativeID}
 			{...props}
 		/>
@@ -109,7 +109,7 @@ const FormDescription = React.forwardRef<React.ElementRef<typeof Text>, React.Co
 			<Text
 				ref={ref}
 				nativeID={formDescriptionNativeID}
-				className={cn("text-sm text-slate-400 pt-1", className)}
+				className={cn("text-sm text-foreground/60 font-medium pt-1", className)}
 				{...props}
 			/>
 		);

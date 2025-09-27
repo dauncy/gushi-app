@@ -87,20 +87,25 @@ const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
 	const selected = categoryId === categoryData.id;
 
 	const handleSelect = useCallback(() => {
-		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+		if (selected) {
+			updateCategoryId(null);
+			Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+			return;
+		}
 		updateCategoryId(categoryData.id as Id<"categories">);
-	}, [categoryData.id]);
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+	}, [categoryData.id, selected]);
 
 	return (
 		<TouchableOpacity
 			disabled={categoryData.soon}
 			activeOpacity={0.8}
-			onPress={() => {
+			onPressIn={() => {
 				handleSelect();
 			}}
 			key={categoryData.id}
 			className={cn(
-				"flex flex-col gap-y-1 items-center p-2 px-3.5 rounded-3xl border-2 border-transparent active:bg-[#ceef32] active:border-[#0395ff] active:border-2",
+				"flex flex-col gap-y-1 items-center p-2 px-3.5 rounded-3xl border-2 border-transparent",
 				selected && "bg-[#ceef32] border-[#0395ff] border-2",
 			)}
 		>
