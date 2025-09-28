@@ -11,6 +11,7 @@ import { usePlayInFullscreen } from "@/hooks/use-play-in-fullscreen";
 import { usePresentPaywall } from "@/hooks/use-present-paywall";
 import { useSelectedCategory } from "@/stores/category-store";
 import { FlashList } from "@shopify/flash-list";
+import { useRouter } from "expo-router";
 import { memo, useCallback, useMemo } from "react";
 import { ActivityIndicator, RefreshControl, Text, View } from "react-native";
 
@@ -158,6 +159,7 @@ const HomePage = () => {
 		return !subscription_required && !!audioUrl;
 	};
 	const { presentPaywall } = usePresentPaywall();
+	const router = useRouter();
 	return (
 		<View style={{ flex: 1 }} className="relative bg-[#fffbf3] flex flex-col">
 			<View className="w-full px-2" style={{ marginTop: 46, paddingTop: 12, paddingBottom: 12 }}>
@@ -174,7 +176,11 @@ const HomePage = () => {
 					}
 				}}
 			/>
-			<AudioPreviewPlayer />
+			<AudioPreviewPlayer
+				onCardPress={(id) => {
+					router.push(`/stories/${id}`);
+				}}
+			/>
 		</View>
 	);
 };

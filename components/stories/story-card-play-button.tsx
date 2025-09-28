@@ -43,13 +43,10 @@ export const StoryCardPlayButton = memo(({ story }: { story: StoryPreview }) => 
 			.onStart(() => {
 				"worklet";
 				if (storyIsPlaying) {
-					console.log("StoryCardPlayButton: --- handleStop --- ");
 					runOnJS(handleStop)();
 				} else if (storyActive) {
-					console.log("StoryCardPlayButton: --- handleResume --- ");
 					runOnJS(handleResume)();
 				} else {
-					console.log("StoryCardPlayButton: --- handleStartAndPlay --- ");
 					runOnJS(handleStartAndPlay)();
 				}
 			})

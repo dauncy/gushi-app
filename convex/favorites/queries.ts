@@ -60,6 +60,7 @@ export const getUserFavorites = query({
 						},
 						featured: !!story.featured,
 						categories: categories.map((category) => ({ _id: category._id, name: category.name })),
+						description: story.description,
 					};
 				}),
 			);

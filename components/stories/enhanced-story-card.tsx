@@ -1,8 +1,8 @@
 import { StoryPreview } from "@/convex/stories/schema";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
-import React, { memo, useCallback, useEffect, useState } from "react";
-import { Modal, Text, TouchableWithoutFeedback, View } from "react-native";
+import React, { memo, useCallback, useEffect, useRef, useState } from "react";
+import { Modal, TouchableWithoutFeedback, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
 	Easing,
@@ -15,12 +15,8 @@ import Animated, {
 	withSpring,
 	withTiming,
 } from "react-native-reanimated";
-import { Carrot } from "../ui/icons/carrot-icon";
-import { Fullscreen } from "../ui/icons/full-screen-icon";
-import { Share } from "../ui/icons/share-icon";
-import { Star } from "../ui/icons/star-icon";
-import { Separator } from "../ui/separator";
 import { StoryCard } from "./story-card";
+import { StoryContextMenu } from "./story-context-menu";
 
 interface LongPressModalProps {
 	visible: boolean;
@@ -30,6 +26,7 @@ interface LongPressModalProps {
 
 const LongPressModal: React.FC<LongPressModalProps> = ({ visible, story, onClose }) => {
 	const [shouldRender, setShouldRender] = useState(visible);
+	const onCloseCallbacks = useRef<Map<string, () => void>>(new Map());
 
 	useEffect(() => {
 		if (visible) {
@@ -42,9 +39,17 @@ const LongPressModal: React.FC<LongPressModalProps> = ({ visible, story, onClose
 		}
 	}, [visible, shouldRender, setShouldRender]);
 
+	const addCloseCallback = useCallback((name: string, callback: () => void) => {
+		onCloseCallbacks.current.set(name, callback);
+	}, []);
+
 	const requestClose = useCallback(async () => {
 		await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 		onClose();
+		setTimeout(() => {
+			onCloseCallbacks.current.forEach((callback) => callback());
+			onCloseCallbacks.current = new Map();
+		}, 150);
 	}, [onClose]);
 
 	if (!story) {
@@ -99,30 +104,7 @@ const LongPressModal: React.FC<LongPressModalProps> = ({ visible, story, onClose
 										shadowRadius: 8,
 									}}
 								>
-									<View className="bg-background w-full rounded-xl border-2 border-border">
-										<View className="p-2 w-full flex flex-col gap-y-0.5">
-											<View className="flex flex-row items-center gap-x-2">
-												<Carrot className="size-4 text-foreground" size={16} />
-												<Text className="text-foreground text-sm font-medium">Story seed</Text>
-											</View>
-											<Text className="text-foreground/60 text-sm font-normal pl-6">{story.description}</Text>
-										</View>
-										<Separator className="h-[2px]" />
-										<View className="p-3 px-4 w-full flex flex-row items-center gap-x-2">
-											<Share className="size-4 text-foreground" size={16} />
-											<Text className="text-foreground text-sm font-medium">Share story</Text>
-										</View>
-										<Separator className="h-[2px]" />
-										<View className="p-3 px-4 w-full flex flex-row items-center gap-x-2">
-											<Star className="size-4 text-foreground" size={16} />
-											<Text className="text-foreground text-sm font-medium">Add to favorites</Text>
-										</View>
-										<Separator className="h-[2px]" />
-										<View className="p-3 px-4 w-ful flex-row items-center gap-x-2">
-											<Fullscreen className="size-4 text-foreground" size={16} />
-											<Text className="text-foreground text-sm font-medium">Fullscreen</Text>
-										</View>
-									</View>
+									<StoryContextMenu story={story} addCloseCallback={addCloseCallback} triggerClose={requestClose} />
 								</Animated.View>
 							</View>
 						</TouchableWithoutFeedback>
@@ -142,9 +124,6 @@ const EnhancedStoryCardComp = ({
 	onCardPress: () => void;
 	margin: "right" | "left";
 }) => {
-	useEffect(() => {
-		console.log("EnhancedStoryCard: --- story ---  initialRender: ", story.title);
-	});
 	const [showModal, setShowModal] = useState(false);
 	const scale = useSharedValue(1);
 
@@ -169,7 +148,6 @@ const EnhancedStoryCardComp = ({
 	const tapGesture = Gesture.Tap()
 		.onStart(() => {
 			"worklet";
-			console.log("TapGesture: --- onStart --- ");
 			scale.value = withSequence(
 				withTiming(0.95, { duration: 100 }),
 				withSpring(0.95, { damping: 10, stiffness: 200 }),

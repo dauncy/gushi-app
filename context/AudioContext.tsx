@@ -134,10 +134,6 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 	const initRef = useRef<boolean>(false);
 
 	useEffect(() => {
-		console.log("[@/context/AudioContext.tsx]: AudioProvider: rerender ");
-	});
-
-	useEffect(() => {
 		async function init() {
 			if (initRef.current) {
 				return;

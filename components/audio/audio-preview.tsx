@@ -47,34 +47,33 @@ export const AudioPreviewPlayer = ({
 	return (
 		<Animated.View
 			entering={FadeInDown.delay(50).duration(50).springify()}
-			exiting={FadeOutDown.delay(50).duration(150).springify()}
+			exiting={FadeOutDown.delay(50).duration(50).springify()}
 		>
 			<Pressable
 				disabled={onCardPress === undefined}
 				onPress={handlePress}
 				style={{
-					shadowColor: "#f8fafc",
+					shadowColor: "#000000",
 					shadowOffset: {
 						width: 0.5,
 						height: 1.5,
 					},
 					shadowOpacity: 0.25,
-					shadowRadius: 4,
+					shadowRadius: 6,
 				}}
 				className={cn(
-					"items-center flex  p-3 rounded-xl bg-slate-900  flex-row  gap-4 border border-slate-800 absolute bottom-24 inset-x-0 mx-2",
-					className,
+					"items-center flex  p-3 rounded-xl bg-secondary  flex-row  gap-4 border-2 border-border absolute bottom-2 inset-x-0 mx-2",
 				)}
 			>
 				<StoryImagePreview imageUrl={story.imageUrl} size="sm" />
 				<View className="flex flex-col">
-					<Text className="text-slate-300 text-base font-semibold" numberOfLines={1} ellipsizeMode="tail">
+					<Text className="text-border text-base font-bold" numberOfLines={1} ellipsizeMode="tail">
 						{story.title}
 					</Text>
 				</View>
 				<View className="flex items-center justify-center flex-row gap-2 ml-auto">
 					<Pressable
-						className="size-8 rounded-full flex items-center justify-center p-2 active:bg-slate-800"
+						className="size-8 rounded-full flex items-center justify-center p-2 active:bg-black/10"
 						onPress={() => {
 							if (isPlaying) {
 								pause();
@@ -84,19 +83,19 @@ export const AudioPreviewPlayer = ({
 						}}
 					>
 						{isPlaying ? (
-							<Pause className="text-slate-200 fill-slate-200" size={16} />
+							<Pause className="text-border fill-border" size={16} />
 						) : (
-							<Play className="text-slate-200 fill-slate-200" size={16} />
+							<Play className="text-border fill-border" size={16} />
 						)}
 					</Pressable>
 
 					<Pressable
-						className="size-8 rounded-full flex items-center justify-center p-2 active:bg-slate-800"
+						className="size-8 rounded-full flex items-center justify-center p-2 active:bg-black/10"
 						onPress={() => {
 							stop();
 						}}
 					>
-						<Stop className="text-slate-200 fill-slate-200" size={16} />
+						<Stop className="text-border fill-border" size={16} />
 					</Pressable>
 				</View>
 			</Pressable>
