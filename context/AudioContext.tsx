@@ -16,6 +16,7 @@ interface AudioContextDTO {
 	pause: () => Promise<void>;
 	stop: () => Promise<void>;
 	loadAudio: (autoplay?: boolean) => Promise<void>;
+	seek: (time: number) => Promise<void>;
 }
 
 const AudioContext = createContext<AudioContextDTO>({
@@ -23,6 +24,7 @@ const AudioContext = createContext<AudioContextDTO>({
 	pause: async () => {},
 	stop: async () => {},
 	loadAudio: async () => {},
+	seek: async () => {},
 });
 
 interface AudioStoreDTO {
@@ -148,9 +150,9 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 
 			await TrackPlayer.updateOptions({
 				alwaysPauseOnInterruption: true,
-				// Only Play/Pause/Stop
-				capabilities: [Capability.Play, Capability.Pause, Capability.Stop],
-				compactCapabilities: [Capability.Play, Capability.Pause, Capability.Stop],
+				// Only Play/Pause/Stop/SeekTo
+				capabilities: [Capability.Play, Capability.Pause, Capability.Stop, Capability.SeekTo],
+				compactCapabilities: [Capability.Play, Capability.Pause, Capability.Stop, Capability.SeekTo],
 				progressUpdateEventInterval: 0.25,
 			});
 
@@ -168,6 +170,7 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 			TrackPlayer.addEventListener(Event.PlaybackProgressUpdated, (event) => {
 				updateAudioCurrentTime({ time: event.position });
 				updateAudioDuration({ duration: event.duration });
+				updateAudioEnded({ ended: false });
 			}),
 			TrackPlayer.addEventListener(Event.PlaybackState, (event) =>
 				updateAudioIsPlaying({ isPlaying: event.state === State.Playing || event.state === State.Buffering }),
@@ -177,6 +180,10 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 	}, []);
 
 	const play = useCallback(async () => {
+		if (audioStore.state.audioState.ended) {
+			await TrackPlayer.seekTo(0);
+			updateAudioEnded({ ended: false });
+		}
 		await TrackPlayer.play();
 	}, []);
 
@@ -188,6 +195,10 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 		await TrackPlayer.stop();
 		await TrackPlayer.reset();
 		resetAudioStore();
+	}, []);
+
+	const seek = useCallback(async (time: number) => {
+		await TrackPlayer.seekTo(time);
 	}, []);
 
 	const loadAudio = useCallback(async (autoplay = true) => {
@@ -224,6 +235,7 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 				pause,
 				stop,
 				loadAudio,
+				seek,
 			}}
 		>
 			{children}

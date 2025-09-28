@@ -6,6 +6,7 @@ import { StoryPreview } from "@/convex/stories/schema";
 import { BlurView } from "expo-blur";
 import { useMemo, useState } from "react";
 import { View } from "react-native";
+import { CategoryBadge } from "./category-badge";
 import { FeaturedBadge } from "./featured-badge";
 import { StoryCardHeader } from "./story-card-header";
 import { StoryCardPlayButton } from "./story-card-play-button";
@@ -29,6 +30,10 @@ export const StoryCardLoading = () => {
 			>
 				<View className="w-full rounded-t-xl" style={{ height: cardDimensions.width }}>
 					<Skeleton className="size-full rounded-t-xl bg-black/20" />
+				</View>
+				<View className="w-full flex flex-row gap-x-2 items-start flex-wrap p-1">
+					<Skeleton className="w-24 h-6 rounded bg-black/20" />
+					<Skeleton className="w-16 h-6 rounded bg-black/20" />
 				</View>
 				<View className="p-2 flex flex-col gap-y-3 pb-4">
 					<View className="flex flex-col gap-y-1">
@@ -57,13 +62,18 @@ export const LockedStoryCard = ({
 	return (
 		<View
 			onLayout={(e) => {
-				setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.width });
+				setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height });
 			}}
-			className="flex flex-col rounded-xl w-full bg-[#fffbf3]/60 border-2 border-[#0395ff] w-full h-full relative"
+			className="flex flex-col rounded-xl w-full bg-[#fffbf3]/60 border-2 border-[#0395ff] grow w-full stretch relative"
 		>
 			<View className="w-full rounded-t-xl w-full relative" style={{ height: cardDimensions.width }}>
 				{story.featured && <FeaturedBadge />}
 				<StoryImagePreview imageUrl={story.imageUrl} blurHash={story.blurHash ?? undefined} size={"featured"} />
+			</View>
+			<View className="w-full flex flex-row gap-x-2 items-start flex-wrap p-1">
+				{story.categories.map((c) => (
+					<CategoryBadge key={c._id} categoryName={c.name} />
+				))}
 			</View>
 			<View className="w-full flex flex-row gap-x-2 p-2 pb-4 items-start">
 				<StoryCardHeader title={story.title} duration={story.duration} />
@@ -116,9 +126,9 @@ export const UnlockedStoryCard = ({
 	}, [hasPlayButton, currentPlaying]);
 	return (
 		<View
-			className="flex flex-col rounded-xl w-full bg-[#fffbf3]/60 border-2 border-[#0395ff]"
+			className="flex flex-col stretch grow rounded-xl w-full bg-[#fffbf3]/60 border-2 border-[#0395ff]"
 			onLayout={(e) => {
-				setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.width });
+				setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height });
 			}}
 		>
 			<View className="w-full rounded-t-xl w-full relative" style={{ height: cardDimensions.width }}>
@@ -129,6 +139,11 @@ export const UnlockedStoryCard = ({
 					active={active}
 				/>
 				{story.featured && <FeaturedBadge />}
+			</View>
+			<View className="w-full flex flex-row gap-x-2 items-start flex-wrap p-1">
+				{story.categories.map((c) => (
+					<CategoryBadge key={c._id} categoryName={c.name} />
+				))}
 			</View>
 			<View className="w-full flex flex-row gap-x-2 p-2 pb-4 items-start">
 				<StoryCardHeader title={story.title} duration={story.duration} />

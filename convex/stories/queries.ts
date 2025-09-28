@@ -116,6 +116,7 @@ export const getStories = query({
 			const storiesPage = await ctx.db
 				.query("stories")
 				.withIndex("by_featured_enabled", (q) => q.eq("featured", false).eq("enabled", true))
+				.order("desc")
 				.paginate(paginationOpts);
 
 			const stories = await Promise.all(
