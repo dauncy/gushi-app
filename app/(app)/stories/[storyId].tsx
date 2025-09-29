@@ -10,7 +10,14 @@ import { Star } from "@/components/ui/icons/star-icon";
 import { Image } from "@/components/ui/image";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAudio, useAudioCurrentTime, useAudioDuration, useIsPlaying } from "@/context/AudioContext";
+import {
+	useAudio,
+	useAudioCurrentTime,
+	useAudioDuration,
+	useIsLoading,
+	useIsPaused,
+	useIsPlaying,
+} from "@/context/AudioContext";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { SegmentTranscript, StoryExtended } from "@/convex/stories/schema";
@@ -61,21 +68,22 @@ export default function StoryPage() {
 	const { data, error, isLoading } = useConvexQuery(api.stories.queries.getStory, {
 		storyId: storyId as Id<"stories">,
 	});
+	const isAudioLoading = useIsLoading();
 	const pageContent = useMemo(() => {
 		if (Platform.OS === "ios") {
 			const platformIOS = Platform as PlatformIOSStatic;
 			if (platformIOS.isPad) {
-				if (isLoading || !data) {
+				if (isLoading || !data || isAudioLoading) {
 					return <StoryTabletLoading />;
 				}
 				return <StoryContentTablet story={data} />;
 			}
 		}
-		if (isLoading || !data) {
+		if (isLoading || !data || isAudioLoading) {
 			return <StoryLoading />;
 		}
 		return <StoryContent story={data} />;
-	}, [data, isLoading]);
+	}, [data, isLoading, isAudioLoading]);
 
 	if (error && error instanceof ConvexError) {
 		if (error.data === "No Subscription") {
@@ -152,8 +160,13 @@ const ScrubbableProgress = ({
 
 	const tap = Gesture.Tap()
 		.maxDuration(250)
-		.onStart((e) => {
+		.onBegin(async (e) => {
 			"worklet";
+			await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid);
+		})
+		.onStart(async (e) => {
+			"worklet";
+			Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 			const w = barWidthSV.value;
 			const p = Math.max(0, Math.min(1, e.x / (w || 1)));
 			progress.value = p;
@@ -228,7 +241,8 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 
 	// On release/tap, commit the seek to the audio engine
 	const handleCommit = useCallback(
-		(t: number) => {
+		async (t: number) => {
+			await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid);
 			setUiTime(t);
 			seek(t);
 		},
@@ -564,17 +578,17 @@ const StoryImage = ({
 }) => {
 	const [error, setError] = useState(false);
 	const showFallback = error || !imageUrl;
-	const isPlaying = useIsPlaying();
+	const isPaused = useIsPaused();
 
 	const scale = useSharedValue(1);
 
 	useEffect(() => {
 		if (disableAnimation) return;
-		scale.value = withSpring(isPlaying ? 1 : 0.75, {
+		scale.value = withSpring(!isPaused ? 1 : 0.75, {
 			damping: 15,
 			stiffness: 150,
 		});
-	}, [isPlaying, disableAnimation, scale]);
+	}, [isPaused, disableAnimation, scale]);
 
 	const animatedStyle = useAnimatedStyle(() => ({
 		transform: [{ scale: scale.value }],

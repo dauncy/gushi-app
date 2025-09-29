@@ -5,6 +5,7 @@ import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "convex/react";
+import * as Haptics from "expo-haptics";
 import { useGlobalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -31,6 +32,7 @@ export default function FeedbackPage() {
 	const submitFeedback = useMutation(api.feedback.mutations.createFeedback);
 	const { type } = useGlobalSearchParams<{ type: "feature" | "issue" }>();
 	const navigateRef = useRef(true);
+	const scrollViewRef = useRef<ScrollView>(null);
 
 	const router = useRouter();
 
@@ -69,6 +71,7 @@ export default function FeedbackPage() {
 			body,
 			email: emailToSubmit,
 		});
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
 
 		if (navigateRef.current) {
 			router.replace("/settings");
@@ -79,6 +82,7 @@ export default function FeedbackPage() {
 		<SafeAreaView className="flex-1 flex flex-col gap-y-12 bg-background" edges={["top", "bottom", "left", "right"]}>
 			<KeyboardAvoidingView className="flex-1" behavior={"padding"} keyboardVerticalOffset={0}>
 				<ScrollView
+					ref={scrollViewRef}
 					className="flex-1"
 					keyboardShouldPersistTaps="handled"
 					alwaysBounceVertical={false}
@@ -103,6 +107,9 @@ export default function FeedbackPage() {
 								render={({ field }) => (
 									<FormItem className="w-full mt-5">
 										<FormInput
+											onFocus={(e) => {
+												scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+											}}
 											disabled={pending}
 											label="Title"
 											{...field}
@@ -120,6 +127,9 @@ export default function FeedbackPage() {
 								render={({ field }) => (
 									<FormItem className="w-full mt-5">
 										<FormInput
+											onFocus={(e) => {
+												scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+											}}
 											disabled={pending}
 											label="Email"
 											description="Optional"
@@ -143,13 +153,16 @@ export default function FeedbackPage() {
 											Message
 										</FormLabel>
 										<Textarea
+											onFocus={(e) => {
+												scrollViewRef.current?.scrollTo({ y: 150, animated: true });
+											}}
 											onChangeText={(text) => {
 												form.setValue("body", text);
 											}}
 											value={field.value ?? ""}
 											placeholder={type === "feature" ? "What would you like to see?" : "What went wrong?"}
 											className={cn(
-												"w-full rounded h-36 border-[0.5px] border-primary bg-black/10 placeholder:text-foreground/60 focus:border-2 focus:border-border",
+												"w-full text-foreground rounded h-36 border-[0.5px] border-primary bg-black/10 placeholder:text-foreground/60 focus:border-2 focus:border-border",
 												pending && "opacity-50",
 											)}
 										/>
@@ -167,7 +180,7 @@ export default function FeedbackPage() {
 								}}
 							>
 								{pending ? (
-									<ActivityIndicator size="small" color="#e2e8f0" />
+									<ActivityIndicator size="small" color={"#0395ff"} />
 								) : (
 									<Text className="text-border text-base font-bold">{"Submit"}</Text>
 								)}

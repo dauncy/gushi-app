@@ -6,7 +6,14 @@ import { Play } from "@/components/ui/icons/play-icon";
 import { Share } from "@/components/ui/icons/share-icon";
 import { Stop } from "@/components/ui/icons/stop-icon";
 import { Separator } from "@/components/ui/separator";
-import { setAudioStoryData, setAudioUrl, useAudio, useIsPlaying, useIsStoryActive } from "@/context/AudioContext";
+import {
+	setAudioStoryData,
+	setAudioUrl,
+	useAudio,
+	useIsBuffering,
+	useIsPlaying,
+	useIsStoryActive,
+} from "@/context/AudioContext";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { Id } from "@/convex/_generated/dataModel";
 import { StoryPreview } from "@/convex/stories/schema";
@@ -14,7 +21,7 @@ import { useFavorite } from "@/hooks/use-favorite";
 import { usePlayInFullscreen } from "@/hooks/use-play-in-fullscreen";
 import { useShareStory } from "@/hooks/use-share-story";
 import { NAV_THEME } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { cn, sanitizeStorageUrl } from "@/lib/utils";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import { debounce } from "lodash";
@@ -200,6 +207,7 @@ const AudioControlsRow = ({ story }: { story: StoryPreview }) => {
 	const { play, pause, stop, loadAudio } = useAudio();
 
 	const isPlaying = useIsPlaying();
+	const isBuffering = useIsBuffering();
 	const storyActive = useIsStoryActive({ storyId: story._id });
 	const storyIsPlaying = isPlaying && storyActive;
 
@@ -208,7 +216,10 @@ const AudioControlsRow = ({ story }: { story: StoryPreview }) => {
 	}, [stop]);
 
 	const handlePlayOrPause = useCallback(async () => {
-		if (loading) {
+		if (!story.audioUrl) {
+			return;
+		}
+		if (loading || (isBuffering && storyActive)) {
 			return;
 		}
 		if (storyIsPlaying) {
@@ -224,23 +235,24 @@ const AudioControlsRow = ({ story }: { story: StoryPreview }) => {
 		setAudioStoryData({
 			id: story._id,
 			title: story.title,
-			imageUrl: story.imageUrl,
+			imageUrl: sanitizeStorageUrl(story.imageUrl ?? ""),
 		});
 		setAudioUrl({
-			url: story.audioUrl,
+			url: sanitizeStorageUrl(story.audioUrl ?? ""),
 		});
 		await loadAudio(true);
 		setTimeout(() => {
 			setLoading(false);
 		}, 250);
 	}, [
-		loading,
-		storyIsPlaying,
-		storyActive,
+		story.audioUrl,
 		story._id,
 		story.title,
 		story.imageUrl,
-		story.audioUrl,
+		loading,
+		isBuffering,
+		storyActive,
+		storyIsPlaying,
 		loadAudio,
 		pause,
 		play,
@@ -299,9 +311,11 @@ const AudioControlsRow = ({ story }: { story: StoryPreview }) => {
 const UnlockButton = ({
 	storyId,
 	addCloseCallback,
+	triggerClose,
 }: {
 	storyId: Id<"stories">;
 	addCloseCallback: (name: string, callback: (...args: any[]) => void) => void;
+	triggerClose: () => void;
 }) => {
 	const pressRef = useRef<boolean>(null);
 	const handleUnlock = useCallback(() => {
@@ -311,9 +325,10 @@ const UnlockButton = ({
 		pressRef.current = true;
 		addCloseCallback("unlock", () => {
 			pressRef.current = false;
-			router.push(`/stories/${storyId}`);
+			router.push(`/upgrade`);
 		});
-	}, [addCloseCallback, storyId]);
+		triggerClose();
+	}, [addCloseCallback, triggerClose]);
 	return (
 		<Pressable onPress={handleUnlock} className="p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-black/10">
 			<LockKeyholeOpen className="size-4 text-foreground" size={16} />
@@ -325,9 +340,11 @@ const UnlockButton = ({
 const LockedStoryContextMenu = ({
 	story,
 	addCloseCallback,
+	triggerClose,
 }: {
 	story: StoryPreview;
 	addCloseCallback: (name: string, callback: (...args: any[]) => void) => void;
+	triggerClose: () => void;
 }) => {
 	return (
 		<View className="bg-background w-full rounded-xl border-2 border-border">
@@ -335,7 +352,7 @@ const LockedStoryContextMenu = ({
 			{story.description && <Separator className="h-[2px]" />}
 			<ShareButton storyId={story._id} storyTitle={story.title} />
 			<Separator className="h-[2px]" />
-			<UnlockButton storyId={story._id} addCloseCallback={addCloseCallback} />
+			<UnlockButton storyId={story._id} addCloseCallback={addCloseCallback} triggerClose={triggerClose} />
 		</View>
 	);
 };
@@ -386,7 +403,7 @@ export const StoryContextMenu = ({
 	}, [story.audioUrl, story.subscription_required, hasSubscription]);
 
 	if (locked) {
-		return <LockedStoryContextMenu addCloseCallback={addCloseCallback} story={story} />;
+		return <LockedStoryContextMenu addCloseCallback={addCloseCallback} story={story} triggerClose={triggerClose} />;
 	}
 
 	return <UnlockedStoryContextMenu addCloseCallback={addCloseCallback} story={story} triggerClose={triggerClose} />;

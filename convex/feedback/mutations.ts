@@ -14,7 +14,7 @@ export const createFeedback = mutation({
 	),
 	handler: async (ctx, args) => {
 		try {
-			const { dbUser } = await verifyAccess(ctx, { validateSubscription: true });
+			const { dbUser } = await verifyAccess(ctx, { validateSubscription: false });
 			const { type, title, body, email } = args;
 
 			const feedback = await ctx.db.insert("feedback", {

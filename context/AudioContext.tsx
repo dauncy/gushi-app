@@ -32,7 +32,11 @@ interface AudioStoreDTO {
 		duration: number;
 		currentTime: number;
 		isPlaying: boolean;
+		isLoading: boolean;
 		ended: boolean;
+		buffering: boolean;
+		paused: boolean;
+		ready: boolean;
 	};
 	story: {
 		id: Id<"stories"> | null;
@@ -48,6 +52,10 @@ const defaultAudioStore: AudioStoreDTO = {
 		currentTime: 0,
 		isPlaying: false,
 		ended: false,
+		isLoading: false,
+		buffering: false,
+		paused: false,
+		ready: false,
 	},
 	story: {
 		id: null,
@@ -122,6 +130,46 @@ export const updateAudioIsPlaying = ({ isPlaying }: { isPlaying: boolean }) => {
 	}));
 };
 
+export const updateAudioBuffering = ({ buffering }: { buffering: boolean }) => {
+	audioStore.setState((prev) => ({
+		...prev,
+		audioState: {
+			...prev.audioState,
+			buffering: buffering,
+		},
+	}));
+};
+
+export const updateAudioIsLoading = ({ isLoading }: { isLoading: boolean }) => {
+	audioStore.setState((prev) => ({
+		...prev,
+		audioState: {
+			...prev.audioState,
+			isLoading: isLoading,
+		},
+	}));
+};
+
+export const updateAudioIsReady = ({ ready }: { ready: boolean }) => {
+	audioStore.setState((prev) => ({
+		...prev,
+		audioState: {
+			...prev.audioState,
+			ready: ready,
+		},
+	}));
+};
+
+export const updateAudioIsPaused = ({ paused }: { paused: boolean }) => {
+	audioStore.setState((prev) => ({
+		...prev,
+		audioState: {
+			...prev.audioState,
+			paused: paused,
+		},
+	}));
+};
+
 export const updateAudioEnded = ({ ended }: { ended: boolean }) => {
 	audioStore.setState((prev) => ({
 		...prev,
@@ -170,11 +218,25 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 			TrackPlayer.addEventListener(Event.PlaybackProgressUpdated, (event) => {
 				updateAudioCurrentTime({ time: event.position });
 				updateAudioDuration({ duration: event.duration });
+
 				updateAudioEnded({ ended: false });
 			}),
-			TrackPlayer.addEventListener(Event.PlaybackState, (event) =>
-				updateAudioIsPlaying({ isPlaying: event.state === State.Playing || event.state === State.Buffering }),
-			),
+			TrackPlayer.addEventListener(Event.RemoteSeek, (event) => {
+				updateAudioCurrentTime({ time: event.position });
+				TrackPlayer.seekTo(event.position);
+			}),
+			TrackPlayer.addEventListener(Event.PlaybackState, (event) => {
+				console.log("[@/context/AudioContext.tsx]: PlaybackState => ", event.state);
+				updateAudioIsPlaying({ isPlaying: event.state === State.Playing });
+				updateAudioBuffering({ buffering: event.state === State.Buffering });
+				updateAudioIsLoading({ isLoading: event.state === State.Loading });
+				updateAudioIsPaused({ paused: event.state === State.Paused });
+				updateAudioIsReady({
+					ready:
+						event.state === State.Ready ||
+						(event.state !== State.None && event.state !== State.Loading && event.state !== State.Buffering),
+				});
+			}),
 		];
 		return () => subs.forEach((s) => s.remove());
 	}, []);
@@ -261,6 +323,26 @@ export const useAudioDuration = () => {
 export const useIsPlaying = () => {
 	const isPlaying = useStore(audioStore, (state) => state.audioState.isPlaying);
 	return isPlaying;
+};
+
+export const useIsBuffering = () => {
+	const buffering = useStore(audioStore, (state) => state.audioState.buffering);
+	return buffering;
+};
+
+export const useIsLoading = () => {
+	const isLoading = useStore(audioStore, (state) => state.audioState.isLoading);
+	return isLoading;
+};
+
+export const useIsPaused = () => {
+	const paused = useStore(audioStore, (state) => state.audioState.paused);
+	return paused;
+};
+
+export const useIsReady = () => {
+	const isReady = useStore(audioStore, (state) => state.audioState.ready);
+	return isReady;
 };
 
 export const useIsStoryActive = ({ storyId }: { storyId: Id<"stories"> }) => {
