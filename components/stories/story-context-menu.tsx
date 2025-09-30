@@ -6,14 +6,7 @@ import { Play } from "@/components/ui/icons/play-icon";
 import { Share } from "@/components/ui/icons/share-icon";
 import { Stop } from "@/components/ui/icons/stop-icon";
 import { Separator } from "@/components/ui/separator";
-import {
-	setAudioStoryData,
-	setAudioUrl,
-	useAudio,
-	useIsBuffering,
-	useIsPlaying,
-	useIsStoryActive,
-} from "@/context/AudioContext";
+import { setAudioStoryData, setAudioUrl, useAudio, useAudioPlayState, useIsStoryActive } from "@/context/AudioContext";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { Id } from "@/convex/_generated/dataModel";
 import { StoryPreview } from "@/convex/stories/schema";
@@ -29,6 +22,7 @@ import { Star } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { State } from "react-native-track-player";
 
 const DescriptionRow = ({ description }: { description: string }) => {
 	return (
@@ -205,8 +199,9 @@ const AudioControlsRow = ({ story }: { story: StoryPreview }) => {
 	const [loading, setLoading] = useState(false);
 	const { play, pause, stop, loadAudio } = useAudio();
 
-	const isPlaying = useIsPlaying();
-	const isBuffering = useIsBuffering();
+	const { currentPlayState } = useAudioPlayState();
+	const isBuffering = currentPlayState === State.Ended;
+	const isPlaying = currentPlayState === State.Playing;
 	const storyActive = useIsStoryActive({ storyId: story._id });
 	const storyIsPlaying = isPlaying && storyActive;
 

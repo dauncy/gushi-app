@@ -1,24 +1,19 @@
-import {
-	setAudioStoryData,
-	setAudioUrl,
-	useAudio,
-	useIsBuffering,
-	useIsPlaying,
-	useIsStoryActive,
-} from "@/context/AudioContext";
+import { setAudioStoryData, setAudioUrl, useAudio, useAudioPlayState, useIsStoryActive } from "@/context/AudioContext";
 import { StoryPreview } from "@/convex/stories/schema";
 import { sanitizeStorageUrl } from "@/lib/utils";
 import { memo, useCallback, useMemo } from "react";
 import { ActivityIndicator, Pressable } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { runOnJS } from "react-native-reanimated";
+import { State } from "react-native-track-player";
 import { Play } from "../ui/icons/play-icon";
 import { Stop } from "../ui/icons/stop-icon";
 
 export const StoryCardPlayButton = memo(({ story }: { story: StoryPreview }) => {
 	const { play, stop, loadAudio } = useAudio();
-	const isPlaying = useIsPlaying();
-	const isBuffering = useIsBuffering();
+	const { currentPlayState } = useAudioPlayState();
+	const isBuffering = currentPlayState === State.Ended;
+	const isPlaying = currentPlayState === State.Playing;
 	const storyActive = useIsStoryActive({ storyId: story._id });
 	const storyIsPlaying = isPlaying && storyActive;
 	const { _id: storyId, audioUrl, title, imageUrl } = story;

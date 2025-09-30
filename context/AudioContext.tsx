@@ -31,12 +31,8 @@ interface AudioStoreDTO {
 	audioState: {
 		duration: number;
 		currentTime: number;
-		isPlaying: boolean;
-		isLoading: boolean;
 		ended: boolean;
-		buffering: boolean;
-		paused: boolean;
-		ready: boolean;
+		playState: State;
 	};
 	story: {
 		id: Id<"stories"> | null;
@@ -50,12 +46,8 @@ const defaultAudioStore: AudioStoreDTO = {
 	audioState: {
 		duration: 0,
 		currentTime: 0,
-		isPlaying: false,
+		playState: State.None,
 		ended: false,
-		isLoading: false,
-		buffering: false,
-		paused: false,
-		ready: false,
 	},
 	story: {
 		id: null,
@@ -120,52 +112,12 @@ export const updateAudioDuration = ({ duration }: { duration: number }) => {
 	}));
 };
 
-export const updateAudioIsPlaying = ({ isPlaying }: { isPlaying: boolean }) => {
+export const updateAudioPlayState = ({ playState }: { playState: State }) => {
 	audioStore.setState((prev) => ({
 		...prev,
 		audioState: {
 			...prev.audioState,
-			isPlaying: isPlaying,
-		},
-	}));
-};
-
-export const updateAudioBuffering = ({ buffering }: { buffering: boolean }) => {
-	audioStore.setState((prev) => ({
-		...prev,
-		audioState: {
-			...prev.audioState,
-			buffering: buffering,
-		},
-	}));
-};
-
-export const updateAudioIsLoading = ({ isLoading }: { isLoading: boolean }) => {
-	audioStore.setState((prev) => ({
-		...prev,
-		audioState: {
-			...prev.audioState,
-			isLoading: isLoading,
-		},
-	}));
-};
-
-export const updateAudioIsReady = ({ ready }: { ready: boolean }) => {
-	audioStore.setState((prev) => ({
-		...prev,
-		audioState: {
-			...prev.audioState,
-			ready: ready,
-		},
-	}));
-};
-
-export const updateAudioIsPaused = ({ paused }: { paused: boolean }) => {
-	audioStore.setState((prev) => ({
-		...prev,
-		audioState: {
-			...prev.audioState,
-			paused: paused,
+			playState: playState,
 		},
 	}));
 };
@@ -226,15 +178,7 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 				TrackPlayer.seekTo(event.position);
 			}),
 			TrackPlayer.addEventListener(Event.PlaybackState, (event) => {
-				updateAudioIsPlaying({ isPlaying: event.state === State.Playing });
-				updateAudioBuffering({ buffering: event.state === State.Buffering });
-				updateAudioIsLoading({ isLoading: event.state === State.Loading });
-				updateAudioIsPaused({ paused: event.state === State.Paused });
-				updateAudioIsReady({
-					ready:
-						event.state === State.Ready ||
-						(event.state !== State.None && event.state !== State.Loading && event.state !== State.Buffering),
-				});
+				updateAudioPlayState({ playState: event.state });
 			}),
 		];
 		return () => subs.forEach((s) => s.remove());
@@ -315,29 +259,14 @@ export const useAudioDuration = () => {
 	return duration;
 };
 
-export const useIsPlaying = () => {
-	const isPlaying = useStore(audioStore, (state) => state.audioState.isPlaying);
-	return isPlaying;
+export const useAudioPlayState = () => {
+	const playState = useStore(audioStore, (state) => state.audioState.playState);
+	return { currentPlayState: playState };
 };
 
-export const useIsBuffering = () => {
-	const buffering = useStore(audioStore, (state) => state.audioState.buffering);
-	return buffering;
-};
-
-export const useIsLoading = () => {
-	const isLoading = useStore(audioStore, (state) => state.audioState.isLoading);
-	return isLoading;
-};
-
-export const useIsPaused = () => {
-	const paused = useStore(audioStore, (state) => state.audioState.paused);
-	return paused;
-};
-
-export const useIsReady = () => {
-	const isReady = useStore(audioStore, (state) => state.audioState.ready);
-	return isReady;
+export const useIsAudioInState = ({ state }: { state: State }) => {
+	const playState = useStore(audioStore, (state) => state.audioState.playState);
+	return playState === state;
 };
 
 export const useIsStoryActive = ({ storyId }: { storyId: Id<"stories"> }) => {

@@ -10,14 +10,7 @@ import { Star } from "@/components/ui/icons/star-icon";
 import { Image } from "@/components/ui/image";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-	useAudio,
-	useAudioCurrentTime,
-	useAudioDuration,
-	useIsLoading,
-	useIsPaused,
-	useIsPlaying,
-} from "@/context/AudioContext";
+import { useAudio, useAudioCurrentTime, useAudioDuration, useIsAudioInState } from "@/context/AudioContext";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { SegmentTranscript, StoryExtended } from "@/convex/stories/schema";
@@ -56,6 +49,7 @@ import Animated, {
 	withTiming,
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { State } from "react-native-track-player";
 
 const formatTime = (seconds: number) => {
 	const minutes = Math.floor(seconds / 60);
@@ -68,7 +62,7 @@ export default function StoryPage() {
 	const { data, error, isLoading } = useConvexQuery(api.stories.queries.getStory, {
 		storyId: storyId as Id<"stories">,
 	});
-	const isAudioLoading = useIsLoading();
+	const isAudioLoading = useIsAudioInState({ state: State.Loading });
 	const pageContent = useMemo(() => {
 		if (Platform.OS === "ios") {
 			const platformIOS = Platform as PlatformIOSStatic;
@@ -210,7 +204,7 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 	const [uiTime, setUiTime] = useState(0);
 	const currentTime = useSharedValue(0);
 	const audioCurrentTime = useAudioCurrentTime();
-	const isPlaying = useIsPlaying();
+	const isPlaying = useIsAudioInState({ state: State.Playing });
 	const duration = useAudioDuration();
 
 	useEffect(() => {
@@ -587,7 +581,7 @@ const StoryImage = ({
 }) => {
 	const [error, setError] = useState(false);
 	const showFallback = error || !imageUrl;
-	const isPaused = useIsPaused();
+	const isPaused = useIsAudioInState({ state: State.Paused });
 
 	const scale = useSharedValue(1);
 
@@ -663,7 +657,7 @@ const StoryContentTablet = ({ story }: { story: StoryExtended }) => {
 	const [uiTime, setUiTime] = useState(0);
 	const audioCurrentTime = useAudioCurrentTime();
 	const currentTime = useSharedValue(0);
-	const isPlaying = useIsPlaying();
+	const isPlaying = useIsAudioInState({ state: State.Playing });
 	const duration = useAudioDuration();
 
 	useEffect(() => {

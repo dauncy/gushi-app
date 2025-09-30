@@ -1,21 +1,16 @@
-import {
-	audioStore,
-	setAudioStoryData,
-	setAudioUrl,
-	useAudio,
-	useIsBuffering,
-	useIsPlaying,
-} from "@/context/AudioContext";
+import { audioStore, setAudioStoryData, setAudioUrl, useAudio, useAudioPlayState } from "@/context/AudioContext";
 import { Id } from "@/convex/_generated/dataModel";
 import { sanitizeStorageUrl } from "@/lib/utils";
 import { useStore } from "@tanstack/react-store";
 import { useRouter } from "expo-router";
 import { useCallback } from "react";
+import { State } from "react-native-track-player";
 
 export const usePlayInFullscreen = () => {
 	const { play, loadAudio } = useAudio();
-	const isPlaying = useIsPlaying();
-	const isBuffering = useIsBuffering();
+	const { currentPlayState } = useAudioPlayState();
+	const isPlaying = currentPlayState === State.Playing;
+	const isBuffering = currentPlayState === State.Ended;
 	const storyId = useStore(audioStore, (state) => state.story.id);
 	const router = useRouter();
 

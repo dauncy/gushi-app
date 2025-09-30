@@ -1,7 +1,7 @@
 import { Pause } from "@/components/ui/icons/pause-icon";
 import { Play } from "@/components/ui/icons/play-icon";
 import { Stop } from "@/components/ui/icons/stop-icon";
-import { audioStore, useAudio, useIsPlaying } from "@/context/AudioContext";
+import { audioStore, useAudio, useIsAudioInState } from "@/context/AudioContext";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
@@ -10,6 +10,7 @@ import { useStore } from "@tanstack/react-store";
 import { useCallback } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
+import { State } from "react-native-track-player";
 import { StoryImagePreview } from "../stories/story-image";
 
 export const AudioPreviewPlayer = ({
@@ -20,7 +21,7 @@ export const AudioPreviewPlayer = ({
 	className?: string;
 }) => {
 	const { play, pause, stop } = useAudio();
-	const isPlaying = useIsPlaying();
+	const isPlaying = useIsAudioInState({ state: State.Playing });
 	const storyId = useStore(audioStore, (state) => state.story.id);
 
 	const { data: story } = useConvexQuery(
