@@ -235,7 +235,7 @@ export const getStoryMetadata = internalQuery({
 	handler: async (
 		ctx,
 		{ storyId },
-	): Promise<{ title: string; imageUrl: string; duration: number; updatedAt: string } | null> => {
+	): Promise<{ title: string; imageUrl: string; duration: number; updatedAt: string; description: string } | null> => {
 		const story = await ctx.db.get(storyId);
 		if (!story) {
 			return null;
@@ -250,6 +250,7 @@ export const getStoryMetadata = internalQuery({
 			imageUrl: imageData.url,
 			duration,
 			updatedAt: story.updatedAt,
+			description: story.description ?? "",
 		};
 	},
 });
@@ -323,6 +324,7 @@ export const getFeaturedStory = query({
 				subscription_required: !!story.subscription_required,
 				featured: !!story.featured,
 				categories: categories.map((category) => ({ _id: category._id, name: category.name })),
+				description: story.description,
 			};
 		} catch (error) {
 			console.warn("[convex/stories/queries.ts]: getFeaturedStory() => --- ERROR --- ", error);

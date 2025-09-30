@@ -226,7 +226,6 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 				TrackPlayer.seekTo(event.position);
 			}),
 			TrackPlayer.addEventListener(Event.PlaybackState, (event) => {
-				console.log("[@/context/AudioContext.tsx]: PlaybackState => ", event.state);
 				updateAudioIsPlaying({ isPlaying: event.state === State.Playing });
 				updateAudioBuffering({ buffering: event.state === State.Buffering });
 				updateAudioIsLoading({ isLoading: event.state === State.Loading });
@@ -270,10 +269,6 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 		if (!story || !storyUrl) {
 			return;
 		}
-		console.log("[@/context/AudioContext.tsx]: loadAudio()=>  --- story --- ", {
-			story,
-			storyUrl,
-		});
 		const track: Track = {
 			id: String(story.id),
 			url: storyUrl,

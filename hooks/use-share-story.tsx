@@ -1,10 +1,12 @@
 import { Id } from "@/convex/_generated/dataModel";
+import * as Haptics from "expo-haptics";
 import { useCallback } from "react";
 import { Share as RNShare } from "react-native";
 
 export const useShareStory = () => {
 	const shareStory = useCallback(async ({ storyId, storyTitle }: { storyId: Id<"stories">; storyTitle: string }) => {
 		try {
+			await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 			await RNShare.share(
 				{
 					message: `Check out this story on Gushi: ${storyTitle}`,

@@ -45,7 +45,6 @@ const DescriptionRow = ({ description }: { description: string }) => {
 const ShareButton = ({ storyId, storyTitle }: { storyId: Id<"stories">; storyTitle: string }) => {
 	const { shareStory } = useShareStory();
 	const handleShare = useCallback(async () => {
-		await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 		shareStory({ storyId, storyTitle });
 	}, [shareStory, storyId, storyTitle]);
 	return (

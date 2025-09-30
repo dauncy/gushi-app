@@ -134,17 +134,23 @@ const ScrubbableProgress = ({
 		barWidthSV.value = w;
 	};
 
+	const handleHaptics = async () => {
+		await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+	};
+
 	// Gesture handlers (UI thread worklets) – no JS helpers!
 	const pan = Gesture.Pan()
 		.onBegin((e) => {
 			"worklet";
+			runOnJS(handleHaptics)();
 			isScrubbing.value = true;
+
 			const w = barWidthSV.value;
 			const p = Math.max(0, Math.min(1, e.x / (w || 1)));
 			progress.value = p;
 			runOnJS(onPreview)(p * duration);
 		})
-		.onChange((e) => {
+		.onChange(async (e) => {
 			"worklet";
 			const w = barWidthSV.value;
 			const p = Math.max(0, Math.min(1, e.x / (w || 1)));
@@ -160,13 +166,8 @@ const ScrubbableProgress = ({
 
 	const tap = Gesture.Tap()
 		.maxDuration(250)
-		.onBegin(async (e) => {
-			"worklet";
-			await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid);
-		})
 		.onStart(async (e) => {
 			"worklet";
-			Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 			const w = barWidthSV.value;
 			const p = Math.max(0, Math.min(1, e.x / (w || 1)));
 			progress.value = p;
@@ -188,14 +189,16 @@ const ScrubbableProgress = ({
 
 	return (
 		<GestureDetector gesture={gesture}>
-			<View
-				onLayout={onBarLayout}
-				className={className ?? "h-2 bg-black/10 w-full rounded-full overflow-hidden"}
-				style={{ position: "relative" }}
-			>
-				<Animated.View className={indicatorClassName ?? "bg-foreground/80 h-full"} style={indicatorStyle} />
+			<View className="py-2">
+				<View
+					onLayout={onBarLayout}
+					className={className ?? "h-2 bg-black/10 w-full rounded-full overflow-hidden"}
+					style={{ position: "relative" }}
+				>
+					<Animated.View className={indicatorClassName ?? "bg-foreground/80 h-full"} style={indicatorStyle} />
 
-				<View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: -12, bottom: -12 }} />
+					<View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: -12, bottom: -12 }} />
+				</View>
 			</View>
 		</GestureDetector>
 	);
@@ -347,9 +350,13 @@ const ClosedCaption = ({ transcript, currentTime }: { transcript: SegmentTranscr
 	/** Auto‑scroll */
 	useEffect(() => {
 		if (currentIndex >= 0) {
-			listRef.current?.scrollToIndex({ index: currentIndex, animated: true, viewPosition: 0 });
+			if (currentIndex === transcript.length - 1) {
+				listRef.current?.scrollToEnd({ animated: true });
+				return;
+			}
+			listRef.current?.scrollToIndex({ index: currentIndex, animated: true, viewPosition: -0.15 });
 		}
-	}, [currentIndex]);
+	}, [currentIndex, transcript]);
 
 	/** Row renderer (memoised) */
 	const renderItem = useCallback(
@@ -357,12 +364,13 @@ const ClosedCaption = ({ transcript, currentTime }: { transcript: SegmentTranscr
 			<TranscriptRow
 				key={item.start_time}
 				segment={item}
+				isLast={index === transcript.length - 1}
 				index={index}
 				currentIndex={currentIndex}
 				currentTime={currentTime}
 			/>
 		),
-		[currentIndex, currentTime],
+		[currentIndex, currentTime, transcript],
 	);
 
 	return (
@@ -372,7 +380,6 @@ const ClosedCaption = ({ transcript, currentTime }: { transcript: SegmentTranscr
 				data={transcript}
 				renderItem={renderItem}
 				showsVerticalScrollIndicator={false}
-				contentContainerStyle={{ paddingBottom: 16 }}
 				// this is for auto-scrolling on last segment... hacky but meh
 				ListFooterComponent={() => <View style={{ height: 248 }} />}
 			/>
@@ -399,15 +406,18 @@ interface TranscriptRowProps {
 	index: number;
 	currentIndex: number;
 	currentTime: number;
+	isLast: boolean;
 }
 
 const TranscriptRow = memo<TranscriptRowProps>(
-	({ segment, index, currentIndex, currentTime }) => {
+	({ segment, index, currentIndex, currentTime, isLast }) => {
 		const status = index < currentIndex ? "completed" : index === currentIndex ? "current" : "upcoming";
 		const isGap = index === currentIndex && !(currentTime >= segment.start_time && currentTime <= segment.end_time);
 
 		return (
-			<View className={cn("w-full my-20 px-1", status === "upcoming" && "bg-transparent")}>
+			<View
+				className={cn("w-full  px-1 min-h-[228px]", status === "upcoming" && "bg-transparent", isLast ? "" : "my-20")}
+			>
 				<View className="flex flex-row flex-wrap">
 					{segment.words.map((word, wIdx) => {
 						let textColor = "text-foreground/80";
@@ -435,7 +445,7 @@ const TranscriptRow = memo<TranscriptRowProps>(
 						return (
 							<Text
 								key={`${segment.start_time}-${wIdx}`}
-								className={cn("text-2xl", textColor, fontWeight)}
+								className={cn("text-3xl", textColor, fontWeight)}
 								style={{
 									textShadowColor: textShadow ? "#0395ff" : "transparent",
 									textShadowOffset: { width: 0, height: 1 },
@@ -463,7 +473,6 @@ const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed
 	}, [isCollapsed, progress]);
 
 	const handleShare = useCallback(async () => {
-		await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 		await shareStory({ storyId: story._id, storyTitle: story.title });
 	}, [story._id, story.title, shareStory]);
 
