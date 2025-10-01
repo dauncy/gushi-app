@@ -1,6 +1,5 @@
 import { Marquee } from "@/components/Marquee";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/icons/calendar-icon";
 import { Headphones } from "@/components/ui/icons/headphones-icon";
 import { LetterText } from "@/components/ui/icons/letters-text-icon";
 import { Pause } from "@/components/ui/icons/pause-icon";
@@ -8,7 +7,6 @@ import { Play } from "@/components/ui/icons/play-icon";
 import { Share } from "@/components/ui/icons/share-icon";
 import { Star } from "@/components/ui/icons/star-icon";
 import { Image } from "@/components/ui/image";
-import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAudio, useAudioCurrentTime, useAudioDuration, useIsAudioInState } from "@/context/AudioContext";
 import { api } from "@/convex/_generated/api";
@@ -21,10 +19,10 @@ import { BLUR_HASH } from "@/lib/constants";
 import { cn, sanitizeStorageUrl } from "@/lib/utils";
 import { FlashList, ListRenderItemInfo, type FlashListRef } from "@shopify/flash-list";
 import { ConvexError } from "convex/values";
-import { formatDistanceToNow } from "date-fns";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
 import { Redirect, useLocalSearchParams } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { debounce } from "lodash";
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -32,7 +30,6 @@ import {
 	Platform,
 	PlatformIOSStatic,
 	Pressable,
-	Share as RNShare,
 	Text,
 	useWindowDimensions,
 	View,
@@ -220,6 +217,7 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 		},
 		[currentTime],
 	);
+
 	const togglePlay = useCallback(() => {
 		if (isPlaying) {
 			pause();
@@ -247,57 +245,60 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 	);
 
 	return (
-		<View className="flex flex-1 flex-col items-center relative bg-background">
-			<StoryHeader story={story} isCollapsed={showClosedCaption} />
-			{showClosedCaption && <ClosedCaption transcript={story.transcript} currentTime={uiTime} />}
+		<>
+			<StatusBar style="light" />
+			<View className="flex flex-1 flex-col items-center relative bg-background">
+				<StoryHeader story={story} isCollapsed={showClosedCaption} />
+				{showClosedCaption && <ClosedCaption transcript={story.transcript} currentTime={uiTime} />}
 
-			{/* ─── PLAYER BAR ──────────────────────────────────────────────────────── */}
-			<View
-				className="absolute bottom-0 left-0 right-0 w-full flex flex-col bg-background pt-4"
-				style={{ zIndex: 1000 }}
-			>
-				<ScrubbableProgress
-					duration={duration || 0}
-					uiTime={uiTime}
-					onPreview={handlePreview}
-					onCommit={handleCommit}
-					className="h-2 bg-black/10 w-full rounded-full overflow-hidden"
-					indicatorClassName="bg-foreground/80 h-full"
-				/>
+				{/* ─── PLAYER BAR ──────────────────────────────────────────────────────── */}
+				<View
+					className="absolute bottom-0 left-0 right-0 w-full flex flex-col bg-background pt-4"
+					style={{ zIndex: 1000 }}
+				>
+					<ScrubbableProgress
+						duration={duration || 0}
+						uiTime={uiTime}
+						onPreview={handlePreview}
+						onCommit={handleCommit}
+						className="h-2 bg-black/10 w-full rounded-full overflow-hidden"
+						indicatorClassName="bg-foreground/80 h-full"
+					/>
 
-				<View className="flex w-full flex-row justify-between mt-3">
-					<Text className="text-foreground/80 text-xs">{formatTime(uiTime)}</Text>
-					<Text className="text-foreground/80 text-xs">{formatTime(duration)}</Text>
-				</View>
+					<View className="flex w-full flex-row justify-between mt-3">
+						<Text className="text-foreground/80 text-xs">{formatTime(uiTime)}</Text>
+						<Text className="text-foreground/80 text-xs">{formatTime(duration)}</Text>
+					</View>
 
-				<View className="flex w-full flex-col items-center py-4">
-					<Pressable
-						onPress={togglePlay}
-						className="size-20 active:bg-foreground/10 rounded-full flex items-center justify-center"
-					>
-						{isPlaying ? (
-							<Pause className="text-foreground/80 fill-foreground/80" size={36} />
-						) : (
-							<Play className="text-foreground/80 fill-foreground/80" size={36} />
-						)}
-					</Pressable>
-				</View>
+					<View className="flex w-full flex-col items-center py-4">
+						<Pressable
+							onPress={togglePlay}
+							className="size-20 active:bg-foreground/10 rounded-full flex items-center justify-center"
+						>
+							{isPlaying ? (
+								<Pause className="text-foreground/80 fill-foreground/80" size={36} />
+							) : (
+								<Play className="text-foreground/80 fill-foreground/80" size={36} />
+							)}
+						</Pressable>
+					</View>
 
-				{/* CC Toggle */}
-				<View className="flex w-full flex-col items-start pb-6 pl-2 bg-background">
-					<Button
-						className={cn("bg-background rounded-xl border border-foreground", showClosedCaption && "bg-foreground")}
-						onPress={() => setShowClosedCaption((p) => !p)}
-					>
-						<LetterText
-							className={cn("text-foreground/80 size-6", showClosedCaption && "text-background")}
-							strokeWidth={2}
-							size={20}
-						/>
-					</Button>
+					{/* CC Toggle */}
+					<View className="flex w-full flex-col items-start pb-6 pl-2 bg-background">
+						<Button
+							className={cn("bg-background rounded-xl border border-foreground", showClosedCaption && "bg-foreground")}
+							onPress={() => setShowClosedCaption((p) => !p)}
+						>
+							<LetterText
+								className={cn("text-foreground/80 size-6", showClosedCaption && "text-background")}
+								strokeWidth={2}
+								size={20}
+							/>
+						</Button>
+					</View>
 				</View>
 			</View>
-		</View>
+		</>
 	);
 };
 
@@ -653,10 +654,10 @@ const StoryLoading = () => (
 
 const StoryContentTablet = ({ story }: { story: StoryExtended }) => {
 	const [showClosedCaption, setShowClosedCaption] = useState(false);
-	const { pause, play } = useAudio();
+	const { pause, play, seek } = useAudio();
 	const [uiTime, setUiTime] = useState(0);
-	const audioCurrentTime = useAudioCurrentTime();
 	const currentTime = useSharedValue(0);
+	const audioCurrentTime = useAudioCurrentTime();
 	const isPlaying = useIsAudioInState({ state: State.Playing });
 	const duration = useAudioDuration();
 
@@ -673,6 +674,7 @@ const StoryContentTablet = ({ story }: { story: StoryExtended }) => {
 		},
 		[currentTime],
 	);
+
 	const togglePlay = useCallback(() => {
 		if (isPlaying) {
 			pause();
@@ -681,33 +683,54 @@ const StoryContentTablet = ({ story }: { story: StoryExtended }) => {
 		}
 	}, [isPlaying, pause, play]);
 
+	// While scrubbing, preview the time in the UI without moving audio yet
+	const handlePreview = useCallback(
+		(t: number) => {
+			setUiTime(t);
+		},
+		[setUiTime],
+	);
+
+	// On release/tap, commit the seek to the audio engine
+	const handleCommit = useCallback(
+		async (t: number) => {
+			await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid);
+			setUiTime(t);
+			seek(t);
+		},
+		[setUiTime, seek],
+	);
+
 	return (
 		<View className="flex flex-1 flex-col items-center relative w-2/3 mx-auto">
 			<StoryHeaderTablet story={story} isCollapsed={showClosedCaption} />
 			{showClosedCaption && <ClosedCaption transcript={story.transcript} currentTime={uiTime} />}
 
 			{/* ─── PLAYER BAR ──────────────────────────────────────────────────────── */}
-			<View className="absolute bottom-0 left-0 right-0 w-full flex flex-col bg-slate-900" style={{ zIndex: 1000 }}>
-				<Progress
-					value={duration > 0 ? (uiTime / duration) * 100 : 0}
-					className="h-2 bg-slate-800 w-full"
-					indicatorClassName="bg-slate-500"
+			<View className="absolute bottom-0 left-0 right-0 w-full flex flex-col bg-background" style={{ zIndex: 1000 }}>
+				<ScrubbableProgress
+					duration={duration || 0}
+					uiTime={uiTime}
+					onPreview={handlePreview}
+					onCommit={handleCommit}
+					className="h-2 bg-black/10 w-full rounded-full overflow-hidden"
+					indicatorClassName="bg-foreground/80 h-full"
 				/>
 
 				<View className="flex w-full flex-row justify-between mt-3">
-					<Text className="text-slate-400 text-xs">{formatTime(uiTime)}</Text>
-					<Text className="text-slate-400 text-xs">{formatTime(duration)}</Text>
+					<Text className="text-foreground/80 text-xs">{formatTime(uiTime)}</Text>
+					<Text className="text-foreground/80 text-xs">{formatTime(duration)}</Text>
 				</View>
 
 				<View className="flex w-full flex-col items-center py-4">
 					<Pressable
 						onPress={togglePlay}
-						className="size-20 active:bg-slate-800 rounded-full flex items-center justify-center"
+						className="size-20 active:bg-foreground/10 rounded-full flex items-center justify-center"
 					>
 						{isPlaying ? (
-							<Pause className="text-white fill-white" size={36} />
+							<Pause className="text-foreground/80 fill-foreground/80" size={36} />
 						) : (
-							<Play className="text-white fill-white" size={36} />
+							<Play className="text-foreground/80 fill-foreground/80" size={36} />
 						)}
 					</Pressable>
 				</View>
@@ -715,11 +738,11 @@ const StoryContentTablet = ({ story }: { story: StoryExtended }) => {
 				{/* CC Toggle */}
 				<View className="flex w-full flex-col items-start pb-6 pl-2">
 					<Button
-						className={cn("bg-slate-900 rounded-xl border border-slate-900", showClosedCaption && "bg-slate-500")}
+						className={cn("bg-black/10 rounded-xl border border-foreground", showClosedCaption && "bg-foreground")}
 						onPress={() => setShowClosedCaption((p) => !p)}
 					>
 						<LetterText
-							className={cn("text-slate-500 size-6", showClosedCaption && "text-slate-900")}
+							className={cn("text-foreground/80 size-6", showClosedCaption && "text-background")}
 							strokeWidth={2}
 							size={20}
 						/>
@@ -733,15 +756,15 @@ const StoryContentTablet = ({ story }: { story: StoryExtended }) => {
 const StoryTabletLoading = () => {
 	return (
 		<View className="flex flex-1 flex-col items-center">
-			<Skeleton className="aspect-square w-2/3 rounded-xl bg-slate-800" />
+			<Skeleton className="aspect-square w-2/3 rounded-xl bg-black/20" />
 			<View className="flex w-2/3 mt-12 flex-row gap-x-8 mx-auto">
 				<View className="flex flex-col flex-1">
-					<Skeleton className="h-6 w-1/5 rounded-xl bg-slate-800" />
-					<Skeleton className="h-4 w-2/5 rounded-xl bg-slate-800 mt-2" />
+					<Skeleton className="h-6 w-1/5 rounded-xl bg-black/20" />
+					<Skeleton className="h-4 w-2/5 rounded-xl bg-black/20 mt-2" />
 				</View>
 				<View className="flex gap-x-4 flex-row items-center">
-					<Skeleton className="h-10 w-10 rounded-full bg-slate-800" />
-					<Skeleton className="h-10 w-10 rounded-full bg-slate-800" />
+					<Skeleton className="h-10 w-10 rounded-full bg-black/20" />
+					<Skeleton className="h-10 w-10 rounded-full bg-black/20" />
 				</View>
 			</View>
 		</View>
@@ -750,6 +773,7 @@ const StoryTabletLoading = () => {
 
 const StoryHeaderTablet = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed: boolean }) => {
 	const progress = useSharedValue(isCollapsed ? 1 : 0);
+	const { shareStory } = useShareStory();
 
 	// Animate collapse / expand
 	useEffect(() => {
@@ -757,19 +781,8 @@ const StoryHeaderTablet = ({ story, isCollapsed }: { story: StoryExtended; isCol
 	}, [isCollapsed, progress]);
 
 	const handleShare = useCallback(async () => {
-		try {
-			await RNShare.share(
-				{
-					message: `Check out this story on Gushi: ${story.title}`,
-					url: `${process.env.EXPO_PUBLIC_WEB_URL}/stories/${story._id}`,
-					title: `Share ${story.title}`,
-				},
-				{ dialogTitle: `Share ${story.title}` },
-			);
-		} catch (e) {
-			console.warn("[StoryHeader] Error sharing story", e);
-		}
-	}, [story]);
+		await shareStory({ storyId: story._id, storyTitle: story.title });
+	}, [story._id, story.title, shareStory]);
 
 	const imgStyle = useAnimatedStyle(() => {
 		const size = interpolate(progress.value, [0, 1], [248, 80]);
@@ -812,14 +825,8 @@ const StoryHeaderTablet = ({ story, isCollapsed }: { story: StoryExtended; isCol
 			>
 				<View className="flex overflow-hidden flex-1 mr-4 flex-col">
 					<Marquee speed={0.5} spacing={48} style={{ maxWidth: isCollapsed ? 150 : undefined }}>
-						<Text className="text-slate-200 text-2xl font-bold">{story.title}</Text>
+						<Text className="text-foreground/80 text-2xl font-bold">{story.title}</Text>
 					</Marquee>
-					<View className="flex flex-row gap-x-2 items-center mt-2">
-						<Calendar className="text-slate-400 size-4" strokeWidth={1} />
-						<Text className="text-slate-400 text-xs font-medium " numberOfLines={2}>
-							{formatDistanceToNow(story.updatedAt, { addSuffix: true })}
-						</Text>
-					</View>
 				</View>
 
 				{/* Fixed width for buttons to prevent them from being cut off */}
@@ -830,9 +837,9 @@ const StoryHeaderTablet = ({ story, isCollapsed }: { story: StoryExtended; isCol
 						onPress={handleShare}
 						size="icon"
 						variant="ghost"
-						className="bg-slate-800 rounded-full border border-slate-600"
+						className="bg-black/10 rounded-full border border-foreground"
 					>
-						<Share className="text-slate-500 size-6" strokeWidth={1.5} size={20} />
+						<Share className="text-foreground/80 size-6" strokeWidth={1.5} size={20} />
 					</Button>
 				</View>
 			</Animated.View>

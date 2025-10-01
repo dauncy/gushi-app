@@ -7,8 +7,9 @@ import { Id } from "@/convex/_generated/dataModel";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
 import { cn } from "@/lib/utils";
 import { useStore } from "@tanstack/react-store";
+import { useGlobalSearchParams, usePathname } from "expo-router";
 import { useCallback } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Platform, PlatformIOSStatic, Pressable, Text, View } from "react-native";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 import { State } from "react-native-track-player";
 import { StoryImagePreview } from "../stories/story-image";
@@ -20,6 +21,16 @@ export const AudioPreviewPlayer = ({
 	onCardPress?: (storyId: Id<"stories">) => void;
 	className?: string;
 }) => {
+	let showAlways = true;
+	if (Platform.OS === "ios") {
+		const platformIOS = Platform as PlatformIOSStatic;
+		if (platformIOS.isPad) {
+			showAlways = false;
+		}
+	}
+
+	const params = useGlobalSearchParams();
+	const pathname = usePathname();
 	const { play, pause, stop } = useAudio();
 	const isPlaying = useIsAudioInState({ state: State.Playing });
 	const storyId = useStore(audioStore, (state) => state.story.id);
@@ -42,6 +53,10 @@ export const AudioPreviewPlayer = ({
 	}, [onCardPress, storyId]);
 
 	if (!storyId || !story) {
+		return null;
+	}
+
+	if ((params.storyId || pathname.toLowerCase().includes("upgrade")) && !showAlways) {
 		return null;
 	}
 
