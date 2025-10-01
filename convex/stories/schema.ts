@@ -1,4 +1,4 @@
-import { Id } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 import { Nullable } from "@/lib/types";
 import { zid, zodToConvex } from "convex-helpers/server/zod";
 import { defineTable } from "convex/server";
@@ -43,6 +43,7 @@ const segmentTranscriptSchema = z.object({
 const storiesSchema = z.object({
 	title: z.string(),
 	body: z.string(),
+	description: z.string().optional(),
 	transcript: z.array(segmentTranscriptSchema),
 	enabled: z.boolean().default(false),
 	subscription_required: z.boolean().default(true),
@@ -61,13 +62,14 @@ export type StoryPublic = Omit<
 
 export type StoryPreview = Omit<
 	StoryPrivate,
-	"body" | "enabled" | "transcript" | "imageId" | "audioId" | "createdAt" | "featured"
+	"body" | "enabled" | "transcript" | "imageId" | "audioId" | "createdAt"
 > & {
 	imageUrl: Nullable<string>;
 	audioUrl: Nullable<string>;
 	duration: number;
 	blurHash?: Nullable<string>;
 	_id: Id<"stories">;
+	categories: { _id: Id<"categories">; name: string }[];
 };
 
 export type StoryExtended = Omit<
@@ -91,3 +93,44 @@ export const stories = defineTable(zodToConvex(storiesSchema))
 	.index("by_subscription_required", ["subscription_required"])
 	.index("by_featured", ["featured"])
 	.index("by_featured_enabled", ["featured", "enabled"]);
+
+export const categories = defineTable(
+	zodToConvex(
+		z.object({
+			name: z.string(),
+			createdAt: z.string().datetime(),
+			updatedAt: z.string().datetime(),
+			featured: z.boolean().default(false),
+		}),
+	),
+).index("by_featured", ["featured"]);
+
+export const storyCategories = defineTable(
+	zodToConvex(
+		z.object({
+			storyId: zid("stories"),
+			categoryId: zid("categories"),
+			createdAt: z.string().datetime(),
+			updatedAt: z.string().datetime(),
+		}),
+	),
+)
+	.index("by_story", ["storyId"])
+	.index("by_category", ["categoryId"]);
+
+type CategoryPromise = {
+	type: "categories";
+	data: Doc<"categories">[];
+};
+
+type AudioPromise = {
+	type: "audio";
+	data: { url: string | null };
+};
+
+type ImagePromise = {
+	type: "image";
+	data: { url: string | null; blurHash: string | null };
+};
+
+export type StorySubDataPromise = CategoryPromise | AudioPromise | ImagePromise;

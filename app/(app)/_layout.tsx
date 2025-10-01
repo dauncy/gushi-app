@@ -1,3 +1,4 @@
+import { NAV_THEME } from "@/lib/constants";
 import { useConvexAuth } from "convex/react";
 import { Stack } from "expo-router";
 import { ReactNode } from "react";
@@ -8,12 +9,9 @@ export default function AppLayout() {
 		<Stack
 			screenOptions={{
 				headerShown: false,
-				contentStyle: {
-					backgroundColor: "#082F49",
-				},
 			}}
 			layout={({ children }) => (
-				<View className="flex-1">
+				<View className="flex-1" style={{ backgroundColor: "#036aacc" }}>
 					<RenderLayout>{children}</RenderLayout>
 				</View>
 			)}
@@ -29,13 +27,12 @@ export default function AppLayout() {
 					animationDuration: 300,
 					sheetGrabberVisible: true,
 					contentStyle: {
-						backgroundColor: "#0f172a",
 						height: "100%",
 					},
 				}}
 			/>
 
-			<Stack.Screen name="(tabs)" options={{ headerShown: false, contentStyle: { backgroundColor: "#0f172a" } }} />
+			<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
 			<Stack.Screen
 				name="stories"
@@ -47,7 +44,6 @@ export default function AppLayout() {
 					headerLargeTitleShadowVisible: true,
 					presentation: "formSheet",
 					contentStyle: {
-						backgroundColor: "#0f172a",
 						height: "100%",
 						width: "100%",
 					},
@@ -64,8 +60,8 @@ const RenderLayout = ({ children }: { children: ReactNode }) => {
 	const { isAuthenticated, isLoading } = useConvexAuth();
 	if (isLoading && !isAuthenticated) {
 		return (
-			<View className="flex-1 items-center justify-center bg-[#082F49]">
-				<ActivityIndicator size="large" color="#c026d3" />
+			<View className="flex-1 items-center justify-center bg-background">
+				<ActivityIndicator size="large" color={NAV_THEME.dark.primary} />
 			</View>
 		);
 	}

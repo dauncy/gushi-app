@@ -1,20 +1,20 @@
 import { AudioPreviewPlayer } from "@/components/audio/audio-preview";
-import { StoryCard, StoryCardLoading } from "@/components/stories/story-card";
+import { EnhancedStoryCard } from "@/components/stories/enhanced-story-card";
+import { StoryCardLoading } from "@/components/stories/story-card";
 import { Sparkles } from "@/components/ui/icons/sparkles-icon";
-import { useAudio } from "@/context/AudioContext";
+import { useSubscription } from "@/context/SubscriptionContext";
 import { api } from "@/convex/_generated/api";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
-import { useDbUser } from "@/hooks/use-dbUser";
-import { sanitizeStorageUrl } from "@/lib/utils";
+import { usePlayInFullscreen } from "@/hooks/use-play-in-fullscreen";
 import { FlashList } from "@shopify/flash-list";
-import { Redirect, useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useCallback } from "react";
 import { ActivityIndicator, RefreshControl, Text, View } from "react-native";
 
 export default function FavoritesListPage() {
 	const router = useRouter();
 	return (
-		<View style={{ flex: 1 }} className="relative px-2">
+		<View style={{ flex: 1 }} className="relative">
 			<FavoritesList />
 			<AudioPreviewPlayer
 				className="bottom-2"
@@ -27,9 +27,7 @@ export default function FavoritesListPage() {
 }
 
 const FavoritesList = () => {
-	const router = useRouter();
-	const { dbUser, isLoading: isDbUserLoading } = useDbUser();
-	const { play, setStory, storyId, isPlaying } = useAudio();
+	const { hasSubscription } = useSubscription();
 	const { isLoading, refreshing, refresh, loadMore, results, status } = useConvexPaginatedQuery(
 		api.favorites.queries.getUserFavorites,
 		{},
@@ -44,81 +42,72 @@ const FavoritesList = () => {
 		}
 	}, [loadMore, status]);
 
-	if (!isDbUserLoading && !dbUser?.subscriptionType) {
-		return <Redirect href={"/"} />;
-	}
+	const { playInFullscreen } = usePlayInFullscreen();
 
 	return (
-		<View className="flex-1" style={{ marginTop: 44 }}>
-			<FlashList
-				refreshControl={<RefreshControl tintColor="#8b5cf6" refreshing={refreshing} onRefresh={refresh} />}
-				onEndReached={onEndReached}
-				extraData={{ isLoading, refreshing, status, storyId, isPlaying }}
-				data={results}
-				keyExtractor={(item) => item._id}
-				renderItem={({ item }) => (
-					<StoryCard
-						story={item}
-						onCardPress={() => {
-							if (item.audioUrl) {
-								if (storyId !== item._id) {
-									setStory({
-										storyUrl: sanitizeStorageUrl(item.audioUrl),
-										storyId: item._id,
-										storyImage: sanitizeStorageUrl(item.imageUrl ?? ""),
-										storyTitle: item.title,
-										autoPlay: true,
-									});
-									router.push(`/stories/${item._id}`);
-								} else {
-									if (!isPlaying) {
-										play();
-									}
-									router.push(`/stories/${item._id}`);
-								}
+		<View style={{ flex: 1 }} className="relative bg-[#fffbf3] flex flex-col px-0 pt-4">
+			<View className="flex-1 bg-black/10 px-2" style={{ marginTop: 46, paddingTop: 12, paddingBottom: 12 }}>
+				<FlashList
+					showsVerticalScrollIndicator={false}
+					numColumns={2}
+					refreshControl={<RefreshControl tintColor="#ff78e5" refreshing={refreshing} onRefresh={refresh} />}
+					onEndReached={onEndReached}
+					extraData={{ isLoading, refreshing, status, hasSubscription, results }}
+					data={results}
+					keyExtractor={(item) => item._id}
+					renderItem={({ item, index: idx }) => (
+						<EnhancedStoryCard
+							story={item}
+							onCardPress={() =>
+								playInFullscreen({
+									storyData: { _id: item._id, title: item.title, imageUrl: item.imageUrl, audioUrl: item.audioUrl },
+								})
 							}
-						}}
-					/>
-				)}
-				ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
-				contentContainerStyle={{
-					paddingBottom: 80,
-					paddingTop: 12,
-					...(results.length === 0 ? { flex: 1 } : {}),
-				}}
-				ListEmptyComponent={
-					<>
-						{isLoading ? (
-							<View className="flex flex-col gap-y-3">
-								{Array.from({ length: 10 }).map((_, index) => (
-									<StoryCardLoading key={`loading-${index}`} />
-								))}
-							</View>
-						) : (
-							<View className="flex flex-col gap-y-3 items-center justify-center flex-1 mt-auto">
-								<View className="flex flex-row gap-x-2 items-center">
-									<Sparkles className="w-size-6 text-slate-400" />
-									<Text className="text-slate-400 text-lg font-medium">No favorites yet</Text>
+							margin={idx % 2 === 0 ? "right" : "left"}
+						/>
+					)}
+					contentContainerStyle={{
+						paddingBottom: results.length === 0 ? 8 : 80,
+						paddingTop: 8,
+					}}
+					ListEmptyComponent={
+						<>
+							{isLoading ? (
+								<View style={{ flexWrap: "wrap", display: "flex", flexDirection: "row" }}>
+									{Array.from({ length: 10 }).map((_, idx) => (
+										<StoryCardLoading key={`loading-${idx}`} />
+									))}
 								</View>
-								<View className="flex flex-row gap-x-2 items-center px-4 mx-auto max-w-[240px]">
-									<Text className="text-slate-400 text-sm text-center">
-										Add some stories to your favorites to get started
-									</Text>
+							) : (
+								<View className="flex flex-col flex-1 items-center justify-center px-4 mt-60">
+									<View className="flex w-full border-2 border-[#ff2d01] bg-background rounded-xl p-4 flex flex-col gap-y-2">
+										<View className="flex w-full flex flex-row items-center gap-x-2">
+											<Sparkles size={20} className="text-[#ff2d01]" />
+											<Text className="text-[#ff2d01] font-semibold text-center">No favs found</Text>
+										</View>
+										<Text className="text-foreground">
+											{"You can add favorites anytime by tapping the star icon on each story."}
+										</Text>
+
+										<Link href={"/"} className="mt-5 bg-[#ceef32] border-[#0395ff] border-2 rounded-xl p-3 ">
+											<Text className="text-[#0395ff] font-semibold text-center">{"Explore stories"}</Text>
+										</Link>
+									</View>
 								</View>
-							</View>
-						)}
-					</>
-				}
-				ListFooterComponent={
-					<>
-						{status === "LoadingMore" ? (
-							<View className="flex flex-row items-center justify-center">
-								<ActivityIndicator size="small" color="#8b5cf6" />
-							</View>
-						) : null}
-					</>
-				}
-			/>
+							)}
+						</>
+					}
+					ListFooterComponent={
+						<>
+							{status === "LoadingMore" ? (
+								<View className="flex flex-row items-center justify-center">
+									<ActivityIndicator size="small" color="#8b5cf6" />
+								</View>
+							) : null}
+						</>
+					}
+				/>
+			</View>
 		</View>
 	);
 };

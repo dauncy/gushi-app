@@ -7,23 +7,26 @@ module.exports = {
 	presets: [require("nativewind/preset")],
 	theme: {
 		extend: {
+			fontFamily: {
+				baloo: ["Baloo"],
+			},
 			colors: {
-				border: "hsl(var(--border))",
+				border: "#0395ff",
 				input: "hsl(var(--input))",
-				ring: "hsl(var(--ring))",
-				background: "hsl(var(--background))",
-				foreground: "hsl(var(--foreground))",
+				ring: "#0395ff",
+				background: "#fffbf3",
+				foreground: "#0D3311",
 				primary: {
-					DEFAULT: "hsl(var(--primary))",
-					foreground: "hsl(var(--primary-foreground))",
+					DEFAULT: "#ff78e5",
+					foreground: "#ff78e5",
 				},
 				secondary: {
-					DEFAULT: "hsl(var(--secondary))",
-					foreground: "hsl(var(--secondary-foreground))",
+					DEFAULT: "#ceef32",
+					foreground: "#ceef32",
 				},
 				destructive: {
-					DEFAULT: "hsl(var(--destructive))",
-					foreground: "hsl(var(--destructive-foreground))",
+					DEFAULT: "#ff2d01",
+					foreground: "#ff2d01",
 				},
 				muted: {
 					DEFAULT: "hsl(var(--muted))",

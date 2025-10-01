@@ -4,10 +4,10 @@ import { MoonStar } from "./icons/moonstar-icon";
 
 const ProUpgradeToast = ({ text1 }: { text1?: string }) => {
 	return (
-		<View className="flex-row items-center gap-3 rounded-xl border border-slate-600 bg-slate-800 px-4 py-3 shadow-md w-[92%] self-center">
-			<MoonStar size={24} color="#facc15" />
+		<View className="flex-row items-center gap-3 rounded-xl border border-destructive bg-background px-4 py-3 shadow-md w-[92%] self-center">
+			<MoonStar size={24} className="text-destructive" />
 			<View className="flex-1">
-				<Text className="text-white font-semibold text-base">
+				<Text className="text-destructive font-semibold text-base">
 					{text1 ?? "Congrats! You've upgraded to Gushi Pro 🌙"}
 				</Text>
 			</View>

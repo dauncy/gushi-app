@@ -1,1 +1,1 @@
-bunx lint-staged
+bun typecheck && bunx lint-staged

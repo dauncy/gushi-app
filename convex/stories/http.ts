@@ -15,13 +15,14 @@ export const storyMetadataHttpAction = httpAction(async (ctx, req) => {
 		return new Response("No story ID", { status: 400 });
 	}
 	try {
-		const [story, metaDescription] = await Promise.all([
-			ctx.runQuery(internal.stories.queries.getStoryMetadata, { storyId }),
-			getDescription(ctx, { storyId }),
-		]);
-
+		const story = await ctx.runQuery(internal.stories.queries.getStoryMetadata, { storyId });
+		let metaDescription = story?.description;
 		if (!story) {
 			return new Response("Story not found", { status: 404 });
+		}
+
+		if (!metaDescription) {
+			metaDescription = await getDescription(ctx, { storyId });
 		}
 
 		return Response.json(

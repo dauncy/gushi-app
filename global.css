@@ -71,3 +71,8 @@
 		}
 	}
 }
+
+@font-face {
+	font-family: "Baloo";
+	src: url("../assets/fonts/baloo-bold.ttf") format("truetype");
+}

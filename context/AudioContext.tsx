@@ -1,9 +1,7 @@
 import { Id } from "@/convex/_generated/dataModel";
-// import { AudioStatus, setAudioModeAsync, useAudioPlayer } from "expo-audio";
-import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from "react";
-import { SharedValue, useSharedValue } from "react-native-reanimated";
+import { Store, useStore } from "@tanstack/react-store";
+import { createContext, ReactNode, useCallback, useContext, useEffect, useRef } from "react";
 import TrackPlayer, {
-	// AppKilledPlaybackBehavior,
 	Capability,
 	Event,
 	IOSCategory,
@@ -11,69 +9,131 @@ import TrackPlayer, {
 	RepeatMode,
 	State,
 	Track,
-	usePlaybackState,
-	useProgress,
 } from "react-native-track-player";
 
-interface AudioState {
-	duration: number;
-	isPlaying: boolean;
-	storyId: Id<"stories"> | null;
-	ended: boolean;
-}
-
 interface AudioContextDTO {
-	setStory: ({
-		storyUrl,
-		storyId,
-		storyImage,
-		storyTitle,
-		autoPlay,
-	}: {
-		storyUrl: string;
-		storyId: Id<"stories">;
-		storyImage: string;
-		storyTitle: string;
-		autoPlay?: boolean;
-	}) => void;
 	play: () => Promise<void>;
 	pause: () => Promise<void>;
 	stop: () => Promise<void>;
-	duration: number;
-	currentTime: SharedValue<number>;
-	isPlaying: boolean;
-	storyId: Id<"stories"> | null;
-	ended: boolean;
+	loadAudio: (autoplay?: boolean) => Promise<void>;
+	seek: (time: number) => Promise<void>;
 }
 
 const AudioContext = createContext<AudioContextDTO>({
-	setStory: () => {},
 	play: async () => {},
 	pause: async () => {},
 	stop: async () => {},
-	duration: 0,
-	currentTime: { value: 0 } as SharedValue<number>,
-	isPlaying: false,
-	storyId: null,
-	ended: false,
+	loadAudio: async () => {},
+	seek: async () => {},
 });
+
+interface AudioStoreDTO {
+	audioState: {
+		duration: number;
+		currentTime: number;
+		ended: boolean;
+		playState: State;
+	};
+	story: {
+		id: Id<"stories"> | null;
+		title: string | null;
+		imageUrl: string | null;
+	};
+	audioUrl: string | null;
+}
+
+const defaultAudioStore: AudioStoreDTO = {
+	audioState: {
+		duration: 0,
+		currentTime: 0,
+		playState: State.None,
+		ended: false,
+	},
+	story: {
+		id: null,
+		title: null,
+		imageUrl: null,
+	},
+	audioUrl: null,
+};
+
+export const audioStore = new Store<AudioStoreDTO>(defaultAudioStore);
+
+export const setAudioStoryData = ({
+	id,
+	title,
+	imageUrl,
+}: {
+	id: Id<"stories"> | null;
+	title: string | null;
+	imageUrl: string | null;
+}) => {
+	audioStore.setState((prev) => ({
+		...prev,
+		story: {
+			...prev.story,
+			id,
+			title,
+			imageUrl,
+		},
+	}));
+};
+
+export const setAudioUrl = ({ url }: { url: string | null }) => {
+	audioStore.setState((prev) => ({
+		...prev,
+		audioUrl: url,
+	}));
+};
+
+export const resetAudioStore = () => {
+	audioStore.setState((prev) => {
+		return defaultAudioStore;
+	});
+};
+
+export const updateAudioCurrentTime = ({ time }: { time: number }) => {
+	audioStore.setState((prev) => ({
+		...prev,
+		audioState: {
+			...prev.audioState,
+			currentTime: time,
+		},
+	}));
+};
+
+export const updateAudioDuration = ({ duration }: { duration: number }) => {
+	audioStore.setState((prev) => ({
+		...prev,
+		audioState: {
+			...prev.audioState,
+			duration: duration,
+		},
+	}));
+};
+
+export const updateAudioPlayState = ({ playState }: { playState: State }) => {
+	audioStore.setState((prev) => ({
+		...prev,
+		audioState: {
+			...prev.audioState,
+			playState: playState,
+		},
+	}));
+};
+
+export const updateAudioEnded = ({ ended }: { ended: boolean }) => {
+	audioStore.setState((prev) => ({
+		...prev,
+		audioState: {
+			...prev.audioState,
+			ended: ended,
+		},
+	}));
+};
 
 export const AudioProvider = ({ children }: { children: ReactNode }) => {
 	const initRef = useRef<boolean>(false);
-	// SharedValues for animation-friendly UI
-	const currentTime = useSharedValue(0);
-	const durationSV = useSharedValue(0);
-
-	const [audioState, setAudioState] = useState<AudioState>({
-		duration: 0,
-		isPlaying: false,
-		storyId: null,
-		ended: false,
-	});
-
-	// TrackPlayer hooks
-	const playbackState = usePlaybackState();
-	const progress = useProgress(250); // update every 250ms
 
 	useEffect(() => {
 		async function init() {
@@ -90,9 +150,9 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 
 			await TrackPlayer.updateOptions({
 				alwaysPauseOnInterruption: true,
-				// Only Play/Pause/Stop
-				capabilities: [Capability.Play, Capability.Pause, Capability.Stop],
-				compactCapabilities: [Capability.Play, Capability.Pause, Capability.Stop],
+				// Only Play/Pause/Stop/SeekTo
+				capabilities: [Capability.Play, Capability.Pause, Capability.Stop, Capability.SeekTo],
+				compactCapabilities: [Capability.Play, Capability.Pause, Capability.Stop, Capability.SeekTo],
 				progressUpdateEventInterval: 0.25,
 			});
 
@@ -102,36 +162,33 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 		init();
 	}, []);
 
-	// Sync SharedValues
-	useEffect(() => {
-		if (typeof progress.position === "number") currentTime.value = progress.position;
-		if (typeof progress.duration === "number") {
-			if (durationSV.value !== progress.duration) {
-				durationSV.value = progress.duration;
-				setAudioState((prev) => ({ ...prev, duration: progress.duration }));
-			}
-		}
-	}, [progress.position, progress.duration, currentTime, durationSV]);
-
-	// Sync isPlaying
-	useEffect(() => {
-		const playing = playbackState.state === State.Playing || playbackState.state === State.Buffering;
-		if (playing !== audioState.isPlaying) {
-			setAudioState((prev) => ({ ...prev, isPlaying: playing }));
-		}
-	}, [playbackState, audioState.isPlaying]);
-
-	// Remote controls: only play/pause
 	useEffect(() => {
 		const subs = [
 			TrackPlayer.addEventListener(Event.RemotePlay, () => TrackPlayer.play()),
 			TrackPlayer.addEventListener(Event.RemotePause, () => TrackPlayer.pause()),
-			TrackPlayer.addEventListener(Event.PlaybackQueueEnded, () => setAudioState((prev) => ({ ...prev, ended: true }))),
+			TrackPlayer.addEventListener(Event.PlaybackQueueEnded, () => updateAudioEnded({ ended: true })),
+			TrackPlayer.addEventListener(Event.PlaybackProgressUpdated, (event) => {
+				updateAudioCurrentTime({ time: event.position });
+				updateAudioDuration({ duration: event.duration });
+
+				updateAudioEnded({ ended: false });
+			}),
+			TrackPlayer.addEventListener(Event.RemoteSeek, (event) => {
+				updateAudioCurrentTime({ time: event.position });
+				TrackPlayer.seekTo(event.position);
+			}),
+			TrackPlayer.addEventListener(Event.PlaybackState, (event) => {
+				updateAudioPlayState({ playState: event.state });
+			}),
 		];
 		return () => subs.forEach((s) => s.remove());
 	}, []);
 
 	const play = useCallback(async () => {
+		if (audioStore.state.audioState.ended) {
+			await TrackPlayer.seekTo(0);
+			updateAudioEnded({ ended: false });
+		}
 		await TrackPlayer.play();
 	}, []);
 
@@ -142,63 +199,44 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 	const stop = useCallback(async () => {
 		await TrackPlayer.stop();
 		await TrackPlayer.reset();
-		currentTime.value = 0;
-		durationSV.value = 0;
-		setAudioState((p) => ({ ...p, isPlaying: false, storyId: null, duration: 0, ended: false }));
-	}, [currentTime, durationSV]);
+		resetAudioStore();
+	}, []);
 
-	const setStory = useCallback(
-		async ({
-			storyUrl,
-			storyId,
-			storyImage,
-			storyTitle = "Gushi Bedtime Story",
-			autoPlay = false,
-		}: {
-			storyUrl: string;
-			storyId: Id<"stories">;
-			storyImage: string;
-			storyTitle: string;
-			autoPlay?: boolean;
-		}) => {
-			await TrackPlayer.reset();
+	const seek = useCallback(async (time: number) => {
+		await TrackPlayer.seekTo(time);
+	}, []);
 
-			const track: Track = {
-				id: String(storyId),
-				url: storyUrl,
-				title: storyTitle,
-				artist: "Gushi",
-				artwork: storyImage, // shows on lock screen
-				// We include duration to keep your UI’s durationSV accurate from the start.
-				// (No seek capability is exposed, so users can’t scrub.)
-			};
+	const loadAudio = useCallback(async (autoplay = true) => {
+		await TrackPlayer.reset();
+		const story = audioStore.state.story;
+		const storyUrl = audioStore.state.audioUrl;
+		if (!story || !storyUrl) {
+			return;
+		}
+		const track: Track = {
+			id: String(story.id),
+			url: storyUrl,
+			title: story.title ?? "",
+			artist: "Gushi",
+			artwork: story.imageUrl ?? "", // shows on lock screen
+			// We include duration to keep your UI’s durationSV accurate from the start.
+			// (No seek capability is exposed, so users can’t scrub.)
+		};
 
-			await TrackPlayer.add([track]);
+		await TrackPlayer.add([track]);
 
-			setAudioState((prev) => ({
-				...prev,
-				storyId,
-				duration: typeof durationSV.value === "number" ? durationSV.value : 0,
-				ended: false,
-				...(autoPlay ? { isPlaying: true } : {}),
-			}));
-
-			if (autoPlay) {
-				await TrackPlayer.play();
-			}
-		},
-		[durationSV],
-	);
-
+		if (autoplay) {
+			await TrackPlayer.play();
+		}
+	}, []);
 	return (
 		<AudioContext.Provider
 			value={{
-				setStory,
 				play,
 				pause,
 				stop,
-				...audioState,
-				currentTime,
+				loadAudio,
+				seek,
 			}}
 		>
 			{children}
@@ -209,4 +247,34 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 export const useAudio = () => {
 	const context = useContext(AudioContext);
 	return context;
+};
+
+export const useAudioCurrentTime = () => {
+	const currentTime = useStore(audioStore, (state) => state.audioState.currentTime);
+	return currentTime;
+};
+
+export const useAudioDuration = () => {
+	const duration = useStore(audioStore, (state) => state.audioState.duration);
+	return duration;
+};
+
+export const useAudioPlayState = () => {
+	const playState = useStore(audioStore, (state) => state.audioState.playState);
+	return { currentPlayState: playState };
+};
+
+export const useIsAudioInState = ({ state }: { state: State }) => {
+	const playState = useStore(audioStore, (state) => state.audioState.playState);
+	return playState === state;
+};
+
+export const useIsStoryActive = ({ storyId }: { storyId: Id<"stories"> }) => {
+	const id = useStore(audioStore, (state) => state.story.id);
+	return storyId === id;
+};
+
+export const useAudioEnded = () => {
+	const ended = useStore(audioStore, (state) => state.audioState.ended);
+	return ended;
 };

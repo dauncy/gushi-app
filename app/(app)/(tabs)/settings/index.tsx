@@ -2,10 +2,12 @@ import { Ban } from "@/components/ui/icons/ban-icon";
 import { Bug } from "@/components/ui/icons/bug-icon";
 import { Feather } from "@/components/ui/icons/feather-icon";
 import { Lightbulb } from "@/components/ui/icons/lightbulb-icon";
+import { LockKeyholeOpen } from "@/components/ui/icons/lock-keyhole-open-icon";
 import { Shield } from "@/components/ui/icons/shield-icons";
 import { Trash2 } from "@/components/ui/icons/trash-icon";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { api } from "@/convex/_generated/api";
+import { usePresentPaywall } from "@/hooks/use-present-paywall";
 import { useMutation } from "convex/react";
 import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
@@ -14,7 +16,7 @@ import { Alert, Text, TouchableOpacity, View } from "react-native";
 
 export default function SettingsListPage() {
 	const clickRef = useRef(false);
-	const { subscriptionType } = useSubscription();
+	const { subscriptionType, hasSubscription } = useSubscription();
 	const router = useRouter();
 	const resetUserAppData = useMutation(api.users.mutations.resetAppData);
 
@@ -48,6 +50,7 @@ export default function SettingsListPage() {
 		Alert.alert("Reset App Data", "Are you sure you want to reset your app data? This action cannot be undone.", [
 			{
 				text: "Reset App Data",
+				style: "destructive",
 				onPress: async () => {
 					clickRef.current = false;
 					await resetUserAppData({});
@@ -81,78 +84,105 @@ export default function SettingsListPage() {
 		}, 500);
 	};
 
-	return (
-		<View className="flex-1 flex flex-col px-2 gap-y-12" style={{ marginTop: 56 }}>
-			<View className="flex flex-col gap-1">
-				<Text className="text-slate-500 text-sm font-semibold ml-2">{"FEEDBACK"}</Text>
-				<View className="bg-slate-800/50 rounded-2xl flex flex-col">
-					<TouchableOpacity
-						activeOpacity={0.8}
-						className="px-4 border-b border-slate-700 py-4 flex flex-row items-center gap-4"
-						onPress={() => handleFeedback("feature")}
-					>
-						<Lightbulb className="w-4 h-4 text-slate-400" />
-						<Text className="text-slate-400 text-base font-medium">{"Suggest a Feature"}</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						activeOpacity={0.8}
-						className="px-4 py-4 flex flex-row items-center gap-4"
-						onPress={() => handleFeedback("issue")}
-					>
-						<Bug className="w-4 h-4 text-slate-400" />
-						<Text className="text-slate-400 text-base font-medium">{"Report an Issue"}</Text>
-					</TouchableOpacity>
-				</View>
-			</View>
-			<View className="flex flex-col gap-1">
-				<Text className="text-slate-500 text-sm font-semibold ml-2">{"LEGAL"}</Text>
-				<View className="bg-slate-800/50 rounded-2xl flex flex-col">
-					<TouchableOpacity
-						activeOpacity={0.8}
-						className="px-4 border-b border-slate-700 py-4 flex flex-row items-center gap-4"
-						onPress={() => handleWebClick(`${process.env.EXPO_PUBLIC_WEB_URL}/terms-of-service`)}
-					>
-						<Feather className="w-4 h-4 text-slate-400" />
-						<Text className="text-slate-400 text-base font-medium">{"Terms of Service"}</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						activeOpacity={0.8}
-						className="px-4 py-4 flex flex-row items-center gap-4"
-						onPress={() => handleWebClick(`${process.env.EXPO_PUBLIC_WEB_URL}/privacy`)}
-					>
-						<Shield className="w-4 h-4 text-slate-400" />
-						<Text className="text-slate-400 text-base font-medium">{"Privacy Policy"}</Text>
-					</TouchableOpacity>
-				</View>
-			</View>
-			<View className="flex flex-col gap-y-12 mt-auto mb-4">
-				{subscriptionType === "recurring" && (
-					<View className="flex flex-col gap-1 ">
-						<Text className="text-slate-500 text-sm font-semibold ml-2">{"Subscription"}</Text>
-						<View className="bg-slate-800/50 rounded-2xl flex flex-col">
-							<TouchableOpacity
-								activeOpacity={0.8}
-								className="px-4 py-4 flex flex-row items-center gap-4"
-								onPress={handleCancelSubscription}
-							>
-								<Ban className="w-4 h-4 text-red-500" />
-								<Text className="text-red-500 text-base font-medium">{"Cancel Subscription"}</Text>
-							</TouchableOpacity>
-						</View>
-					</View>
-				)}
+	const { presentPaywall } = usePresentPaywall();
 
-				<View className="flex flex-col gap-1">
-					<Text className="text-slate-500 text-sm font-semibold ml-2">{"Personal Data"}</Text>
-					<View className="bg-slate-800/50 rounded-2xl flex flex-col">
+	const handleUpgradeToPro = () => {
+		if (clickRef.current) return;
+		clickRef.current = true;
+		presentPaywall();
+		setTimeout(() => {
+			clickRef.current = false;
+		}, 500);
+	};
+
+	return (
+		<View style={{ flex: 1 }} className="relative bg-[#fffbf3] flex flex-col px-0 pt-4">
+			<View className="flex-1 bg-black/10 px-2 gap-y-8" style={{ marginTop: 46, paddingTop: 12, paddingBottom: 12 }}>
+				<View className="flex flex-col gap-1 ">
+					<Text className="text-foreground text-sm font-semibold ml-2">{"FEEDBACK"}</Text>
+					<View className="bg-background rounded-2xl flex flex-col border border-border">
+						<TouchableOpacity
+							activeOpacity={0.8}
+							className="px-4 border-b border-border py-4 flex flex-row items-center gap-4"
+							onPress={() => handleFeedback("feature")}
+						>
+							<Lightbulb className="w-4 h-4 text-primary" strokeWidth={2.5} />
+							<Text className="text-primary text-base font-semibold">{"SUGGEST A FEATURE"}</Text>
+						</TouchableOpacity>
 						<TouchableOpacity
 							activeOpacity={0.8}
 							className="px-4 py-4 flex flex-row items-center gap-4"
-							onPress={handleResetAppData}
+							onPress={() => handleFeedback("issue")}
 						>
-							<Trash2 className="w-4 h-4 text-red-500" />
-							<Text className="text-red-500 text-base font-medium">{"Reset App Data"}</Text>
+							<Bug className="w-4 h-4 text-primary" strokeWidth={2.5} />
+							<Text className="text-primary text-base font-semibold">{"REPORT AN ISSUE"}</Text>
 						</TouchableOpacity>
+					</View>
+				</View>
+				<View className="flex flex-col gap-1">
+					<Text className="text-foreground text-sm font-semibold ml-2">{"LEGAL"}</Text>
+					<View className="bg-background border border-primary rounded-2xl flex flex-col">
+						<TouchableOpacity
+							activeOpacity={0.8}
+							className="px-4 border-b border-primary py-4 flex flex-row items-center gap-4"
+							onPress={() => handleWebClick(`${process.env.EXPO_PUBLIC_WEB_URL}/terms-of-service`)}
+						>
+							<Feather className="w-4 h-4 text-border" strokeWidth={2.5} />
+							<Text className="text-border text-base font-semibold">{"TERMS OF SERVICE"}</Text>
+						</TouchableOpacity>
+						<TouchableOpacity
+							activeOpacity={0.8}
+							className="px-4 py-4 flex flex-row items-center gap-4"
+							onPress={() => handleWebClick(`${process.env.EXPO_PUBLIC_WEB_URL}/privacy`)}
+						>
+							<Shield className="w-4 h-4 text-border" strokeWidth={2.5} />
+							<Text className="text-border text-base font-semibold">{"PRIVACY POLICY"}</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
+				<View className="flex flex-col gap-y-8 mt-auto mb-4">
+					{subscriptionType === "recurring" ? (
+						<View className="flex flex-col gap-1 ">
+							<Text className="text-foreground text-sm font-semibold ml-2">{"SUBSCRIPTION"}</Text>
+							<View className="bg-background border border-destructive rounded-2xl flex flex-col">
+								<TouchableOpacity
+									activeOpacity={0.8}
+									className="px-4 py-4 flex flex-row items-center gap-4"
+									onPress={handleCancelSubscription}
+								>
+									<Ban className="w-4 h-4 text-destructive" strokeWidth={1.5} />
+									<Text className="text-destructive text-base font-medium">{"CANCEL SUBSCRIPTION"}</Text>
+								</TouchableOpacity>
+							</View>
+						</View>
+					) : hasSubscription === false ? (
+						<View className="flex flex-col gap-1 ">
+							<Text className="text-foreground text-sm font-semibold ml-2">{"SUBSCRIPTION"}</Text>
+							<View className="bg-secondary border border-border rounded-2xl flex flex-col shadow">
+								<TouchableOpacity
+									activeOpacity={0.8}
+									className="px-4 py-4 flex flex-row items-center gap-4"
+									onPress={handleUpgradeToPro}
+								>
+									<LockKeyholeOpen className="w-4 h-4 text-border" strokeWidth={2.5} />
+									<Text className="text-border text-base font-bold">{"UPGRADE TO PRO"}</Text>
+								</TouchableOpacity>
+							</View>
+						</View>
+					) : null}
+
+					<View className="flex flex-col gap-1">
+						<Text className="text-foreground text-sm font-semibold ml-2">{"PERSONAL DATA"}</Text>
+						<View className="bg-background border border-destructive rounded-2xl flex flex-col">
+							<TouchableOpacity
+								activeOpacity={0.8}
+								className="px-4 py-4 flex flex-row items-center gap-4"
+								onPress={handleResetAppData}
+							>
+								<Trash2 className="w-4 h-4 text-destructive" strokeWidth={1.5} />
+								<Text className="text-destructive text-base font-medium">{"RESET APP DATA"}</Text>
+							</TouchableOpacity>
+						</View>
 					</View>
 				</View>
 			</View>

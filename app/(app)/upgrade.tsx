@@ -44,8 +44,11 @@ export default function UpgradePage() {
 		async ({ customerInfo }: { customerInfo: CustomerInfo }) => {
 			setIsLoading(true);
 			await updateCustomer({ revenueCatId: customerInfo.originalAppUserId });
-			handleToast();
-			setCompleted(true);
+			const activeEntitlements = customerInfo?.entitlements?.active;
+			if (activeEntitlements["Pro - Lifetime"] || activeEntitlements["Pro - Recurring"]) {
+				handleToast();
+				setCompleted(true);
+			}
 			setIsLoading(false);
 		},
 		[handleToast, updateCustomer],
@@ -60,7 +63,7 @@ export default function UpgradePage() {
 		if (isLoading) {
 			return (
 				<View className="flex-1 items-center flex-col justify-center">
-					<ActivityIndicator size="large" color="#8b5cf6" />
+					<ActivityIndicator size="large" color="#ff78e5" />
 				</View>
 			);
 		}
