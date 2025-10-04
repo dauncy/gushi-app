@@ -9,7 +9,6 @@ import { View } from "react-native";
 import { CategoryBadge } from "./category-badge";
 import { FeaturedBadge } from "./featured-badge";
 import { StoryCardHeader } from "./story-card-header";
-import { StoryCardPlayButton } from "./story-card-play-button";
 import { StoryImagePreview } from "./story-image";
 
 export const StoryCardLoading = () => {
@@ -18,8 +17,8 @@ export const StoryCardLoading = () => {
 		<View
 			style={{
 				width: "50%", // Takes exactly half the container
-				paddingHorizontal: 6, // Padding instead of margin for consistent spacing
-				paddingBottom: 12,
+				paddingHorizontal: 4, // Padding instead of margin for consistent spacing
+				paddingBottom: 8,
 			}}
 		>
 			<View
@@ -75,8 +74,8 @@ export const LockedStoryCard = ({
 					<CategoryBadge key={c._id} categoryName={c.name} />
 				))}
 			</View>
-			<View className="w-full flex flex-row gap-x-2 p-2 pb-4 items-start">
-				<StoryCardHeader title={story.title} duration={story.duration} />
+			<View className="w-full flex flex-row gap-x-2 p-2 pb-4 items-start flex-1 grow">
+				<StoryCardHeader story={story} hasPlayButton={false} />
 			</View>
 
 			<View className="absolute inset-0 rounded-xl bg-black opacity-40 overflow-hidden" style={{ zIndex: 1 }} />
@@ -126,7 +125,7 @@ export const UnlockedStoryCard = ({
 	}, [hasPlayButton, currentPlaying]);
 	return (
 		<View
-			className="flex flex-col stretch grow rounded-xl w-full bg-[#fffbf3]/60 border-2 border-[#0395ff]"
+			className="flex flex-col grow stretch rounded-xl w-full bg-[#fffbf3]/60 border-2 border-[#0395ff]"
 			onLayout={(e) => {
 				setCardDimensions({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height });
 			}}
@@ -145,27 +144,14 @@ export const UnlockedStoryCard = ({
 					<CategoryBadge key={c._id} categoryName={c.name} />
 				))}
 			</View>
-			<View className="w-full flex flex-row gap-x-2 p-2 pb-4 items-start">
-				<StoryCardHeader title={story.title} duration={story.duration} />
-				{hasPlayButton && (
-					<View className="flex items-center justify-center mt-0.5">
-						<StoryCardPlayButton story={story} />
-					</View>
-				)}
+			<View className="w-full flex flex-row gap-x-2 p-2 pb-4 items-stretch grow stretch">
+				<StoryCardHeader story={story} hasPlayButton={hasPlayButton} />
 			</View>
 		</View>
 	);
 };
 
-export const StoryCard = ({
-	story,
-	margin,
-	hasPlayButton = true,
-}: {
-	story: StoryPreview;
-	margin?: "right" | "left";
-	hasPlayButton?: boolean;
-}) => {
+export const StoryCard = ({ story, hasPlayButton = true }: { story: StoryPreview; hasPlayButton?: boolean }) => {
 	const [cardDimensions, setCardDimensions] = useState<{ width: number; height: number }>({ width: 168, height: 140 });
 	const { hasSubscription } = useSubscription();
 

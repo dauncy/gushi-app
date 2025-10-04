@@ -80,10 +80,6 @@ export type StoryExtended = Omit<
 	audioUrl: Nullable<string>;
 	blurHash: Nullable<string>;
 	_id: Id<"stories">;
-	favorite: null | {
-		_id: Id<"favorites">;
-		_createdAt: string;
-	};
 };
 
 export type SegmentTranscript = z.infer<typeof segmentTranscriptSchema>;
@@ -92,7 +88,11 @@ export const stories = defineTable(zodToConvex(storiesSchema))
 	.index("by_enabled", ["enabled"])
 	.index("by_subscription_required", ["subscription_required"])
 	.index("by_featured", ["featured"])
-	.index("by_featured_enabled", ["featured", "enabled"]);
+	.index("by_featured_enabled", ["featured", "enabled"])
+	.searchIndex("story_search", {
+		searchField: "body",
+		filterFields: ["enabled"],
+	});
 
 export const categories = defineTable(
 	zodToConvex(

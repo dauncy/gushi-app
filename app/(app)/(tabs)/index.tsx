@@ -10,9 +10,9 @@ import { useConvexQuery } from "@/hooks/use-convexQuery";
 import { usePlayInFullscreen } from "@/hooks/use-play-in-fullscreen";
 import { usePresentPaywall } from "@/hooks/use-present-paywall";
 import { useSelectedCategory } from "@/stores/category-store";
-import { FlashList } from "@shopify/flash-list";
+import { FlashList, type FlashListRef } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
-import { memo, useCallback, useMemo } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { ActivityIndicator, RefreshControl, Text, View } from "react-native";
 
 export default function Home() {
@@ -20,6 +20,8 @@ export default function Home() {
 }
 
 const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => void }) => {
+	const initRef = useRef(false);
+	const storyListRef = useRef<FlashListRef<StoryPreview>>(null);
 	const { hasSubscription } = useSubscription();
 	const categoryId = useSelectedCategory();
 	const { isLoading, refreshing, refresh, loadMore, results, status } = useConvexPaginatedQuery(
@@ -89,14 +91,33 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 		categoryId,
 	]);
 
+	useEffect(() => {
+		if (!initRef.current) {
+			initRef.current = true;
+			return;
+		}
+		if (isLoading || refreshing) return;
+		storyListRef.current?.scrollToIndex({ index: 0, animated: false, viewOffset: -8 });
+	}, [categoryId, isLoading, refreshing]);
+
 	return (
 		<View className="flex-1 bg-black/10 px-2">
 			<FlashList
+				ref={storyListRef}
 				showsVerticalScrollIndicator={false}
 				numColumns={2}
 				refreshControl={<RefreshControl tintColor="#ff78e5" refreshing={refreshing} onRefresh={handleListRefetch} />}
 				onEndReached={onEndReached}
-				extraData={{ isLoading, refreshing, status, hasSubscription, listItems, freeStories, isFeaturedStoryLoading }}
+				extraData={{
+					isLoading,
+					refreshing,
+					status,
+					hasSubscription,
+					listItems,
+					freeStories,
+					isFeaturedStoryLoading,
+					categoryId,
+				}}
 				data={listData}
 				keyExtractor={(item) => item._id}
 				renderItem={({ item, index: idx }) => (

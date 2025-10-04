@@ -1,9 +1,9 @@
-import { Carrot } from "@/components/ui/icons/carrot-icon";
 import { Fullscreen } from "@/components/ui/icons/full-screen-icon";
 import { LockKeyholeOpen } from "@/components/ui/icons/lock-keyhole-open-icon";
 import { Pause } from "@/components/ui/icons/pause-icon";
 import { Play } from "@/components/ui/icons/play-icon";
 import { Share } from "@/components/ui/icons/share-icon";
+import { Sprout } from "@/components/ui/icons/sprout-icon";
 import { Stop } from "@/components/ui/icons/stop-icon";
 import { Separator } from "@/components/ui/separator";
 import { setAudioStoryData, setAudioUrl, useAudio, useAudioPlayState, useIsStoryActive } from "@/context/AudioContext";
@@ -26,11 +26,23 @@ import { State } from "react-native-track-player";
 
 const DescriptionRow = ({ description }: { description: string }) => {
 	return (
-		<View className="flex flex-row items-start gap-x-2 p-2">
-			<Carrot className="size-4 text-foreground mt-0.5" size={16} />
-			<View className="flex flex-col flex-1 gap-y-1">
-				<Text className="text-foreground text-sm font-medium">Story seed</Text>
-				<Text className="text-foreground/80 text-sm font-normal">{description}</Text>
+		<View className="flex flex-col gap-y-1 p-3 px-4 w-full">
+			<View className="flex flex-row gap-x-2 items-center">
+				<Sprout className="size-4 text-foreground" size={16} />
+				<Text
+					className="text-foreground font-medium"
+					style={{ fontSize: 14, lineHeight: 16 }}
+					maxFontSizeMultiplier={1.2}
+				>
+					Story seed
+				</Text>
+			</View>
+
+			<View className="flex-row flex gap-x-2 items-start">
+				<View className="w-4 h-4" style={{ minWidth: 16 }} />
+				<Text className="text-foreground/80 text-sm font-normal flex-1" maxFontSizeMultiplier={1.2}>
+					{description}
+				</Text>
 			</View>
 		</View>
 	);
@@ -44,7 +56,13 @@ const ShareButton = ({ storyId, storyTitle }: { storyId: Id<"stories">; storyTit
 	return (
 		<Pressable onPress={handleShare} className="p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-black/10">
 			<Share className="size-4 text-foreground" size={16} />
-			<Text className="text-foreground text-sm font-medium">Share this story</Text>
+			<Text
+				className="text-foreground font-medium"
+				style={{ fontSize: 14, lineHeight: 16 }}
+				maxFontSizeMultiplier={1.2}
+			>
+				Share this story
+			</Text>
 		</Pressable>
 	);
 };
@@ -75,7 +93,13 @@ const AddToFavoritesButton = ({ storyId }: { storyId: Id<"stories"> }) => {
 			className={cn("p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-black/10", isLoading && "opacity-50")}
 		>
 			<Star className={cn("size-4 text-foreground", fav && "fill-foreground")} size={16} />
-			<Text className="text-foreground text-sm font-medium">{text}</Text>
+			<Text
+				className="text-foreground font-medium"
+				style={{ fontSize: 14, lineHeight: 16 }}
+				maxFontSizeMultiplier={1.2}
+			>
+				{text}
+			</Text>
 		</Pressable>
 	);
 };
@@ -112,7 +136,13 @@ const FullscreenButton = ({
 			className="p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-black/10"
 		>
 			<Fullscreen className="size-4 text-foreground" size={16} />
-			<Text className="text-foreground text-sm font-medium">Play in fullscreen</Text>
+			<Text
+				className="text-foreground font-medium"
+				style={{ fontSize: 14, lineHeight: 16 }}
+				maxFontSizeMultiplier={1.2}
+			>
+				Play in fullscreen
+			</Text>
 		</Pressable>
 	);
 };
@@ -283,7 +313,11 @@ const AudioControlsRow = ({ story }: { story: StoryPreview }) => {
 				)}
 			>
 				{playOrPauseIcon}
-				<Text className={cn("text-foreground text-sm font-medium", loading && "text-foreground/80")}>
+				<Text
+					className={cn("text-foreground font-medium", loading && "text-foreground/80")}
+					style={{ fontSize: 14, lineHeight: 16 }}
+					maxFontSizeMultiplier={1.2}
+				>
 					{playOrPauseText}
 				</Text>
 			</Pressable>
@@ -295,7 +329,13 @@ const AudioControlsRow = ({ story }: { story: StoryPreview }) => {
 					className="p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-black/10 bg-background rounded-b-xl"
 				>
 					<Stop className="size-4 text-foreground fill-foreground" size={16} />
-					<Text className="text-foreground text-sm font-medium">Stop</Text>
+					<Text
+						className="text-foreground font-medium"
+						style={{ fontSize: 14, lineHeight: 16 }}
+						maxFontSizeMultiplier={1.2}
+					>
+						Stop
+					</Text>
 				</Pressable>
 			</Collapsible>
 		</>
@@ -326,7 +366,13 @@ const UnlockButton = ({
 	return (
 		<Pressable onPress={handleUnlock} className="p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-black/10">
 			<LockKeyholeOpen className="size-4 text-foreground" size={16} />
-			<Text className="text-foreground text-sm font-medium">Unlock this story</Text>
+			<Text
+				className="text-foreground font-medium"
+				style={{ fontSize: 14, lineHeight: 16 }}
+				maxFontSizeMultiplier={1.2}
+			>
+				Unlock this story
+			</Text>
 		</Pressable>
 	);
 };

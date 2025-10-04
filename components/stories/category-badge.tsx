@@ -15,7 +15,7 @@ export const CategoryBadge = memo(({ categoryName }: { categoryName: string }) =
 			style={{ backgroundColor: color.background, borderColor: color.foreground, borderWidth: 1 }}
 		>
 			<Icon color={color.foreground} size={16} />
-			<Text className="text-sm font-medium" style={{ color: color.foreground }}>
+			<Text className="text-sm font-medium" style={{ color: color.foreground }} allowFontScaling={false}>
 				{categoryName}
 			</Text>
 		</View>

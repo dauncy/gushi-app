@@ -27,6 +27,7 @@ import type * as stories_actions from "../stories/actions.js";
 import type * as stories_http from "../stories/http.js";
 import type * as stories_index from "../stories/index.js";
 import type * as stories_queries from "../stories/queries.js";
+import type * as stories_utils from "../stories/utils.js";
 import type * as subscriptions_actions from "../subscriptions/actions.js";
 import type * as subscriptions_http from "../subscriptions/http.js";
 import type * as subscriptions_index from "../subscriptions/index.js";
@@ -74,6 +75,7 @@ declare const fullApi: ApiFromModules<{
   "stories/http": typeof stories_http;
   "stories/index": typeof stories_index;
   "stories/queries": typeof stories_queries;
+  "stories/utils": typeof stories_utils;
   "subscriptions/actions": typeof subscriptions_actions;
   "subscriptions/http": typeof subscriptions_http;
   "subscriptions/index": typeof subscriptions_index;

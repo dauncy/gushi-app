@@ -10,7 +10,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { Circle } from "../ui/icons/circle-icon";
 import { Grid2X2Plus } from "../ui/icons/grid-2-plus-icon";
 import { Skeleton } from "../ui/skeleton";
-import { CategoryToIcon } from "./category-utils";
+import { CategoryToColor, CategoryToIcon } from "./category-utils";
 
 interface Category {
 	name: string;
@@ -96,6 +96,14 @@ const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
 		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
 	}, [categoryData.id, selected]);
 
+	const color = CategoryToColor[categoryData.name.toLowerCase() as keyof typeof CategoryToColor] ?? {
+		background: "#0395ff",
+		foreground: "#fffbf3",
+	};
+
+	const style = { ...(selected ? { backgroundColor: color.background, borderColor: color.foreground } : {}) };
+	const textStyle = { ...(selected ? { color: color.foreground } : {}) };
+	const iconcolor = selected ? color.foreground : "#0395ff";
 	return (
 		<TouchableOpacity
 			disabled={categoryData.soon}
@@ -104,13 +112,13 @@ const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
 				handleSelect();
 			}}
 			key={categoryData.id}
-			className={cn(
-				"flex flex-col gap-y-1 items-center p-2 px-3.5 rounded-3xl border-2 border-transparent",
-				selected && "bg-[#ceef32] border-[#0395ff] border-2",
-			)}
+			style={style}
+			className={cn("flex flex-col gap-y-1 items-center p-1 px-2.5 rounded-3xl border-2 border-transparent min-h-18")}
 		>
-			<categoryData.icon className={cn("text-[#0395ff]", categoryData.soon && "opacity-50")} size={28} />
+			<categoryData.icon className={cn("", categoryData.soon && "opacity-50")} size={28} color={iconcolor} />
 			<Text
+				allowFontScaling={false}
+				style={textStyle}
 				className={cn(
 					"text-[#0395ff] text-sm font-medium mt-auto capitalize",
 					selected && "font-semibold",
@@ -134,7 +142,9 @@ const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
 							shadowRadius: 8,
 						}}
 					>
-						<Text className="text-[#ff2d01] text-[8px] font-bold mt-auto">Launching soon</Text>
+						<Text className="text-[#ff2d01] text-[8px] font-bold mt-auto" allowFontScaling={false}>
+							Launching soon
+						</Text>
 					</View>
 				</>
 			)}
