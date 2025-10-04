@@ -2,7 +2,7 @@ import { internalQuery, query } from "@/convex/_generated/server";
 import { verifyAccess } from "@/convex/common/utils";
 import { StoryPreview } from "@/convex/stories";
 import { paginationOptsValidator, PaginationResult } from "convex/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { storyDocToStoryPreview } from "../stories/utils";
 
 export const getUserFavorites = query({
@@ -31,6 +31,13 @@ export const getUserFavorites = query({
 				page: stories.filter(Boolean) as StoryPreview[],
 			};
 		} catch (e) {
+			if (e instanceof ConvexError && e.data.toLowerCase().includes("unauthorized")) {
+				return {
+					page: [],
+					isDone: true,
+					continueCursor: "",
+				};
+			}
 			console.warn("[convex/favorites/queries.ts]: getUserFavorites() => error", e);
 			return {
 				page: [],
