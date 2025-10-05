@@ -39,9 +39,12 @@ export const StoryCardLoading = () => {
 						<Skeleton className="w-3/5 h-4 rounded-xl bg-black/20" />
 						<Skeleton className="w-1/3 h-4 rounded-xl bg-black/20" />
 					</View>
-					<View className="flex flex-row items-center gap-x-2">
-						<Skeleton className="size-4 rounded-full bg-black/20" />
-						<Skeleton className="w-1/3 h-4 rounded-xl bg-black/20" />
+					<View className="flex flex-row gap-x-2 items-center">
+						<View className="flex flex-row items-center gap-x-2 flex-1">
+							<Skeleton className="size-4 rounded-full bg-black/20" />
+							<Skeleton className="w-1/3 h-4 rounded-xl bg-black/20" />
+						</View>
+						<View className="flex size-[34px]"></View>
 					</View>
 				</View>
 			</View>

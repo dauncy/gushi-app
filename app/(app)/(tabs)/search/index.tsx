@@ -1,3 +1,4 @@
+import { AudioPreviewPlayer } from "@/components/audio/audio-preview";
 import { EnhancedStorySearchCard } from "@/components/stories/story-search-card";
 import { ScanSearch } from "@/components/ui/icons/scan-search";
 import { Search } from "@/components/ui/icons/search-icon";
@@ -14,7 +15,7 @@ import { eventRegister, EVENTS } from "@/lib/events";
 import { FlashList } from "@shopify/flash-list";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { debounce } from "lodash";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
 	ActivityIndicator,
 	KeyboardAvoidingView,
@@ -33,9 +34,13 @@ export default function SearchPge() {
 	const router = useRouter();
 	const [input, setInput] = useState("");
 
-	const debouncedSearch = debounce((search: string) => {
-		router.setParams({ search });
-	}, 300);
+	const debouncedSearch = useMemo(
+		() =>
+			debounce((search: string) => {
+				router.setParams({ search });
+			}, 350),
+		[router],
+	);
 
 	const handleInputChange = useCallback(
 		(text: string) => {
@@ -126,67 +131,74 @@ export default function SearchPge() {
 	);
 
 	return (
-		<View style={{ flex: 1 }} className="relative flex-col px-0 bg-background">
-			<View className="flex-1 bg-black/10">
-				<KeyboardAvoidingView behavior={"padding"} keyboardVerticalOffset={0} className="flex-1">
-					<View className="px-2 w-full bg-background py-4  border-b border-black/20">
-						<View className="relative flex flex-row items-center w-full">
-							<Search className="absolute left-2 text-black/30 size-5" color="red" />
-							<Input
-								ref={searchRef}
-								placeholder="Search stories"
-								className="px-10 w-full"
-								onChangeText={handleInputChange}
-								autoFocus={true}
-								autoCorrect={false}
-							/>
-							{input && input.trim() !== "" && (
-								<Pressable
-									style={{
-										shadowColor: "#000",
-										shadowOffset: { width: 0.75, height: 1.5 },
-										shadowOpacity: 0.4,
-										shadowRadius: 3.25,
-									}}
-									onPress={clearSearch}
-									className={"size-7 rounded-full bg-black/20 flex items-center justify-center absolute right-2 "}
-								>
-									<X className="text-background size-3" size={16} />
-								</Pressable>
-							)}
+		<>
+			<View style={{ flex: 1 }} className="relative flex-col px-0 bg-background">
+				<View className="flex-1 bg-black/10">
+					<KeyboardAvoidingView behavior={"padding"} keyboardVerticalOffset={0} className="flex-1">
+						<View className="px-2 w-full bg-background py-4  border-b border-black/20">
+							<View className="relative flex flex-row items-center w-full">
+								<Search className="absolute left-2 text-black/30 size-5" color="red" />
+								<Input
+									ref={searchRef}
+									placeholder="Search stories"
+									className="px-10 w-full"
+									onChangeText={handleInputChange}
+									autoFocus={true}
+									autoCorrect={false}
+								/>
+								{input && input.trim() !== "" && (
+									<Pressable
+										style={{
+											shadowColor: "#000",
+											shadowOffset: { width: 0.75, height: 1.5 },
+											shadowOpacity: 0.4,
+											shadowRadius: 3.25,
+										}}
+										onPress={clearSearch}
+										className={"size-7 rounded-full bg-black/20 flex items-center justify-center absolute right-2 "}
+									>
+										<X className="text-background size-3" size={16} />
+									</Pressable>
+								)}
+							</View>
 						</View>
-					</View>
-					<FlashList
-						refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor="#ff78e5" />}
-						extraData={{ isLoading, refreshing, search }}
-						data={results}
-						renderItem={({ item }) => <EnhancedStorySearchCard story={item} onCardPress={() => onCardPress(item)} />}
-						ListEmptyComponent={
-							<>
-								{(isLoading || refreshing) && search && search.trim() !== "" ? (
-									<SearchLoading />
-								) : search && search.trim() !== "" ? (
-									<SearchEmpty query={search} />
-								) : null}
-							</>
-						}
-						ListFooterComponent={
-							<>
-								{status === "LoadingMore" ? (
-									<View className="flex flex-row items-center justify-center px-4 py-1.5">
-										<ActivityIndicator size={16} color="#ff78e5" />
-									</View>
-								) : null}
-							</>
-						}
-						onEndReached={onEndReached}
-						keyboardShouldPersistTaps={"handled"}
-						onScroll={handleScroll}
-						scrollEventThrottle={250}
-					/>
-				</KeyboardAvoidingView>
+						<FlashList
+							refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor="#ff78e5" />}
+							extraData={{ isLoading, refreshing, search }}
+							data={results}
+							renderItem={({ item }) => <EnhancedStorySearchCard story={item} onCardPress={() => onCardPress(item)} />}
+							ListEmptyComponent={
+								<>
+									{(isLoading || refreshing) && search && search.trim() !== "" ? (
+										<SearchLoading />
+									) : search && search.trim() !== "" ? (
+										<SearchEmpty query={search} />
+									) : null}
+								</>
+							}
+							ListFooterComponent={
+								<>
+									{status === "LoadingMore" ? (
+										<View className="flex flex-row items-center justify-center px-4 py-1.5">
+											<ActivityIndicator size={16} color="#ff78e5" />
+										</View>
+									) : null}
+								</>
+							}
+							onEndReached={onEndReached}
+							keyboardShouldPersistTaps={"handled"}
+							onScroll={handleScroll}
+							scrollEventThrottle={250}
+						/>
+					</KeyboardAvoidingView>
+				</View>
 			</View>
-		</View>
+			<AudioPreviewPlayer
+				onCardPress={(id) => {
+					router.push(`/stories/${id}`);
+				}}
+			/>
+		</>
 	);
 }
 
