@@ -106,7 +106,7 @@ export default function FeedbackPage() {
 					<View className="w-full flex flex-col items-center">
 						<View className="w-full flex flex-col gap-y-2 p-4 pt-8 items-center">
 							<Text className="text-foreground text-xl font-medium">
-								{type === "feature" ? "Request a Feature" : "Report a Bug"}
+								{type === "feature" ? "Provide Feedback" : "Report an Issue"}
 							</Text>
 							<Text className="text-foreground/80 text-base w-2/3 text-center">
 								Help us improve the app! We want to hear from you.
@@ -197,7 +197,9 @@ export default function FeedbackPage() {
 								{pending ? (
 									<ActivityIndicator size="small" color={"#0395ff"} />
 								) : (
-									<Text className="text-border text-base font-bold">{"Submit"}</Text>
+									<Text className="text-border text-base font-bold" maxFontSizeMultiplier={1.2}>
+										{"Submit"}
+									</Text>
 								)}
 							</TouchableOpacity>
 						</View>
