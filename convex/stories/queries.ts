@@ -180,6 +180,9 @@ export const getFeaturedStory = query({
 			}
 			return await storyDocToStoryPreview(ctx, story);
 		} catch (error) {
+			if (error instanceof ConvexError && error.data.toLowerCase().includes("unauthorized")) {
+				return null;
+			}
 			console.warn("[convex/stories/queries.ts]: getFeaturedStory() => --- ERROR --- ", error);
 			return null;
 		}

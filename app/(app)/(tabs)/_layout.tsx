@@ -3,19 +3,20 @@ import { Home } from "@/components/ui/icons/home-icon";
 import { Search } from "@/components/ui/icons/search-icon";
 import { Settings } from "@/components/ui/icons/settings-icon";
 import { Star } from "@/components/ui/icons/star-icon";
+import { eventRegister, EVENTS } from "@/lib/events";
 import { updateCategoryId, useSelectedCategory } from "@/stores/category-store";
 import { Tabs } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { RefObject } from "react";
 import { Pressable, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TabsLayout() {
 	const currentCategory = useSelectedCategory();
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: "#fffbf3", padding: 0 }} edges={["top", "bottom"]}>
-			<StatusBar style={"dark"} />
+		<>
+			<StatusBar style={"dark"} backgroundColor="#fffbf3" />
 			<Tabs
+				backBehavior="history"
 				screenOptions={() => ({
 					header: () => <Header />,
 					tabBarShowLabel: true,
@@ -88,11 +89,25 @@ export default function TabsLayout() {
 						tabBarIcon: ({ color, size, focused }) => (
 							<Search size={size} className={focused ? "text-[#0395ff]" : "text-black/30"} />
 						),
+						tabBarButton: ({ children, onPress, ...props }) => (
+							<Pressable
+								//@ts-ignore
+								ref={props.ref ? (props.ref as RefObject<View>) : null}
+								{...props}
+								onPress={(e) => {
+									eventRegister.emit(EVENTS.SEARCH_TAB_PRESS);
+									onPress?.(e);
+								}}
+							>
+								{children}
+							</Pressable>
+						),
 					}}
 				/>
 				<Tabs.Screen
 					name="settings"
 					options={{
+						headerShown: false,
 						title: "Settings",
 						tabBarAccessibilityLabel: "Settings",
 						tabBarIcon: ({ color, size, focused }) => (
@@ -101,6 +116,6 @@ export default function TabsLayout() {
 					}}
 				/>
 			</Tabs>
-		</SafeAreaView>
+		</>
 	);
 }

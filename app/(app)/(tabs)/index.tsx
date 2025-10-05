@@ -183,7 +183,7 @@ const HomePage = () => {
 	const router = useRouter();
 	return (
 		<View style={{ flex: 1 }} className="relative bg-[#fffbf3] flex flex-col">
-			<View className="w-full px-2" style={{ marginTop: 46, paddingTop: 12, paddingBottom: 12 }}>
+			<View className="w-full px-2" style={{ paddingTop: 12, paddingBottom: 12 }}>
 				<CategoriesSelector />
 			</View>
 			<StoryList

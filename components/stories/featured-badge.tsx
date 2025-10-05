@@ -17,7 +17,7 @@ export const FeaturedBadge = memo(({ className = "" }: { className?: string }) =
 			}}
 		>
 			<Text className="text-[#ff2d01] text-center text-xs font-bold" allowFontScaling={false}>
-				FEATURED
+				NEW DROP
 			</Text>
 		</View>
 	);

@@ -21,6 +21,8 @@ interface Category {
 
 export const CategoriesSelector = memo(() => {
 	const { data: categories, isLoading } = useConvexQuery(api.stories.queries.getFeaturedCategories, {});
+
+	// const isLoading = true
 	const sanitizedCatgeories = useMemo(() => {
 		if (!categories || categories.length === 0) {
 			return [];
@@ -57,7 +59,7 @@ export const CategoriesSelector = memo(() => {
 			{isLoading ? (
 				<>
 					{Array.from({ length: 4 }).map((_, index) => (
-						<LoadingCategory key={index} />
+						<LoadingCategory key={index} last={index === 3} />
 					))}
 				</>
 			) : (
@@ -73,11 +75,11 @@ export const CategoriesSelector = memo(() => {
 
 CategoriesSelector.displayName = "CategoriesSelector";
 
-const LoadingCategory = () => {
+const LoadingCategory = ({ last }: { last: boolean }) => {
 	return (
-		<View className="flex flex-col p-2 px-3.5 items-center gap-y-1">
-			<Skeleton className="w-10 h-10 rounded-full bg-black/30" />
-			<Skeleton className="w-16 h-4 rounded-md bg-black/30" />
+		<View className="flex flex-col p-1 px-3.5 rounded-3xl items-center gap-y-2.5">
+			<Skeleton className=" rounded-full bg-black/20 w-[28px] h-[28px]" />
+			<Skeleton className={cn("w-[50px] h-3 rounded-md bg-black/20", last && "w-[88px]")} />
 		</View>
 	);
 };
@@ -96,14 +98,15 @@ const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
 		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
 	}, [categoryData.id, selected]);
 
-	const color = CategoryToColor[categoryData.name.toLowerCase() as keyof typeof CategoryToColor] ?? {
+	const colors = CategoryToColor[categoryData.name.toLowerCase() as keyof typeof CategoryToColor] ?? {
 		background: "#0395ff",
 		foreground: "#fffbf3",
 	};
 
-	const style = { ...(selected ? { backgroundColor: color.background, borderColor: color.foreground } : {}) };
-	const textStyle = { ...(selected ? { color: color.foreground } : {}) };
-	const iconcolor = selected ? color.foreground : "#0395ff";
+	const color = colors.background;
+
+	const textStyle = { ...(selected ? { color, borderColor: colors.foreground } : {}) };
+	const iconcolor = selected ? colors.background : "#00000030";
 	return (
 		<TouchableOpacity
 			disabled={categoryData.soon}
@@ -112,15 +115,19 @@ const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
 				handleSelect();
 			}}
 			key={categoryData.id}
-			style={style}
-			className={cn("flex flex-col gap-y-1 items-center p-1 px-2.5 rounded-3xl border-2 border-transparent min-h-18")}
+			className={cn("flex flex-col gap-y-1 items-center p-1 px-3.5")}
 		>
-			<categoryData.icon className={cn("", categoryData.soon && "opacity-50")} size={28} color={iconcolor} />
+			<categoryData.icon
+				className={cn("", categoryData.soon && "opacity-50")}
+				size={28}
+				color={iconcolor}
+				fill={selected ? colors.foreground : "none"}
+			/>
 			<Text
 				allowFontScaling={false}
 				style={textStyle}
 				className={cn(
-					"text-[#0395ff] text-sm font-medium mt-auto capitalize",
+					"text-black/30 text-sm font-medium mt-auto capitalize",
 					selected && "font-semibold",
 					categoryData.soon && "opacity-50",
 				)}

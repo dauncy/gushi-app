@@ -1,6 +1,7 @@
 import { EnhancedStorySearchCard } from "@/components/stories/story-search-card";
 import { ScanSearch } from "@/components/ui/icons/scan-search";
 import { Search } from "@/components/ui/icons/search-icon";
+import { X } from "@/components/ui/icons/x-icon";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSubscription } from "@/context/SubscriptionContext";
@@ -9,19 +10,40 @@ import { StoryPreview } from "@/convex/stories/schema";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { usePlayInFullscreen } from "@/hooks/use-play-in-fullscreen";
 import { usePresentPaywall } from "@/hooks/use-present-paywall";
+import { eventRegister, EVENTS } from "@/lib/events";
 import { FlashList } from "@shopify/flash-list";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { debounce } from "lodash";
-import { useCallback } from "react";
-import { ActivityIndicator, KeyboardAvoidingView, RefreshControl, Text, View } from "react-native";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+	ActivityIndicator,
+	KeyboardAvoidingView,
+	NativeScrollEvent,
+	NativeSyntheticEvent,
+	Pressable,
+	RefreshControl,
+	Text,
+	TextInput,
+	View,
+} from "react-native";
 
 export default function SearchPge() {
+	const searchRef = useRef<TextInput>(null);
 	const params = useLocalSearchParams();
 	const router = useRouter();
+	const [input, setInput] = useState("");
 
 	const debouncedSearch = debounce((search: string) => {
 		router.setParams({ search });
-	}, 250);
+	}, 300);
+
+	const handleInputChange = useCallback(
+		(text: string) => {
+			setInput(text);
+			debouncedSearch(text);
+		},
+		[debouncedSearch, setInput],
+	);
 
 	const search = params.search as string;
 
@@ -70,29 +92,72 @@ export default function SearchPge() {
 		[presentPaywall, playInFullscreen, unlocked],
 	);
 
+	const clearSearch = useCallback(() => {
+		setInput("");
+		searchRef.current?.clear();
+		router.setParams({ search: undefined });
+	}, [router]);
+
+	const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+		searchRef.current?.blur();
+	}, []);
+
+	useEffect(() => {
+		const handleSearchTabPress = () => {
+			if (!searchRef.current?.isFocused()) {
+				searchRef.current?.focus();
+			}
+		};
+		eventRegister.on(EVENTS.SEARCH_TAB_PRESS, handleSearchTabPress);
+		return () => {
+			eventRegister.off(EVENTS.SEARCH_TAB_PRESS, handleSearchTabPress);
+		};
+	}, []);
+
+	useFocusEffect(
+		useCallback(() => {
+			// Small delay to ensure the screen transition is complete
+			const timeoutId = setTimeout(() => {
+				searchRef.current?.focus();
+			}, 100);
+
+			return () => clearTimeout(timeoutId);
+		}, []),
+	);
+
 	return (
 		<View style={{ flex: 1 }} className="relative flex-col px-0 bg-background">
-			<View className="flex-1 bg-black/10" style={{ marginTop: 46 }}>
+			<View className="flex-1 bg-black/10">
 				<KeyboardAvoidingView behavior={"padding"} keyboardVerticalOffset={0} className="flex-1">
-					<View className="px-2 w-full bg-background py-4 pt-8 border-b border-black/20">
+					<View className="px-2 w-full bg-background py-4  border-b border-black/20">
 						<View className="relative flex flex-row items-center w-full">
 							<Search className="absolute left-2 text-black/30 size-5" color="red" />
 							<Input
+								ref={searchRef}
 								placeholder="Search stories"
-								className="pl-10 w-full"
-								onChangeText={debouncedSearch}
+								className="px-10 w-full"
+								onChangeText={handleInputChange}
 								autoFocus={true}
+								autoCorrect={false}
 							/>
+							{input && input.trim() !== "" && (
+								<Pressable
+									style={{
+										shadowColor: "#000",
+										shadowOffset: { width: 0.75, height: 1.5 },
+										shadowOpacity: 0.4,
+										shadowRadius: 3.25,
+									}}
+									onPress={clearSearch}
+									className={"size-7 rounded-full bg-black/20 flex items-center justify-center absolute right-2 "}
+								>
+									<X className="text-background size-3" size={16} />
+								</Pressable>
+							)}
 						</View>
 					</View>
 					<FlashList
 						refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor="#ff78e5" />}
-						contentContainerStyle={{
-							display: results.length === 0 && search && search.trim() !== "" && !refreshing ? "flex" : undefined,
-							flex: results.length === 0 && search && search.trim() !== "" && !refreshing ? 1 : undefined,
-							justifyContent:
-								results.length === 0 && search && search.trim() !== "" && !refreshing ? "center" : undefined,
-						}}
 						extraData={{ isLoading, refreshing, search }}
 						data={results}
 						renderItem={({ item }) => <EnhancedStorySearchCard story={item} onCardPress={() => onCardPress(item)} />}
@@ -115,7 +180,9 @@ export default function SearchPge() {
 							</>
 						}
 						onEndReached={onEndReached}
-						keyboardShouldPersistTaps="handled"
+						keyboardShouldPersistTaps={"handled"}
+						onScroll={handleScroll}
+						scrollEventThrottle={250}
 					/>
 				</KeyboardAvoidingView>
 			</View>

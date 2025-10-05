@@ -46,7 +46,7 @@ const FavoritesList = () => {
 
 	return (
 		<View style={{ flex: 1 }} className="relative bg-[#fffbf3] flex flex-col px-0 pt-4">
-			<View className="flex-1 bg-black/10 px-2" style={{ marginTop: 46, paddingTop: 12, paddingBottom: 12 }}>
+			<View className="flex-1 bg-black/10 px-2" style={{ paddingTop: 12, paddingBottom: 12 }}>
 				<FlashList
 					showsVerticalScrollIndicator={false}
 					numColumns={2}

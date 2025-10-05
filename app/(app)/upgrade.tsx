@@ -84,17 +84,19 @@ export default function UpgradePage() {
 		}
 		return (
 			<View className="flex-1 items-center flex-col justify-center">
-				<Text className="text-2xl font-bold text-slate-200">Welcome to Gushi Pro 🌙</Text>
-				<Text className="text-lg text-slate-400 mt-3">{"Enjoy access to every story."}</Text>
+				<Text className="text-2xl font-bold text-foreground">Welcome to Gushi Premium</Text>
+				<Text className="text-lg text-foreground/80 mt-1 text-center w-3/4">
+					{"Enjoy access to our entire library of stories and premium features."}
+				</Text>
 				<Pressable
 					disabled={revalidating}
-					className="bg-slate-800 rounded-xl py-2 px-4 mt-4 border border-slate-700 disabled:opacity-50"
+					className="bg-secondary rounded-xl py-2 px-4 mt-4 border-2 border-border disabled:opacity-50"
 					onPress={handleComplete}
 				>
 					{revalidating ? (
-						<ActivityIndicator size="small" color="#8b5cf6" />
+						<ActivityIndicator size="small" color="#0395ff" />
 					) : (
-						<Text className="text-lg text-slate-400 font-bold">{"Continue"}</Text>
+						<Text className="text-lg text-border font-bold">{"Continue"}</Text>
 					)}
 				</Pressable>
 			</View>

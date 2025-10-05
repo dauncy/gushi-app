@@ -74,7 +74,7 @@ export const LockedStoryCard = ({
 					<CategoryBadge key={c._id} categoryName={c.name} />
 				))}
 			</View>
-			<View className="w-full flex flex-row gap-x-2 p-2 pb-4 items-stretch grow stretch">
+			<View className="w-full flex flex-row gap-x-2 p-2 pb-4 items-stretch grow">
 				<StoryCardHeader story={story} hasPlayButton={false} />
 			</View>
 
