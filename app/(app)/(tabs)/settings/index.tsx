@@ -13,6 +13,9 @@ import Purchases, { PurchasesPackage } from "react-native-purchases";
 
 import GushiThumbnail from "@/assets/images/thumbnail.png";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AUTOPLAY_KEY } from "@/lib/constants";
+import { getData, storeData } from "@/lib/storage";
+import { debounce } from "lodash";
 
 export default function SettingsListPage() {
 	const clickRef = useRef(false);
@@ -79,6 +82,26 @@ export default function SettingsListPage() {
 
 const AutoPlaySection = () => {
 	const [autoPlay, setAutoPlay] = useState(false);
+	useEffect(() => {
+		const init = async () => {
+			const value = await getData({ key: AUTOPLAY_KEY });
+			setAutoPlay(value ?? false);
+		};
+		init();
+	}, []);
+
+	const debounceAutoplay = debounce(async (value: boolean) => {
+		await storeData({ key: AUTOPLAY_KEY, value });
+	}, 300);
+
+	const toggleAutoPlay = useCallback(
+		(value: boolean) => {
+			setAutoPlay(value);
+			debounceAutoplay(value);
+		},
+		[debounceAutoplay],
+	);
+
 	return (
 		<Pressable className="w-full py-4 px-4 flex flex-row gap-x-4 items-center border-b border-black/20 bg-background/60">
 			<View className="flex-1 flex flex-col gap-y-0">
@@ -89,7 +112,7 @@ const AutoPlaySection = () => {
 					Automatically play the next story when the current one ends
 				</Text>
 			</View>
-			<Switch value={autoPlay} onValueChange={setAutoPlay} trackColor={{ true: "#0395ff" }} />
+			<Switch value={autoPlay} onValueChange={toggleAutoPlay} trackColor={{ true: "#0395ff" }} />
 		</Pressable>
 	);
 };
@@ -328,7 +351,7 @@ const MonthlyUserSubscriptionRow = ({ clickRef }: { clickRef: RefObject<boolean>
 					{offering.product.title}
 				</Text>
 				<Text className="text-foreground/80 text-sm" maxFontSizeMultiplier={1.2}>
-					{offering.product.pricePerMonthString}
+					{offering.product.pricePerMonthString}/month
 				</Text>
 			</View>
 		);
