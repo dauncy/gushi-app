@@ -11,7 +11,7 @@ import { usePlayInFullscreen } from "@/hooks/use-play-in-fullscreen";
 import { usePresentPaywall } from "@/hooks/use-present-paywall";
 import { useSelectedCategory } from "@/stores/category-store";
 import { FlashList, type FlashListRef } from "@shopify/flash-list";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { ActivityIndicator, RefreshControl, Text, View } from "react-native";
 
@@ -99,6 +99,12 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 		if (isLoading || refreshing) return;
 		storyListRef.current?.scrollToIndex({ index: 0, animated: false, viewOffset: -8 });
 	}, [categoryId, isLoading, refreshing]);
+
+	useFocusEffect(
+		useCallback(() => {
+			storyListRef.current?.scrollToIndex({ index: 0, animated: false, viewOffset: -8 });
+		}, []),
+	);
 
 	return (
 		<View className="flex-1 bg-black/10 px-2">

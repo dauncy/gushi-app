@@ -82,15 +82,19 @@ const FavoritesList = () => {
 								<View className="flex flex-col flex-1 items-center justify-center px-4 mt-60">
 									<View className="flex w-full border-2 border-[#ff2d01] bg-background rounded-xl p-4 flex flex-col gap-y-2">
 										<View className="flex w-full flex flex-row items-center gap-x-2">
-											<Sparkles size={20} className="text-[#ff2d01]" />
-											<Text className="text-[#ff2d01] font-semibold text-center">No favs found</Text>
+											<Sparkles size={20} className="text-[#ff2d01]" />`
+											<Text className="text-[#ff2d01] font-semibold text-center" maxFontSizeMultiplier={1.2}>
+												No favs found
+											</Text>
 										</View>
-										<Text className="text-foreground">
+										<Text className="text-foreground" maxFontSizeMultiplier={1.2}>
 											{"You can add favorites anytime by tapping the star icon on each story."}
 										</Text>
 
 										<Link href={"/"} className="mt-5 bg-[#ceef32] border-[#0395ff] border-2 rounded-xl p-3 ">
-											<Text className="text-[#0395ff] font-semibold text-center">{"Explore stories"}</Text>
+											<Text className="text-[#0395ff] font-semibold text-center" allowFontScaling={false}>
+												{"Explore stories"}
+											</Text>
 										</Link>
 									</View>
 								</View>

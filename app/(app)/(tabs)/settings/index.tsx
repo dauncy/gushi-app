@@ -13,7 +13,7 @@ import Purchases, { PurchasesPackage } from "react-native-purchases";
 
 import GushiThumbnail from "@/assets/images/thumbnail.png";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AUTOPLAY_KEY } from "@/lib/constants";
+import { AUTOPLAY_KEY, BLUR_HASH } from "@/lib/constants";
 import { getData, storeData } from "@/lib/storage";
 import { debounce } from "lodash";
 
@@ -47,7 +47,15 @@ export default function SettingsListPage() {
 					{"Settings"}
 				</Text>
 			</View>
-			<ScrollView className="bg-black/10 gap-y-8" showsVerticalScrollIndicator={false} alwaysBounceVertical={false}>
+			<ScrollView
+				contentContainerStyle={{
+					alignItems: "stretch",
+					flexGrow: 1,
+				}}
+				className="bg-black/10 gap-y-8 flex-1"
+				showsVerticalScrollIndicator={false}
+				alwaysBounceVertical={false}
+			>
 				<AutoPlaySection />
 				<FeedbackRow
 					title="Report an issue"
@@ -230,7 +238,7 @@ const ResetAppDataRow = ({ clickRef }: { clickRef: RefObject<boolean> }) => {
 			className="w-full py-4 px-4 flex flex-row gap-x-4 items-center border-b border-black/20 bg-background/60"
 		>
 			<View className="flex-1 flex flex-col gap-y-0">
-				<Text className="text-destructive font-medium text-xl" maxFontSizeMultiplier={1.2}>
+				<Text className="text-foreground font-medium text-xl" maxFontSizeMultiplier={1.2}>
 					Reset account
 				</Text>
 				<Text className="text-foreground/80 w-3/4 text-sm" maxFontSizeMultiplier={1.2}>
@@ -255,10 +263,10 @@ const SubscriptionRow = ({ clickRef }: { clickRef: RefObject<boolean> }) => {
 const FreeUserSubscriptionRow = () => {
 	const { presentPaywall } = usePresentPaywall();
 	return (
-		<View className="w-full py-4 px-4 flex flex-row gap-x-4 items-center border-b border-black/20 bg-background/60">
+		<View className="w-full py-4 px-4 flex-1 self-stretch grow flex flex-row gap-x-4 items-center border-b border-black/20 bg-background/60">
 			<View className="flex-1 flex flex-col gap-y-0">
 				<Text className="text-foreground font-medium text-xl" maxFontSizeMultiplier={1.2}>
-					Subscription
+					My Subscription
 				</Text>
 				<Text className="text-foreground/80 text-sm w-3/4" maxFontSizeMultiplier={1.2}>
 					{"Upgrade to Gushi Premium to get access to our entire library of stories."}
@@ -358,17 +366,21 @@ const MonthlyUserSubscriptionRow = ({ clickRef }: { clickRef: RefObject<boolean>
 	}, [loading, offering]);
 
 	return (
-		<View className="w-full py-4 px-4 flex flex-col gap-y-4  border-b border-black/20 bg-background/60">
+		<View className="w-full py-4 px-4 flex flex-1 self-stretch grow flex-col gap-y-4  border-b border-black/20 bg-background/60">
 			<Text className="text-foreground font-medium text-xl" maxFontSizeMultiplier={1.2}>
-				Subscription
+				My Subscription
 			</Text>
 			<View className="flex flex-row gap-x-4 w-full items-start">
-				<Image
-					source={GushiThumbnail}
-					className="size-[56px] rounded-lg"
-					contentFit="contain"
-					cachePolicy={"memory-disk"}
-				/>
+				<View className="size-[56px] rounded-lg bg-black/10">
+					<Image
+						placeholder={{ blurhash: BLUR_HASH }}
+						transition={100}
+						source={GushiThumbnail}
+						className="size-[56px] rounded-lg"
+						contentFit="contain"
+						cachePolicy={"memory-disk"}
+					/>
+				</View>
 				{content}
 
 				{!loading && (
@@ -388,17 +400,21 @@ const MonthlyUserSubscriptionRow = ({ clickRef }: { clickRef: RefObject<boolean>
 
 const LifetimeUserSubscriptionRow = () => {
 	return (
-		<View className="w-full py-4 px-4 flex flex-col gap-y-4  border-b border-black/20 bg-background/60">
+		<View className="w-full py-4 px-4 flex flex-1 self-stretch grow flex-col gap-y-4  border-b border-black/20 bg-background/60">
 			<Text className="text-foreground font-medium text-xl" maxFontSizeMultiplier={1.2}>
-				Subscription
+				My Subscription
 			</Text>
 			<View className="flex flex-row gap-x-4 w-full items-start">
-				<Image
-					source={GushiThumbnail}
-					className="size-[56px] rounded-lg"
-					contentFit="contain"
-					cachePolicy={"memory-disk"}
-				/>
+				<View className="size-[56px] rounded-lg bg-black/10">
+					<Image
+						placeholder={{ blurhash: BLUR_HASH }}
+						transition={100}
+						source={GushiThumbnail}
+						className="size-[56px] rounded-lg"
+						contentFit="contain"
+						cachePolicy={"memory-disk"}
+					/>
+				</View>
 				<View className="flex flex-col gap-y-1.5 flex-1">
 					<Text className="text-border font-semibold text-lg" maxFontSizeMultiplier={1.2}>
 						{"Gushi Premium"}

@@ -121,7 +121,7 @@ const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
 				className={cn("", categoryData.soon && "opacity-50")}
 				size={28}
 				color={iconcolor}
-				fill={selected ? colors.foreground : "none"}
+				fill={selected ? "#fffbf3" : "none"}
 			/>
 			<Text
 				allowFontScaling={false}
