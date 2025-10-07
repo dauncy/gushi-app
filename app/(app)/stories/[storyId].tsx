@@ -273,7 +273,7 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 					<View className="flex w-full flex-col items-center py-4">
 						<Pressable
 							onPress={togglePlay}
-							className="size-20 active:bg-foreground/10 rounded-full flex items-center justify-center"
+							className="size-20 active:bg-black/10 rounded-full flex items-center justify-center"
 						>
 							{isPlaying ? (
 								<Pause className="text-foreground/80 fill-foreground/80" size={36} />
@@ -725,7 +725,7 @@ const StoryContentTablet = ({ story }: { story: StoryExtended }) => {
 				<View className="flex w-full flex-col items-center py-4">
 					<Pressable
 						onPress={togglePlay}
-						className="size-20 active:bg-foreground/10 rounded-full flex items-center justify-center"
+						className="size-20 active:bg-black/10 rounded-full flex items-center justify-center"
 					>
 						{isPlaying ? (
 							<Pause className="text-foreground/80 fill-foreground/80" size={36} />

@@ -54,7 +54,7 @@ export const CategoriesSelector = memo(() => {
 				justifyContent: "space-between",
 				display: "flex",
 			}}
-			className="w-full p-1 bg-black/20 rounded-3xl overflow-hidden"
+			className="w-full p-1 bg-black/20 rounded-3xl overflow-hidden max-w-[468px]"
 		>
 			{isLoading ? (
 				<>

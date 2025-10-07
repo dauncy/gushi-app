@@ -22,7 +22,7 @@ import { StoryModal } from "./story-modal";
 
 const LockedStorySearchCard = ({ story }: { story: StoryPreview }) => {
 	return (
-		<View className="w-full border-b border-border p-2 py-4 pb-6  flex-row gap-x-4 bg-background/60 relative">
+		<View className="w-full border-b border-border p-2 py-4 pb-6 flex-row gap-x-4 bg-background/60 relative">
 			<StoryImagePreview size={"md"} imageUrl={story.imageUrl} blurHash={story.blurHash ?? undefined} />
 			<View className="flex flex-col gap-y-2 flex-1 mt-1">
 				<View className="flex-row flex flex-1 gap-x-4 items-center">
@@ -44,7 +44,12 @@ const LockedStorySearchCard = ({ story }: { story: StoryPreview }) => {
 					</View>
 					<View className="flex items-center justify-center size-10"></View>
 				</View>
-				<Text className="text-foreground/80 text-sm" numberOfLines={2} ellipsizeMode="tail" maxFontSizeMultiplier={1.2}>
+				<Text
+					className="text-foreground/80 text-sm max-w-[424px]"
+					numberOfLines={2}
+					ellipsizeMode="tail"
+					maxFontSizeMultiplier={1.2}
+				>
 					{story.description}
 				</Text>
 			</View>
@@ -101,7 +106,12 @@ const UnlockedStorySearchCard = ({ story }: { story: StoryPreview }) => {
 						<StoryCardPlayButton story={story} />
 					</View>
 				</View>
-				<Text className="text-foreground/80 text-sm" numberOfLines={2} ellipsizeMode="tail" maxFontSizeMultiplier={1.2}>
+				<Text
+					className="text-foreground/80 text-sm max-w-[424px]"
+					numberOfLines={2}
+					ellipsizeMode="tail"
+					maxFontSizeMultiplier={1.2}
+				>
 					{story.description}
 				</Text>
 			</View>

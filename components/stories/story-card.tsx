@@ -3,6 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useIsStoryActive } from "@/context/AudioContext";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { StoryPreview } from "@/convex/stories/schema";
+import { useIsIpad } from "@/hooks/use-is-ipad";
 import { BlurView } from "expo-blur";
 import { useMemo, useState } from "react";
 import { View } from "react-native";
@@ -12,13 +13,14 @@ import { StoryCardHeader } from "./story-card-header";
 import { StoryImagePreview } from "./story-image";
 
 export const StoryCardLoading = () => {
+	const isIpad = useIsIpad();
 	const [cardDimensions, setCardDimensions] = useState<{ width: number; height: number }>({ width: 168, height: 140 });
 	return (
 		<View
 			style={{
-				width: "50%", // Takes exactly half the container
-				paddingHorizontal: 4, // Padding instead of margin for consistent spacing
-				paddingBottom: 8,
+				width: isIpad ? "25%" : "50%", // Takes exactly half the container
+				paddingHorizontal: isIpad ? 8 : 4, // Padding instead of margin for consistent spacing
+				paddingBottom: isIpad ? 12 : 8,
 			}}
 		>
 			<View

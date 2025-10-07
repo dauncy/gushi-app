@@ -13,8 +13,10 @@ import Purchases, { PurchasesPackage } from "react-native-purchases";
 
 import GushiThumbnail from "@/assets/images/thumbnail.png";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useIsIpad } from "@/hooks/use-is-ipad";
 import { AUTOPLAY_KEY, BLUR_HASH } from "@/lib/constants";
 import { getData, storeData } from "@/lib/storage";
+import { cn } from "@/lib/utils";
 import { debounce } from "lodash";
 
 export default function SettingsListPage() {
@@ -261,9 +263,15 @@ const SubscriptionRow = ({ clickRef }: { clickRef: RefObject<boolean> }) => {
 };
 
 const FreeUserSubscriptionRow = () => {
+	const isIpad = useIsIpad();
 	const { presentPaywall } = usePresentPaywall();
 	return (
-		<View className="w-full py-4 px-4 flex-1 self-stretch grow flex flex-row gap-x-4 items-center border-b border-black/20 bg-background/60">
+		<View
+			className={cn(
+				"w-full py-4 px-4 flex flex-row gap-x-4 items-center border-b border-black/20 bg-background/60",
+				!isIpad && "flex-1 self-stretch grow ",
+			)}
+		>
 			<View className="flex-1 flex flex-col gap-y-0">
 				<Text className="text-foreground font-medium text-xl" maxFontSizeMultiplier={1.2}>
 					My Subscription
@@ -283,6 +291,7 @@ const FreeUserSubscriptionRow = () => {
 };
 
 const MonthlyUserSubscriptionRow = ({ clickRef }: { clickRef: RefObject<boolean> }) => {
+	const isIpad = useIsIpad();
 	const initRef = useRef(false);
 	const [loading, setLoading] = useState(false);
 	const [offering, setOffering] = useState<PurchasesPackage | null>(null);
@@ -366,7 +375,12 @@ const MonthlyUserSubscriptionRow = ({ clickRef }: { clickRef: RefObject<boolean>
 	}, [loading, offering]);
 
 	return (
-		<View className="w-full py-4 px-4 flex flex-1 self-stretch grow flex-col gap-y-4  border-b border-black/20 bg-background/60">
+		<View
+			className={cn(
+				"w-full py-4 px-4 flex flex-col gap-y-4  border-b border-black/20 bg-background/60",
+				!isIpad && "flex-1 self-stretch grow ",
+			)}
+		>
 			<Text className="text-foreground font-medium text-xl" maxFontSizeMultiplier={1.2}>
 				My Subscription
 			</Text>
@@ -399,8 +413,14 @@ const MonthlyUserSubscriptionRow = ({ clickRef }: { clickRef: RefObject<boolean>
 };
 
 const LifetimeUserSubscriptionRow = () => {
+	const isIpad = useIsIpad();
 	return (
-		<View className="w-full py-4 px-4 flex flex-1 self-stretch grow flex-col gap-y-4  border-b border-black/20 bg-background/60">
+		<View
+			className={cn(
+				"w-full py-4 px-4 flex flex-col gap-y-4  border-b border-black/20 bg-background/60",
+				!isIpad && "flex-1 self-stretch grow ",
+			)}
+		>
 			<Text className="text-foreground font-medium text-xl" maxFontSizeMultiplier={1.2}>
 				My Subscription
 			</Text>

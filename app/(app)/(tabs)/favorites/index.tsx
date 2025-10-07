@@ -69,6 +69,10 @@ const FavoritesList = () => {
 					contentContainerStyle={{
 						paddingBottom: results.length === 0 ? 8 : 80,
 						paddingTop: 8,
+						display: !isLoading && !refreshing && results.length === 0 ? "flex" : undefined,
+						flex: !isLoading && !refreshing && results.length === 0 ? 1 : undefined,
+						alignItems: !isLoading && !refreshing && results.length === 0 ? "center" : undefined,
+						justifyContent: !isLoading && !refreshing && results.length === 0 ? "center" : undefined,
 					}}
 					ListEmptyComponent={
 						<>
@@ -79,10 +83,10 @@ const FavoritesList = () => {
 									))}
 								</View>
 							) : (
-								<View className="flex flex-col flex-1 items-center justify-center px-4 mt-60">
+								<View className="flex flex-col flex-1 items-center justify-center px-4">
 									<View className="flex w-full border-2 border-[#ff2d01] bg-background rounded-xl p-4 flex flex-col gap-y-2">
 										<View className="flex w-full flex flex-row items-center gap-x-2">
-											<Sparkles size={20} className="text-[#ff2d01]" />`
+											<Sparkles size={20} className="text-[#ff2d01]" />
 											<Text className="text-[#ff2d01] font-semibold text-center" maxFontSizeMultiplier={1.2}>
 												No favs found
 											</Text>

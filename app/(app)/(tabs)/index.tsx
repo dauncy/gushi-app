@@ -7,6 +7,7 @@ import { api } from "@/convex/_generated/api";
 import { StoryPreview } from "@/convex/stories";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
+import { useIsIpad } from "@/hooks/use-is-ipad";
 import { usePlayInFullscreen } from "@/hooks/use-play-in-fullscreen";
 import { usePresentPaywall } from "@/hooks/use-present-paywall";
 import { useSelectedCategory } from "@/stores/category-store";
@@ -106,12 +107,22 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 		}, []),
 	);
 
+	const isIpad = useIsIpad();
+	const calcMargin = useCallback(
+		(idx: number) => {
+			if (!isIpad) {
+				return idx % 2 === 0 ? "right" : "left";
+			}
+			return "right";
+		},
+		[isIpad],
+	);
 	return (
 		<View className="flex-1 bg-black/10 px-2">
 			<FlashList
 				ref={storyListRef}
 				showsVerticalScrollIndicator={false}
-				numColumns={2}
+				numColumns={isIpad ? 4 : 2}
 				refreshControl={<RefreshControl tintColor="#ff78e5" refreshing={refreshing} onRefresh={handleListRefetch} />}
 				onEndReached={onEndReached}
 				extraData={{
@@ -127,11 +138,7 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 				data={listData}
 				keyExtractor={(item) => item._id}
 				renderItem={({ item, index: idx }) => (
-					<EnhancedStoryCard
-						story={item}
-						onCardPress={() => onCardPress(item)}
-						margin={idx % 2 === 0 ? "right" : "left"}
-					/>
+					<EnhancedStoryCard story={item} onCardPress={() => onCardPress(item)} margin={calcMargin(idx)} />
 				)}
 				contentContainerStyle={{
 					paddingBottom: 80,

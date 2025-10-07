@@ -1,5 +1,6 @@
 import { Info } from "@/components/ui/icons/info-icon";
 import { StoryPreview } from "@/convex/stories/schema";
+import { useIsIpad } from "@/hooks/use-is-ipad";
 import * as Haptics from "expo-haptics";
 import React, { memo, useCallback, useState } from "react";
 import { View } from "react-native";
@@ -24,6 +25,7 @@ const EnhancedStoryCardComp = ({
 	onCardPress: () => void;
 	margin: "right" | "left";
 }) => {
+	const isIpad = useIsIpad();
 	const [showModal, setShowModal] = useState(false);
 	const scale = useSharedValue(1);
 
@@ -74,8 +76,8 @@ const EnhancedStoryCardComp = ({
 					style={[
 						animatedStyle,
 						{
-							marginRight: margin === "right" ? 4 : 0,
-							marginBottom: 8,
+							marginRight: margin === "right" ? (isIpad ? 12 : 4) : 0,
+							marginBottom: isIpad ? 12 : 8,
 							marginLeft: margin === "left" ? 4 : 0,
 						},
 					]}

@@ -1,4 +1,6 @@
 import { StoryPreview } from "@/convex/stories";
+import { useIsIpad } from "@/hooks/use-is-ipad";
+import { cn } from "@/lib/utils";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -14,6 +16,7 @@ interface StoryModalProps {
 }
 
 export const StoryModal = ({ visible, story, onClose }: StoryModalProps) => {
+	const isIpad = useIsIpad();
 	const onCloseCallbacks = useRef<Map<string, () => void>>(new Map());
 
 	const addCloseCallback = useCallback((name: string, callback: () => void) => {
@@ -75,7 +78,7 @@ export const StoryModal = ({ visible, story, onClose }: StoryModalProps) => {
 								<View
 									collapsable={false}
 									style={{
-										width: "51%",
+										width: isIpad ? "25.5%" : "51%",
 										alignSelf: "stretch",
 										marginHorizontal: "auto",
 										shadowColor: "#000",
@@ -89,7 +92,7 @@ export const StoryModal = ({ visible, story, onClose }: StoryModalProps) => {
 								</View>
 
 								<View
-									className="w-full max-w-[66%]"
+									className={cn("w-full max-w-[66%]", isIpad && "max-w-[33%%]")}
 									style={{
 										shadowColor: "#000",
 										shadowOffset: { width: 0.5, height: 0.85 },
