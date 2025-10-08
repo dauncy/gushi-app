@@ -5,11 +5,12 @@ import { audioStore, useAudio, useIsAudioInState } from "@/context/AudioContext"
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
+import { useIsIpad } from "@/hooks/use-is-ipad";
 import { cn } from "@/lib/utils";
 import { useStore } from "@tanstack/react-store";
 import { useGlobalSearchParams, usePathname } from "expo-router";
 import { useCallback } from "react";
-import { Platform, PlatformIOSStatic, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 import { State } from "react-native-track-player";
 import { StoryImagePreview } from "../stories/story-image";
@@ -21,16 +22,15 @@ export const AudioPreviewPlayer = ({
 	onCardPress?: (storyId: Id<"stories">) => void;
 	className?: string;
 }) => {
-	let showAlways = true;
-	if (Platform.OS === "ios") {
-		const platformIOS = Platform as PlatformIOSStatic;
-		if (platformIOS.isPad) {
-			showAlways = false;
-		}
-	}
+	const isIpad = useIsIpad();
 
-	const params = useGlobalSearchParams();
-	const pathname = usePathname();
+	if (isIpad) {
+		return <IpadPlayer onCardPress={onCardPress} />;
+	}
+	return <PhonePlayer onCardPress={onCardPress} />;
+};
+
+const PhonePlayer = ({ onCardPress }: { onCardPress?: (storyId: Id<"stories">) => void }) => {
 	const { play, pause, stop } = useAudio();
 	const isPlaying = useIsAudioInState({ state: State.Playing });
 	const storyId = useStore(audioStore, (state) => state.story.id);
@@ -55,8 +55,94 @@ export const AudioPreviewPlayer = ({
 	if (!storyId || !story) {
 		return null;
 	}
+	return (
+		<Animated.View
+			entering={FadeInDown.delay(50).duration(50).springify()}
+			exiting={FadeOutDown.delay(50).duration(50).springify()}
+		>
+			<Pressable
+				disabled={onCardPress === undefined}
+				onPress={handlePress}
+				style={{
+					shadowColor: "#000000",
+					shadowOffset: {
+						width: 0.5,
+						height: 1.5,
+					},
+					shadowOpacity: 0.25,
+					shadowRadius: 6,
+				}}
+				className={cn(
+					"items-center flex  p-3 rounded-xl bg-background flex-row  gap-4 border-2 border-border absolute bottom-2 inset-x-0 mx-2",
+				)}
+			>
+				<StoryImagePreview imageUrl={story.imageUrl} size="sm" />
+				<View className="flex flex-col">
+					<Text className="text-foreground text-base font-bold" numberOfLines={1} ellipsizeMode="tail">
+						{story.title}
+					</Text>
+				</View>
+				<View className="flex items-center justify-center flex-row gap-2 ml-auto">
+					<Pressable
+						className="size-8 rounded-full flex items-center justify-center p-2 active:bg-black/10"
+						onPress={() => {
+							if (isPlaying) {
+								pause();
+							} else {
+								play();
+							}
+						}}
+					>
+						{isPlaying ? (
+							<Pause className="text-foreground fill-foreground" size={16} />
+						) : (
+							<Play className="text-foreground fill-foreground" size={16} />
+						)}
+					</Pressable>
 
-	if ((params.storyId || pathname.toLowerCase().includes("upgrade")) && !showAlways) {
+					<Pressable
+						className="size-8 rounded-full flex items-center justify-center p-2 active:bg-black/10"
+						onPress={() => {
+							stop();
+						}}
+					>
+						<Stop className="text-foreground fill-foreground" size={16} />
+					</Pressable>
+				</View>
+			</Pressable>
+		</Animated.View>
+	);
+};
+
+const IpadPlayer = ({ onCardPress }: { onCardPress?: (storyId: Id<"stories">) => void }) => {
+	const { play, pause, stop } = useAudio();
+	const pathname = usePathname();
+	const params = useGlobalSearchParams();
+	const isPlaying = useIsAudioInState({ state: State.Playing });
+	const storyId = useStore(audioStore, (state) => state.story.id);
+
+	const { data: story } = useConvexQuery(
+		api.stories.queries.getStory,
+		{
+			storyId: storyId as Id<"stories">,
+		},
+		{ enabled: !!storyId },
+	);
+
+	const handlePress = useCallback(() => {
+		if (!onCardPress) {
+			return;
+		}
+		if (storyId) {
+			onCardPress(storyId);
+		}
+	}, [onCardPress, storyId]);
+
+	if (!storyId || !story) {
+		return null;
+	}
+
+	if (params.storyId || pathname.toLowerCase().includes("upgrade")) {
 		return null;
 	}
 
@@ -78,12 +164,12 @@ export const AudioPreviewPlayer = ({
 					shadowRadius: 6,
 				}}
 				className={cn(
-					"items-center flex  p-3 rounded-xl bg-secondary  flex-row  gap-4 border-2 border-border absolute bottom-2 inset-x-0 mx-2",
+					"items-center flex w-[40%] absolute bottom-2 right-0 mr-[30%]  p-3 rounded-xl bg-background  flex-row  gap-4 border-2 border-border",
 				)}
 			>
 				<StoryImagePreview imageUrl={story.imageUrl} size="sm" />
 				<View className="flex flex-col">
-					<Text className="text-border text-base font-bold" numberOfLines={1} ellipsizeMode="tail">
+					<Text className="text-foreground text-base font-bold" numberOfLines={1} ellipsizeMode="tail">
 						{story.title}
 					</Text>
 				</View>
@@ -99,9 +185,9 @@ export const AudioPreviewPlayer = ({
 						}}
 					>
 						{isPlaying ? (
-							<Pause className="text-border fill-border" size={16} />
+							<Pause className="text-foreground fill-foreground" size={16} />
 						) : (
-							<Play className="text-border fill-border" size={16} />
+							<Play className="text-foreground fill-foreground" size={16} />
 						)}
 					</Pressable>
 
@@ -111,7 +197,7 @@ export const AudioPreviewPlayer = ({
 							stop();
 						}}
 					>
-						<Stop className="text-border fill-border" size={16} />
+						<Stop className="text-foreground fill-foreground" size={16} />
 					</Pressable>
 				</View>
 			</Pressable>

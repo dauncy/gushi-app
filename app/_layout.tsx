@@ -14,6 +14,7 @@ import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Purchases, { CustomerInfo } from "react-native-purchases";
 import "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import "../global.css";
 
@@ -97,11 +98,13 @@ export default function RootLayout() {
 					<ConvexProviderWithCustomAuth client={convex}>
 						<QueryClientProvider client={queryClient}>
 							<GestureHandlerRootView onLayout={onLayoutRootView} style={{ flex: 1 }}>
-								<AudioProvider>
-									<StatusBar style={"dark"} />
-									<Slot />
-									<Toast config={toastConfig} position={"top"} topOffset={48} />
-								</AudioProvider>
+								<SafeAreaView edges={["top", "bottom"]} className="flex-1 bg-background">
+									<AudioProvider>
+										<StatusBar style={"dark"} backgroundColor="#fffbf3" />
+										<Slot />
+										<Toast config={toastConfig} position={"top"} topOffset={48} />
+									</AudioProvider>
+								</SafeAreaView>
 							</GestureHandlerRootView>
 						</QueryClientProvider>
 					</ConvexProviderWithCustomAuth>

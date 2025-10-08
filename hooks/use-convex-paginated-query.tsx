@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 export const useConvexPaginatedQuery = <T extends PaginatedQueryReference>(
 	query: T,
-	args: PaginatedQueryArgs<T>,
+	args: PaginatedQueryArgs<T> | "skip",
 	options: { initialNumItems: number },
 ) => {
 	const [refreshing, setRefreshing] = useState(false);
@@ -11,7 +11,7 @@ export const useConvexPaginatedQuery = <T extends PaginatedQueryReference>(
 	const abortControllerRef = useRef<AbortController | null>(null);
 	const isMountedRef = useRef(true);
 
-	const shouldSkip = refreshing;
+	const shouldSkip = refreshing || args === "skip";
 	const { isLoading, loadMore, results, status } = usePaginatedQuery(query, shouldSkip ? "skip" : args, options);
 
 	const handleRefresh = async () => {

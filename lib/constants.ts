@@ -20,3 +20,4 @@ export const NAV_THEME = {
 export const REVENUE_CAT_API_BASE_URL = "https://api.revenuecat.com/v2";
 export const REVENUE_CAT_PROJECT_ID = "projaad37f1f";
 export const BLUR_HASH = "8FJ[I,~q009FD%M{Rjj[Rj";
+export const AUTOPLAY_KEY = "__gushi__autoplay__";

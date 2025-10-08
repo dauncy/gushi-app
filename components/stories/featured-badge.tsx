@@ -5,7 +5,7 @@ import { Text, View } from "react-native";
 export const FeaturedBadge = memo(({ className = "" }: { className?: string }) => {
 	return (
 		<View
-			className={cn("absolute top-2 right-2 bg-[#fffbf3] z-20 w-24 rounded-md p-1 border border-[#ff2d01]", className)}
+			className={cn("absolute top-2 left-2 bg-[#fffbf3] z-20 w-24 rounded-md p-1 border border-[#ff2d01]", className)}
 			style={{
 				shadowColor: "#f8fafc",
 				shadowOffset: {
@@ -16,7 +16,9 @@ export const FeaturedBadge = memo(({ className = "" }: { className?: string }) =
 				shadowRadius: 4,
 			}}
 		>
-			<Text className="text-[#ff2d01] text-center text-xs font-bold">FEATURED</Text>
+			<Text className="text-[#ff2d01] text-center text-xs font-bold" allowFontScaling={false}>
+				NEW DROP
+			</Text>
 		</View>
 	);
 });

@@ -12,6 +12,7 @@ const imageVariants = cva("flex items-center justify-center", {
 		size: {
 			default: "size-20 rounded-md ",
 			sm: "size-10 rounded-md ",
+			md: "size-24 rounded-md ",
 			featured: "w-full h-full rounded-t-xl",
 		},
 	},
@@ -28,7 +29,7 @@ const StoryImagePreviewComp = ({
 	className = "",
 }: {
 	imageUrl: string | null;
-	size?: "default" | "sm" | "featured";
+	size?: "default" | "sm" | "md" | "featured";
 	active?: boolean;
 	className?: string;
 	blurHash?: string;
@@ -38,8 +39,8 @@ const StoryImagePreviewComp = ({
 	const showFallback = error || !imageUrl;
 	if (showFallback) {
 		return (
-			<View className={cn(imageVariants({ size }), "bg-slate-800 border border-zinc-700", className)}>
-				<FileX className="text-zinc-700" strokeWidth={1} size={36} />
+			<View className={cn(imageVariants({ size }), "bg-black/20", className)}>
+				<FileX className="text-foreground/60" strokeWidth={1} size={36} />
 			</View>
 		);
 	}

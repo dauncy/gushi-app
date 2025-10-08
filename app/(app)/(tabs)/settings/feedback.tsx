@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Form, FormField, FormInput, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/convex/_generated/api";
@@ -9,8 +8,15 @@ import * as Haptics from "expo-haptics";
 import { useGlobalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { ActivityIndicator, KeyboardAvoidingView, ScrollView, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+	ActivityIndicator,
+	Keyboard,
+	KeyboardAvoidingView,
+	ScrollView,
+	Text,
+	TouchableOpacity,
+	View,
+} from "react-native";
 import { z } from "zod";
 
 const giveFeedbackSchema = z.object({
@@ -18,12 +24,11 @@ const giveFeedbackSchema = z.object({
 	body: z.string().min(3, { message: "Enter a valid message" }),
 	email: z
 		.string()
-		.email({ message: "Enter a valid email" })
-		.optional()
-		.nullable()
 		.transform((val) => {
-			return val && val?.trim().length === 0 ? null : val?.trim();
-		}),
+			return (val ?? "")?.trim().length === 0 ? null : val?.trim();
+		})
+		.optional()
+		.nullable(),
 });
 
 const emailCheck = z.string().email();
@@ -55,15 +60,22 @@ export default function FeedbackPage() {
 		},
 	});
 
-	const pending = form.formState.isSubmitting || form.formState.isValidating;
+	const pending = form.formState.isSubmitting || form.formState.isLoading;
 
 	const onSubmit = async (data: z.infer<typeof giveFeedbackSchema>) => {
 		const { title, body, email } = data;
+		Keyboard.dismiss();
 		let emailToSubmit = null;
-		const emailResult = emailCheck.safeParse(email);
-		if (emailResult.success) {
-			emailToSubmit = email;
+		if ((email ?? "").trim().length > 0) {
+			const emailResult = emailCheck.safeParse(email);
+			if (emailResult.success) {
+				emailToSubmit = email;
+			} else {
+				form.setError("email", { message: "Enter a valid email" });
+				return;
+			}
 		}
+
 		await new Promise((resolve) => setTimeout(resolve, 1000));
 		await submitFeedback({
 			type,
@@ -79,7 +91,7 @@ export default function FeedbackPage() {
 	};
 
 	return (
-		<SafeAreaView className="flex-1 flex flex-col gap-y-12 bg-background" edges={["top", "bottom", "left", "right"]}>
+		<View className="flex-1 flex flex-col gap-y-12 bg-background">
 			<KeyboardAvoidingView className="flex-1" behavior={"padding"} keyboardVerticalOffset={0}>
 				<ScrollView
 					ref={scrollViewRef}
@@ -87,11 +99,14 @@ export default function FeedbackPage() {
 					keyboardShouldPersistTaps="handled"
 					alwaysBounceVertical={false}
 					showsVerticalScrollIndicator={false}
+					contentContainerStyle={{
+						paddingBottom: 48,
+					}}
 				>
 					<View className="w-full flex flex-col items-center">
 						<View className="w-full flex flex-col gap-y-2 p-4 pt-8 items-center">
 							<Text className="text-foreground text-xl font-medium">
-								{type === "feature" ? "Request a Feature" : "Report a Bug"}
+								{type === "feature" ? "Provide Feedback" : "Report an Issue"}
 							</Text>
 							<Text className="text-foreground/80 text-base w-2/3 text-center">
 								Help us improve the app! We want to hear from you.
@@ -154,7 +169,7 @@ export default function FeedbackPage() {
 										</FormLabel>
 										<Textarea
 											onFocus={(e) => {
-												scrollViewRef.current?.scrollTo({ y: 150, animated: true });
+												scrollViewRef.current?.scrollToEnd({ animated: true });
 											}}
 											onChangeText={(text) => {
 												form.setValue("body", text);
@@ -172,9 +187,9 @@ export default function FeedbackPage() {
 							/>
 						</Form>
 						<View className="w-full flex py-6  mt-auto ">
-							<Button
-								disabled={pending}
-								className="w-full bg-secondary border border-border rounded-2xl flex flex-col shadow"
+							<TouchableOpacity
+								activeOpacity={0.8}
+								className="px-4 py-4 flex flex-row items-center gap-4 bg-secondary border border-border rounded-2xl justify-center shadow"
 								onPress={() => {
 									form.handleSubmit(onSubmit)();
 								}}
@@ -182,13 +197,15 @@ export default function FeedbackPage() {
 								{pending ? (
 									<ActivityIndicator size="small" color={"#0395ff"} />
 								) : (
-									<Text className="text-border text-base font-bold">{"Submit"}</Text>
+									<Text className="text-border text-base font-bold" maxFontSizeMultiplier={1.2}>
+										{"Submit"}
+									</Text>
 								)}
-							</Button>
+							</TouchableOpacity>
 						</View>
 					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
-		</SafeAreaView>
+		</View>
 	);
 }

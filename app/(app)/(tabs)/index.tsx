@@ -7,12 +7,13 @@ import { api } from "@/convex/_generated/api";
 import { StoryPreview } from "@/convex/stories";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
+import { useIsIpad } from "@/hooks/use-is-ipad";
 import { usePlayInFullscreen } from "@/hooks/use-play-in-fullscreen";
 import { usePresentPaywall } from "@/hooks/use-present-paywall";
 import { useSelectedCategory } from "@/stores/category-store";
-import { FlashList } from "@shopify/flash-list";
-import { useRouter } from "expo-router";
-import { memo, useCallback, useMemo } from "react";
+import { FlashList, type FlashListRef } from "@shopify/flash-list";
+import { useFocusEffect, useRouter } from "expo-router";
+import { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { ActivityIndicator, RefreshControl, Text, View } from "react-native";
 
 export default function Home() {
@@ -20,6 +21,8 @@ export default function Home() {
 }
 
 const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => void }) => {
+	const initRef = useRef(false);
+	const storyListRef = useRef<FlashListRef<StoryPreview>>(null);
 	const { hasSubscription } = useSubscription();
 	const categoryId = useSelectedCategory();
 	const { isLoading, refreshing, refresh, loadMore, results, status } = useConvexPaginatedQuery(
@@ -89,22 +92,53 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 		categoryId,
 	]);
 
+	useEffect(() => {
+		if (!initRef.current) {
+			initRef.current = true;
+			return;
+		}
+		if (isLoading || refreshing) return;
+		storyListRef.current?.scrollToIndex({ index: 0, animated: false, viewOffset: -8 });
+	}, [categoryId, isLoading, refreshing]);
+
+	useFocusEffect(
+		useCallback(() => {
+			storyListRef.current?.scrollToIndex({ index: 0, animated: false, viewOffset: -8 });
+		}, []),
+	);
+
+	const isIpad = useIsIpad();
+	const calcMargin = useCallback(
+		(idx: number) => {
+			if (!isIpad) {
+				return idx % 2 === 0 ? "right" : "left";
+			}
+			return "right";
+		},
+		[isIpad],
+	);
 	return (
 		<View className="flex-1 bg-black/10 px-2">
 			<FlashList
+				ref={storyListRef}
 				showsVerticalScrollIndicator={false}
-				numColumns={2}
+				numColumns={isIpad ? 4 : 2}
 				refreshControl={<RefreshControl tintColor="#ff78e5" refreshing={refreshing} onRefresh={handleListRefetch} />}
 				onEndReached={onEndReached}
-				extraData={{ isLoading, refreshing, status, hasSubscription, listItems, freeStories, isFeaturedStoryLoading }}
+				extraData={{
+					isLoading,
+					refreshing,
+					status,
+					hasSubscription,
+					listItems,
+					freeStories,
+					isFeaturedStoryLoading,
+					categoryId,
+				}}
 				data={listData}
 				keyExtractor={(item) => item._id}
 				renderItem={({ item, index: idx }) => (
-					<EnhancedStoryCard
-						story={item}
-						onCardPress={() => onCardPress(item)}
-						margin={idx % 2 === 0 ? "right" : "left"}
-					/>
+					<EnhancedStoryCard story={item} onCardPress={() => onCardPress(item)} margin={calcMargin(idx)} />
 				)}
 				contentContainerStyle={{
 					paddingBottom: 80,
@@ -162,7 +196,7 @@ const HomePage = () => {
 	const router = useRouter();
 	return (
 		<View style={{ flex: 1 }} className="relative bg-[#fffbf3] flex flex-col">
-			<View className="w-full px-2" style={{ marginTop: 46, paddingTop: 12, paddingBottom: 12 }}>
+			<View className="w-full px-2" style={{ paddingTop: 12, paddingBottom: 12 }}>
 				<CategoriesSelector />
 			</View>
 			<StoryList

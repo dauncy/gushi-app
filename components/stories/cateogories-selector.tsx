@@ -10,7 +10,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { Circle } from "../ui/icons/circle-icon";
 import { Grid2X2Plus } from "../ui/icons/grid-2-plus-icon";
 import { Skeleton } from "../ui/skeleton";
-import { CategoryToIcon } from "./category-utils";
+import { CategoryToColor, CategoryToIcon } from "./category-utils";
 
 interface Category {
 	name: string;
@@ -21,6 +21,8 @@ interface Category {
 
 export const CategoriesSelector = memo(() => {
 	const { data: categories, isLoading } = useConvexQuery(api.stories.queries.getFeaturedCategories, {});
+
+	// const isLoading = true
 	const sanitizedCatgeories = useMemo(() => {
 		if (!categories || categories.length === 0) {
 			return [];
@@ -52,12 +54,12 @@ export const CategoriesSelector = memo(() => {
 				justifyContent: "space-between",
 				display: "flex",
 			}}
-			className="w-full p-1 bg-black/20 rounded-3xl overflow-hidden"
+			className="w-full p-1 bg-black/20 rounded-3xl overflow-hidden max-w-[468px]"
 		>
 			{isLoading ? (
 				<>
 					{Array.from({ length: 4 }).map((_, index) => (
-						<LoadingCategory key={index} />
+						<LoadingCategory key={index} last={index === 3} />
 					))}
 				</>
 			) : (
@@ -73,11 +75,11 @@ export const CategoriesSelector = memo(() => {
 
 CategoriesSelector.displayName = "CategoriesSelector";
 
-const LoadingCategory = () => {
+const LoadingCategory = ({ last }: { last: boolean }) => {
 	return (
-		<View className="flex flex-col p-2 px-3.5 items-center gap-y-1">
-			<Skeleton className="w-10 h-10 rounded-full bg-black/30" />
-			<Skeleton className="w-16 h-4 rounded-md bg-black/30" />
+		<View className="flex flex-col p-1 px-3.5 rounded-3xl items-center gap-y-2.5">
+			<Skeleton className=" rounded-full bg-black/20 w-[28px] h-[28px]" />
+			<Skeleton className={cn("w-[50px] h-3 rounded-md bg-black/20", last && "w-[88px]")} />
 		</View>
 	);
 };
@@ -96,6 +98,15 @@ const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
 		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
 	}, [categoryData.id, selected]);
 
+	const colors = CategoryToColor[categoryData.name.toLowerCase() as keyof typeof CategoryToColor] ?? {
+		background: "#0395ff",
+		foreground: "#fffbf3",
+	};
+
+	const color = colors.background;
+
+	const textStyle = { ...(selected ? { color, borderColor: colors.foreground } : {}) };
+	const iconcolor = selected ? colors.background : "#00000030";
 	return (
 		<TouchableOpacity
 			disabled={categoryData.soon}
@@ -104,15 +115,19 @@ const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
 				handleSelect();
 			}}
 			key={categoryData.id}
-			className={cn(
-				"flex flex-col gap-y-1 items-center p-2 px-3.5 rounded-3xl border-2 border-transparent",
-				selected && "bg-[#ceef32] border-[#0395ff] border-2",
-			)}
+			className={cn("flex flex-col gap-y-1 items-center p-1 px-3.5")}
 		>
-			<categoryData.icon className={cn("text-[#0395ff]", categoryData.soon && "opacity-50")} size={28} />
+			<categoryData.icon
+				className={cn("", categoryData.soon && "opacity-50")}
+				size={28}
+				color={iconcolor}
+				fill={selected ? "#fffbf3" : "none"}
+			/>
 			<Text
+				allowFontScaling={false}
+				style={textStyle}
 				className={cn(
-					"text-[#0395ff] text-sm font-medium mt-auto capitalize",
+					"text-black/30 text-sm font-medium mt-auto capitalize",
 					selected && "font-semibold",
 					categoryData.soon && "opacity-50",
 				)}
@@ -134,7 +149,9 @@ const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
 							shadowRadius: 8,
 						}}
 					>
-						<Text className="text-[#ff2d01] text-[8px] font-bold mt-auto">Launching soon</Text>
+						<Text className="text-[#ff2d01] text-[8px] font-bold mt-auto" allowFontScaling={false}>
+							Launching soon
+						</Text>
 					</View>
 				</>
 			)}
