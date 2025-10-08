@@ -268,7 +268,7 @@ const FreeUserSubscriptionRow = () => {
 	return (
 		<View
 			className={cn(
-				"w-full py-4 px-4 flex flex-row gap-x-4 items-center border-b border-black/20 bg-background/60",
+				"w-full py-4 px-4 flex flex-row gap-x-4 items-start border-b border-black/20 bg-background/60",
 				!isIpad && "flex-1 self-stretch grow ",
 			)}
 		>
