@@ -1,5 +1,6 @@
 import { Header } from "@/components/nav/Header";
 import { Home } from "@/components/ui/icons/home-icon";
+import { Playlist } from "@/components/ui/icons/playlist-icon";
 import { Search } from "@/components/ui/icons/search-icon";
 import { Settings } from "@/components/ui/icons/settings-icon";
 import { Star } from "@/components/ui/icons/star-icon";
@@ -78,6 +79,16 @@ export default function TabsLayout() {
 						tabBarAccessibilityLabel: "Favorites",
 						tabBarIcon: ({ color, size, focused }) => (
 							<Star size={size} className={focused ? "text-[#0395ff] fill-[#0395ff]" : "text-black/30"} />
+						),
+					}}
+				/>
+				<Tabs.Screen
+					name="playlists"
+					options={{
+						title: "Playlists",
+						tabBarAccessibilityLabel: "Playlists",
+						tabBarIcon: ({ color, size, focused }) => (
+							<Playlist size={size} className={focused ? "text-[#0395ff] fill-[#0395ff]" : "text-black/30"} />
 						),
 					}}
 				/>

@@ -2,6 +2,8 @@ import { defineSchema } from "convex/server";
 import { jwtKeys } from "./auth/schema";
 import { favorites } from "./favorites/schema";
 import { feedback } from "./feedback/schema";
+import { files } from "./files/schema";
+import { playlists, playlistStories } from "./playlists/schema";
 import { audio, categories, images, stories, storyCategories } from "./stories/schema";
 import { support } from "./support/schema";
 import { users } from "./users/schema";
@@ -17,6 +19,9 @@ const schema = defineSchema({
 	support,
 	categories,
 	storyCategories,
+	playlists,
+	files,
+	playlistStories,
 });
 
 export default schema;

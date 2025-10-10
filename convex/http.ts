@@ -1,5 +1,6 @@
 import { httpRouter } from "convex/server";
 import { getWellKnownJWKsHttp, loginHttp, refreshHttp } from "./auth/http";
+import { uploadFileHttp, uploadFileOptionHttp } from "./files/http";
 import { storyMetadataHttpAction } from "./stories";
 import { subscriptionWebhooksHttpAction } from "./subscriptions/http";
 import { createSupportRequestHttp } from "./support/http";
@@ -47,6 +48,18 @@ http.route({
 	path: "/support",
 	method: "POST",
 	handler: createSupportRequestHttp,
+});
+
+http.route({
+	path: "/files",
+	method: "POST",
+	handler: uploadFileHttp,
+});
+
+http.route({
+	path: "/files",
+	method: "OPTIONS",
+	handler: uploadFileOptionHttp,
 });
 
 export default http;

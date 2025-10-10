@@ -22,5 +22,6 @@ export function useConvexQuery<R extends FunctionReference<"query">>(
 		...convexQueryClient.queryOptions(ref, args),
 		...opts,
 		enabled: opts?.enabled ?? true,
+		staleTime: opts?.staleTime ?? 0,
 	});
 }

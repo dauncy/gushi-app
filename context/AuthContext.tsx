@@ -116,7 +116,7 @@ export const ConvexProviderWithCustomAuth = ({
 	);
 };
 
-const useCustomAuth = () => {
+export const useCustomAuth = () => {
 	// Only use state here, not actions - prevents unnecessary re-renders
 	const { loading, dbUser, setToken } = useAuth();
 	const { customerInfo } = useSubscription();
@@ -125,7 +125,7 @@ const useCustomAuth = () => {
 	}, [customerInfo]);
 
 	const fetchAccessToken = useCallback(
-		async ({ forceRefreshToken }: { forceRefreshToken: boolean }) => {
+		async ({ forceRefreshToken }: { forceRefreshToken: boolean }): Promise<string | null> => {
 			const url = `${getConvexSiteURL()}/auth/refresh`;
 			if (!customerId || !dbUser) {
 				return null;

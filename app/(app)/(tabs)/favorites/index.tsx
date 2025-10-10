@@ -1,15 +1,17 @@
 import { AudioPreviewPlayer } from "@/components/audio/audio-preview";
 import { EnhancedStoryCard } from "@/components/stories/enhanced-story-card";
 import { StoryCardLoading } from "@/components/stories/story-card";
+import { Headphones } from "@/components/ui/icons/headphones-icon";
 import { Sparkles } from "@/components/ui/icons/sparkles-icon";
+import { Star } from "@/components/ui/icons/star-icon";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { api } from "@/convex/_generated/api";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { usePlayInFullscreen } from "@/hooks/use-play-in-fullscreen";
 import { FlashList } from "@shopify/flash-list";
-import { Link, useRouter } from "expo-router";
-import { useCallback } from "react";
-import { ActivityIndicator, RefreshControl, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import { useCallback, useMemo } from "react";
+import { ActivityIndicator, RefreshControl, Text, View, ViewStyle } from "react-native";
 
 export default function FavoritesListPage() {
 	const router = useRouter();
@@ -44,9 +46,38 @@ const FavoritesList = () => {
 
 	const { playInFullscreen } = usePlayInFullscreen();
 
+	const contentContainerStyle: ViewStyle | undefined = useMemo(() => {
+		if (isLoading) {
+			return {
+				paddingTop: 8,
+				display: "contents",
+			};
+		}
+		if (refreshing) {
+			return {
+				paddingTop: 8,
+				display: "contents",
+			};
+		}
+		if (results.length > 0) {
+			return {
+				paddingBottom: 80,
+				paddingTop: 8,
+				display: "contents",
+			};
+		}
+		return {
+			paddingTop: 0,
+			paddingBottom: 0,
+			display: "flex",
+			flex: 1,
+			alignItems: "center",
+			justifyContent: "center",
+		};
+	}, [isLoading, refreshing, results.length]);
 	return (
 		<View style={{ flex: 1 }} className="relative bg-[#fffbf3] flex flex-col px-0 pt-4">
-			<View className="flex-1 bg-black/10 px-2" style={{ paddingTop: 12, paddingBottom: 12 }}>
+			<View className="flex-1 bg-black/10 px-2">
 				<FlashList
 					showsVerticalScrollIndicator={false}
 					numColumns={2}
@@ -66,14 +97,7 @@ const FavoritesList = () => {
 							margin={idx % 2 === 0 ? "right" : "left"}
 						/>
 					)}
-					contentContainerStyle={{
-						paddingBottom: results.length === 0 ? 8 : 80,
-						paddingTop: 8,
-						display: !isLoading && !refreshing && results.length === 0 ? "flex" : undefined,
-						flex: !isLoading && !refreshing && results.length === 0 ? 1 : undefined,
-						alignItems: !isLoading && !refreshing && results.length === 0 ? "center" : undefined,
-						justifyContent: !isLoading && !refreshing && results.length === 0 ? "center" : undefined,
-					}}
+					contentContainerStyle={contentContainerStyle}
 					ListEmptyComponent={
 						<>
 							{isLoading ? (
@@ -83,25 +107,7 @@ const FavoritesList = () => {
 									))}
 								</View>
 							) : (
-								<View className="flex flex-col flex-1 items-center justify-center px-4">
-									<View className="flex w-full border-2 border-[#ff2d01] bg-background rounded-xl p-4 flex flex-col gap-y-2">
-										<View className="flex w-full flex flex-row items-center gap-x-2">
-											<Sparkles size={20} className="text-[#ff2d01]" />
-											<Text className="text-[#ff2d01] font-semibold text-center" maxFontSizeMultiplier={1.2}>
-												No favs found
-											</Text>
-										</View>
-										<Text className="text-foreground" maxFontSizeMultiplier={1.2}>
-											{"You can add favorites anytime by tapping the star icon on each story."}
-										</Text>
-
-										<Link href={"/"} className="mt-5 bg-[#ceef32] border-[#0395ff] border-2 rounded-xl p-3 ">
-											<Text className="text-[#0395ff] font-semibold text-center" allowFontScaling={false}>
-												{"Explore stories"}
-											</Text>
-										</Link>
-									</View>
-								</View>
+								<EmptyState />
 							)}
 						</>
 					}
@@ -115,6 +121,36 @@ const FavoritesList = () => {
 						</>
 					}
 				/>
+			</View>
+		</View>
+	);
+};
+
+const EmptyState = () => {
+	return (
+		<View className="flex-1 flex items-center justify-center flex-col gap-y-2 w-full p-8">
+			<View className="flex flex-row items-end gap-x-1">
+				<View className="flex rounded-full bg-background size-[34px] items-center justify-center">
+					<Headphones size={24} className="text-foreground/60" />
+				</View>
+				<View className="flex rounded-full bg-background size-[56px] items-center justify-center">
+					<Star size={34} className="text-border fill-border" />
+				</View>
+				<View className="flex rounded-full bg-background size-[34px] items-center justify-center">
+					<Sparkles size={24} className="text-destructive/60 fill-destructive/60" />
+				</View>
+			</View>
+			<View className="flex flex-col gap-y-0 w-full items-center justify-center">
+				<Text
+					style={{ letterSpacing: 0.5, fontFamily: "Baloo", fontWeight: "bold", fontSize: 28 }}
+					className="text-foreground/80"
+					maxFontSizeMultiplier={1.2}
+				>
+					{"No favorites yet"}
+				</Text>
+				<Text className="-mt-3 text-foreground text-lg text-center" maxFontSizeMultiplier={1.2}>
+					{"Your favorite stories will show up here."}
+				</Text>
 			</View>
 		</View>
 	);

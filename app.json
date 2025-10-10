@@ -51,6 +51,12 @@
           "resizeMode": "contain",
           "backgroundColor": "#fffbf3"
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you customize playlists."
+        }
       ]
     ],
     "experiments": {
