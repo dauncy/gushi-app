@@ -1,3 +1,4 @@
+import { FormHeader } from "@/components/nav/form-header";
 import { Camera } from "@/components/ui/icons/camera-icon";
 import { X } from "@/components/ui/icons/x-icon";
 import { Image } from "@/components/ui/image";
@@ -12,17 +13,8 @@ import { usePreventRemove } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation, useRouter } from "expo-router";
-import { useCallback, useMemo, useRef, useState } from "react";
-import {
-	ActivityIndicator,
-	Alert,
-	KeyboardAvoidingView,
-	Pressable,
-	ScrollView,
-	Text,
-	TouchableOpacity,
-	View,
-} from "react-native";
+import { useCallback, useMemo, useState } from "react";
+import { ActivityIndicator, Alert, KeyboardAvoidingView, Pressable, ScrollView, View } from "react-native";
 import Toast from "react-native-toast-message";
 
 export default function CreatePlaylistPage() {
@@ -200,10 +192,14 @@ export default function CreatePlaylistPage() {
 					keyboardShouldPersistTaps="handled"
 					contentContainerStyle={{ flexGrow: 1, alignItems: "center" }}
 				>
-					<PageHeader
+					<FormHeader
 						isDirty={isDirty}
-						submitDisabled={submitDisabled || isSubmitting}
-						backDisabled={backDisabled || isSubmitting}
+						submitDisabled={submitDisabled}
+						backDisabled={backDisabled}
+						dismissTo="/playlists"
+						formTitle="Create a Playlist"
+						alertTitle="Discard Changes"
+						alertMessage="Are you sure you want to cancel this playlist?"
 						onSubmit={handleSubmit}
 					/>
 					<View className="flex-1 flex flex-col items-center  p-8 gap-y-8 w-full">
@@ -266,91 +262,3 @@ export default function CreatePlaylistPage() {
 		</>
 	);
 }
-
-const PageHeader = ({
-	isDirty,
-	submitDisabled,
-	backDisabled,
-	onSubmit,
-}: {
-	isDirty: boolean;
-	submitDisabled: boolean;
-	backDisabled: boolean;
-	onSubmit: () => Promise<void>;
-}) => {
-	const clickRef = useRef(false);
-	const router = useRouter();
-	const handleBack = useCallback(() => {
-		if (clickRef.current) return;
-		if (backDisabled) return;
-		clickRef.current = true;
-		if (!isDirty) {
-			if (router.canGoBack()) {
-				router.back();
-			} else {
-				router.dismissTo("/playlists");
-			}
-			return;
-		}
-		Alert.alert("Discard Changes", "Are you sure you want to cancel this playlist?", [
-			{
-				text: "Discard Changes",
-				style: "destructive",
-				onPress: () => {
-					if (router.canGoBack()) {
-						router.back();
-					} else {
-						router.dismissTo("/playlists");
-					}
-					setTimeout(() => {
-						clickRef.current = false;
-					}, 500);
-				},
-			},
-			{
-				text: "Cancel",
-				style: "cancel",
-				onPress: () => {
-					clickRef.current = false;
-				},
-			},
-		]);
-	}, [router, isDirty, backDisabled]);
-
-	const handleSubmit = useCallback(() => {
-		if (clickRef.current) return;
-		clickRef.current = true;
-		onSubmit();
-		setTimeout(() => {
-			clickRef.current = false;
-		}, 500);
-	}, [onSubmit]);
-	return (
-		<View className="w-full px-4 p-4 items-center flex flex-row gap-x-4">
-			<TouchableOpacity
-				disabled={backDisabled}
-				className="mb-4 disabled:opacity-50"
-				activeOpacity={0.8}
-				onPress={handleBack}
-			>
-				<Text className="text-destructive/80 font-medium text-lg" maxFontSizeMultiplier={1.2}>
-					{"Cancel"}
-				</Text>
-			</TouchableOpacity>
-			<View className="flex-1 items-center justify-center">
-				<Text
-					style={{ fontFamily: "Baloo", lineHeight: 32, fontSize: 24 }}
-					className="text-foreground font-normal text-2xl"
-					maxFontSizeMultiplier={1.2}
-				>
-					{"Create a Playlist"}
-				</Text>
-			</View>
-			<TouchableOpacity onPress={handleSubmit} className="mb-4 disabled:opacity-50" disabled={submitDisabled}>
-				<Text className="text-border font-semibold text-lg" maxFontSizeMultiplier={1.2}>
-					{"Create"}
-				</Text>
-			</TouchableOpacity>
-		</View>
-	);
-};

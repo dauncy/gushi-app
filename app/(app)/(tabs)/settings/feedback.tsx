@@ -1,3 +1,4 @@
+import { FormHeader } from "@/components/nav/form-header";
 import { Form, FormField, FormInput, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { toastConfig } from "@/components/ui/toast";
@@ -10,7 +11,7 @@ import * as Haptics from "expo-haptics";
 import { useGlobalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { Alert, Keyboard, KeyboardAvoidingView, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Keyboard, KeyboardAvoidingView, ScrollView, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 
@@ -133,11 +134,18 @@ export default function FeedbackPage() {
 					keyboardShouldPersistTaps="handled"
 					contentContainerStyle={{ flexGrow: 1, alignItems: "center", paddingBottom: 80 }}
 				>
-					<PageHeader
-						type={type}
+					<FormHeader
 						isDirty={isDirty}
-						submitDisabled={pending || submitDisabled}
+						submitDisabled={submitDisabled}
 						backDisabled={pending}
+						dismissTo="/settings"
+						formTitle="Feedback"
+						alertTitle="Discard Changes"
+						alertMessage={
+							type === "feature"
+								? "Are you sure you want to cancel this feedback?"
+								: "Are you sure you want to cancel this report?"
+						}
 						onSubmit={handleSubmit}
 					/>
 					<View className="w-full flex flex-col gap-y-4 px-4 flex-1">
@@ -219,95 +227,3 @@ export default function FeedbackPage() {
 		</>
 	);
 }
-
-const PageHeader = ({
-	isDirty,
-	type,
-	submitDisabled,
-	backDisabled,
-	onSubmit,
-}: {
-	isDirty: boolean;
-	type: "feature" | "issue";
-	submitDisabled: boolean;
-	backDisabled: boolean;
-	onSubmit: () => Promise<void>;
-}) => {
-	const clickRef = useRef(false);
-	const router = useRouter();
-
-	const handleBack = useCallback(() => {
-		if (clickRef.current) return;
-		if (backDisabled) return;
-		clickRef.current = true;
-		if (!isDirty) {
-			if (router.canGoBack()) {
-				router.back();
-			} else {
-				router.dismissTo("/settings");
-			}
-			return;
-		}
-		Alert.alert("Discard Changes", "Are you sure you want to leave this page?", [
-			{
-				text: "Discard Changes",
-				style: "destructive",
-				onPress: () => {
-					if (router.canGoBack()) {
-						router.back();
-					} else {
-						router.dismissTo("/settings");
-					}
-					setTimeout(() => {
-						clickRef.current = false;
-					}, 500);
-				},
-			},
-			{
-				text: "Cancel",
-				style: "cancel",
-				onPress: () => {
-					clickRef.current = false;
-				},
-			},
-		]);
-	}, [router, isDirty, backDisabled]);
-
-	const handleSubmit = useCallback(() => {
-		if (clickRef.current) return;
-		clickRef.current = true;
-		onSubmit();
-		setTimeout(() => {
-			clickRef.current = false;
-		}, 500);
-	}, [onSubmit]);
-
-	return (
-		<View className="w-full px-4 p-4 items-center flex flex-row gap-x-4">
-			<TouchableOpacity
-				disabled={backDisabled}
-				className="mb-4 disabled:opacity-50"
-				activeOpacity={0.8}
-				onPress={handleBack}
-			>
-				<Text className="text-destructive/80 font-medium text-lg" maxFontSizeMultiplier={1.2}>
-					{"Cancel"}
-				</Text>
-			</TouchableOpacity>
-			<View className="flex-1 items-center justify-center">
-				<Text
-					style={{ fontFamily: "Baloo", lineHeight: 32, fontSize: 24 }}
-					className="text-foreground font-normal text-2xl"
-					maxFontSizeMultiplier={1.2}
-				>
-					{type === "feature" ? "Provide Feedback" : "Report an Issue"}
-				</Text>
-			</View>
-			<TouchableOpacity onPress={handleSubmit} className="mb-4 disabled:opacity-50" disabled={submitDisabled}>
-				<Text className="text-border font-semibold text-lg" maxFontSizeMultiplier={1.2}>
-					{"Submit"}
-				</Text>
-			</TouchableOpacity>
-		</View>
-	);
-};
