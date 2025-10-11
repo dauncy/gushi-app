@@ -303,10 +303,16 @@ const BasicStoryCard = ({
 		};
 	});
 
+	const handlePress = useCallback(async () => {
+		if (disabled) return;
+		await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+		toggleStory(story._id);
+	}, [disabled, toggleStory, story._id]);
+
 	return (
 		<Pressable
 			disabled={disabled}
-			onPress={() => toggleStory(story._id)}
+			onPress={handlePress}
 			className={cn(
 				"w-full flex flex-row gap-x-4 px-2 py-4 items-center",
 				selected && "bg-foreground/10",
@@ -326,7 +332,7 @@ const BasicStoryCard = ({
 			</View>
 			<View className="flex items-center justify-center">
 				<Pressable
-					onPress={() => toggleStory(story._id)}
+					onPress={handlePress}
 					className="size-[34px] flex items-center justify-center rounded-full active:bg-foreground/10"
 				>
 					<Animated.View style={animatedIconStyle}>
