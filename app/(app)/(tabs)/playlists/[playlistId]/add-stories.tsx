@@ -7,6 +7,7 @@ import { Search } from "@/components/ui/icons/search-icon";
 import { X } from "@/components/ui/icons/x-icon";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toastConfig } from "@/components/ui/toast";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { StoryPreview } from "@/convex/stories";
@@ -14,6 +15,8 @@ import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { usePreventFormDismiss } from "@/hooks/use-prevent-form-dismiss";
 import { cn } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
+import { useMutation } from "convex/react";
+import * as Haptics from "expo-haptics";
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 import { debounce } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -28,6 +31,7 @@ import {
 	View,
 } from "react-native";
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import Toast from "react-native-toast-message";
 
 const ALERT_TITLE = "Discard Changes";
 const ALERT_MESSAGE = "These stories will not be added to the playlist.";
@@ -41,6 +45,7 @@ export default function AddStoriesPage() {
 	const [submitting, setSubmitting] = useState(false);
 	const [searchInput, setSearchInput] = useState("");
 	const searchRef = useRef<TextInput>(null);
+	const addStoriesToPlaylist = useMutation(api.playlists.mutations.addStoriesToPlaylist);
 
 	const hasSearch = useMemo(() => search && search.trim().length > 0, [search]);
 
@@ -166,72 +171,82 @@ export default function AddStoriesPage() {
 
 	usePreventFormDismiss({ isDirty: selectedStoryIds.length > 0, alertTitle: ALERT_TITLE, alertMessage: ALERT_MESSAGE });
 
+	const handleSubmit = useCallback(async () => {
+		setSubmitting(true);
+		await addStoriesToPlaylist({ playlistId, storyIds: selectedStoryIds });
+		setSubmitting(false);
+		await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+		Toast.show({ type: "success", text1: "Stories added", text2: "Your stories have been added to your playlist" });
+		router.dismissTo(`/playlists/${playlistId}`);
+	}, [addStoriesToPlaylist, playlistId, selectedStoryIds, router]);
+
 	if (!playlistId) {
 		return <Redirect href="/playlists" />;
 	}
 
 	return (
-		<KeyboardAvoidingView behavior={"padding"} keyboardVerticalOffset={0} className="flex-1 bg-background">
-			<FormHeader
-				isDirty={selectedStoryIds.length > 0}
-				submitDisabled={selectedStoryIds.length === 0}
-				backDisabled={submitting}
-				dismissTo={`/playlists/${playlistId}`}
-				formTitle="Add Stories"
-				alertTitle={ALERT_TITLE}
-				alertMessage={ALERT_MESSAGE}
-				submitText="Add Stories"
-				onSubmit={async () => {
-					console.log("submit");
-				}}
-			/>
-			<View className="px-2 w-full bg-background pb-4 flex flex-col gap-y-2">
-				<View className="relative flex flex-row items-center w-full">
-					<Search className="absolute left-2 text-black/30 size-5" color="red" />
-					<Input
-						ref={searchRef}
-						placeholder="Search stories"
-						className="px-10 w-full"
-						onChangeText={handleInputChange}
-						autoFocus={false}
-						autoCorrect={false}
-					/>
-					{searchInput && searchInput.trim() !== "" && (
-						<Pressable
-							style={{
-								shadowColor: "#000",
-								shadowOffset: { width: 0.75, height: 1.5 },
-								shadowOpacity: 0.4,
-								shadowRadius: 3.25,
-							}}
-							onPress={clearSearch}
-							className={"size-7 rounded-full bg-foreground/20 flex items-center justify-center absolute right-2 "}
-						>
-							<X className="text-background size-3" size={16} />
-						</Pressable>
-					)}
-				</View>
-			</View>
-			<View className="flex-1">
-				<FlashList
-					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#ff78e5" />}
-					data={listData}
-					renderItem={({ item }) => (
-						<BasicStoryCard
-							story={item}
-							toggleStory={toggleStory}
-							selected={selectedStoryIds.includes(item._id)}
-							disabled={submitting}
-						/>
-					)}
-					ListEmptyComponent={emptyComponent}
-					scrollEventThrottle={250}
-					onScroll={handleScroll}
-					onEndReached={handleLoadMore}
-					onEndReachedThreshold={0.5}
+		<>
+			<KeyboardAvoidingView behavior={"padding"} keyboardVerticalOffset={0} className="flex-1 bg-background">
+				<FormHeader
+					isDirty={selectedStoryIds.length > 0}
+					submitDisabled={selectedStoryIds.length === 0}
+					backDisabled={submitting}
+					dismissTo={`/playlists/${playlistId}`}
+					formTitle="Add Stories"
+					alertTitle={ALERT_TITLE}
+					alertMessage={ALERT_MESSAGE}
+					submitText="Add Stories"
+					onSubmit={handleSubmit}
 				/>
-			</View>
-		</KeyboardAvoidingView>
+				<View className="px-2 w-full bg-background pb-4 flex flex-col gap-y-2">
+					<View className="relative flex flex-row items-center w-full">
+						<Search className="absolute left-2 text-black/30 size-5" color="red" />
+						<Input
+							ref={searchRef}
+							placeholder="Search stories"
+							className="px-10 w-full"
+							onChangeText={handleInputChange}
+							autoFocus={false}
+							autoCorrect={false}
+						/>
+						{searchInput && searchInput.trim() !== "" && (
+							<Pressable
+								style={{
+									shadowColor: "#000",
+									shadowOffset: { width: 0.75, height: 1.5 },
+									shadowOpacity: 0.4,
+									shadowRadius: 3.25,
+								}}
+								onPress={clearSearch}
+								className={"size-7 rounded-full bg-foreground/20 flex items-center justify-center absolute right-2 "}
+							>
+								<X className="text-background size-3" size={16} />
+							</Pressable>
+						)}
+					</View>
+				</View>
+				<View className="flex-1">
+					<FlashList
+						refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#ff78e5" />}
+						data={listData}
+						renderItem={({ item }) => (
+							<BasicStoryCard
+								story={item}
+								toggleStory={toggleStory}
+								selected={selectedStoryIds.includes(item._id)}
+								disabled={submitting}
+							/>
+						)}
+						ListEmptyComponent={emptyComponent}
+						scrollEventThrottle={250}
+						onScroll={handleScroll}
+						onEndReached={handleLoadMore}
+						onEndReachedThreshold={0.5}
+					/>
+				</View>
+			</KeyboardAvoidingView>
+			<Toast config={toastConfig} position={"top"} topOffset={48} />
+		</>
 	);
 }
 

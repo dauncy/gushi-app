@@ -72,6 +72,7 @@ export default function FeedbackPage() {
 					emailToSubmit = email;
 				} else {
 					form.setError("email", { message: "Enter a valid email" });
+					await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
 					return;
 				}
 			}
@@ -82,7 +83,7 @@ export default function FeedbackPage() {
 				body,
 				email: emailToSubmit,
 			});
-			Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+			await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 			const text1 = type === "feature" ? "Feedback submitted" : "Issue reported";
 			const text2 = type === "feature" ? "Thank you for your feedback!" : "Thank you for your report!";
 			Toast.show({ type: "success", text1, text2 });

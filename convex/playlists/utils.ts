@@ -15,3 +15,21 @@ export const ensurePlaylistBelongsToUser = async (
 	}
 	return playlist;
 };
+
+export const getLastPlaylistOrder = async (ctx: QueryCtx, userId: Id<"users">) => {
+	const lastByOrder = await ctx.db
+		.query("playlists")
+		.withIndex("by_user_order", (q) => q.eq("userId", userId))
+		.order("desc")
+		.take(1);
+	return lastByOrder[0]?.order ?? 0;
+};
+
+export const getLastPlaylistStoryOrder = async (ctx: QueryCtx, playlistId: Id<"playlists">) => {
+	const lastByOrder = await ctx.db
+		.query("playlistStories")
+		.withIndex("by_playlist_id_order", (q) => q.eq("playlistId", playlistId))
+		.order("desc")
+		.take(1);
+	return lastByOrder[0]?.order ?? 0;
+};

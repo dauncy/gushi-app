@@ -1,7 +1,8 @@
 import { mutation } from "@/convex/_generated/server";
 import { verifyAccess } from "@/convex/common/utils";
 import { ConvexError, v } from "convex/values";
-import { ensurePlaylistBelongsToUser } from "./utils";
+import { Id } from "../_generated/dataModel";
+import { ensurePlaylistBelongsToUser, getLastPlaylistOrder, getLastPlaylistStoryOrder } from "./utils";
 
 export const createPlaylist = mutation({
 	args: {
@@ -21,14 +22,7 @@ export const createPlaylist = mutation({
 					error: "Playlist with this title already exists",
 				};
 			}
-
-			const lastByOrder = await ctx.db
-				.query("playlists")
-				.withIndex("by_user_order", (q) => q.eq("userId", dbUser._id))
-				.order("desc")
-				.take(1);
-
-			const order = lastByOrder[0]?.order ?? 0;
+			const order = await getLastPlaylistOrder(ctx, dbUser._id);
 			const playlist = await ctx.db.insert("playlists", {
 				userId: dbUser._id,
 				name: args.title,
@@ -81,6 +75,44 @@ export const reorderPlaylist = mutation({
 			}
 			console.warn("[@/convex/playlists/mutations.ts]: reorderPlaylist() => error", e);
 			return { success: false };
+		}
+	},
+});
+
+export const addStoriesToPlaylist = mutation({
+	args: {
+		playlistId: v.id("playlists"),
+		storyIds: v.array(v.id("stories")),
+	},
+	handler: async (ctx, args) => {
+		try {
+			const { dbUser } = await verifyAccess(ctx, { validateSubscription: false });
+			await ensurePlaylistBelongsToUser(ctx, { playlistId: args.playlistId, userId: dbUser._id });
+			let order = await getLastPlaylistStoryOrder(ctx, args.playlistId);
+			const storyOrders: { order: number; storyId: Id<"stories"> }[] = [];
+			for (const storyId of args.storyIds) {
+				storyOrders.push({ order: order + 1, storyId });
+				order++;
+			}
+			return await Promise.all(
+				storyOrders.map((storyOrder) => {
+					return ctx.db.insert("playlistStories", {
+						playlistId: args.playlistId,
+						storyId: storyOrder.storyId,
+						order: storyOrder.order,
+						createdAt: new Date().toISOString(),
+						updatedAt: new Date().toISOString(),
+					});
+				}),
+			);
+		} catch (e) {
+			if (e instanceof ConvexError) {
+				if (e.data.toLowerCase().includes("unauthorized")) {
+					return null;
+				}
+			}
+			console.warn("[@/convex/playlists/mutations.ts]: addStoriesToPlaylist() => error", e);
+			return null;
 		}
 	},
 });

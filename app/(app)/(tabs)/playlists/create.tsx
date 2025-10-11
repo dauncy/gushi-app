@@ -134,7 +134,7 @@ export default function CreatePlaylistPage() {
 
 		if (error) {
 			Toast.show({ type: "error", text1: "Something went wrong", text2: error });
-			Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+			await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
 			setIsSubmitting(false);
 			return;
 		}
@@ -145,13 +145,13 @@ export default function CreatePlaylistPage() {
 				text1: "Something went wrong",
 				text2: "We hit a snag trying to create your playlist. Please try again later",
 			});
-			Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+			await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
 			setIsSubmitting(false);
 			return;
 		}
 
 		Toast.show({ type: "success", text1: "Playlist created", text2: "Your playlist has been created" });
-		Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+		await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 		router.dismissTo("/playlists");
 		setIsSubmitting(false);
 	}, [isSubmitting, title, createPlaylist, image?.fileId, router]);
