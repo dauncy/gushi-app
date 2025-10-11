@@ -1,40 +1,25 @@
+import GushiThumbnail from "@/assets/images/thumbnail.png";
+import { SecondaryHeader } from "@/components/nav/secondary-header";
 import { ChevronRight } from "@/components/ui/icons/chevron-right-icon";
 import { Image } from "@/components/ui/image";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { api } from "@/convex/_generated/api";
+import { useIsIpad } from "@/hooks/use-is-ipad";
 import { usePresentPaywall } from "@/hooks/use-present-paywall";
+import { AUTOPLAY_KEY, BLUR_HASH } from "@/lib/constants";
+import { getData, storeData } from "@/lib/storage";
+import { cn } from "@/lib/utils";
 import { useMutation } from "convex/react";
 import * as Linking from "expo-linking";
-import { Href, router, useRouter } from "expo-router";
+import { Href, router } from "expo-router";
+import { debounce } from "lodash";
 import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert, Pressable, ScrollView, Switch, Text, View } from "react-native";
 import Purchases, { PurchasesPackage } from "react-native-purchases";
 
-import GushiThumbnail from "@/assets/images/thumbnail.png";
-import { SecondaryHeader } from "@/components/nav/secondary-header";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useIsIpad } from "@/hooks/use-is-ipad";
-import { AUTOPLAY_KEY, BLUR_HASH } from "@/lib/constants";
-import { getData, storeData } from "@/lib/storage";
-import { cn } from "@/lib/utils";
-import { debounce } from "lodash";
-
 export default function SettingsListPage() {
 	const clickRef = useRef(false);
-	const router = useRouter();
-
-	const handleBack = useCallback(() => {
-		if (clickRef.current) return;
-		clickRef.current = true;
-		if (router.canGoBack()) {
-			router.back();
-		} else {
-			router.dismissTo("/");
-		}
-		setTimeout(() => {
-			clickRef.current = false;
-		}, 500);
-	}, [router]);
 
 	return (
 		<View className="flex-1 relative bg-background">
@@ -45,7 +30,7 @@ export default function SettingsListPage() {
 						alignItems: "stretch",
 						flexGrow: 1,
 					}}
-					className="bg-black/10 gap-y-8 flex-1"
+					className="bg-foreground/10 gap-y-8 flex-1"
 					showsVerticalScrollIndicator={false}
 					alwaysBounceVertical={false}
 				>
@@ -105,12 +90,12 @@ const AutoPlaySection = () => {
 	);
 
 	return (
-		<Pressable className="w-full py-4 px-4 flex flex-row gap-x-4 items-center border-b border-black/20 bg-background/60">
+		<Pressable className="w-full py-4 px-4 flex flex-row gap-x-4 items-center border-b border-foreground/20">
 			<View className="flex-1 flex flex-col gap-y-0">
-				<Text className="text-foreground font-medium text-xl" maxFontSizeMultiplier={1.2}>
+				<Text className="text-foreground font-semibold text-xl" maxFontSizeMultiplier={1.2}>
 					Auto play
 				</Text>
-				<Text className="text-foreground/80 w-3/4 text-sm" maxFontSizeMultiplier={1.2}>
+				<Text className="text-foreground w-3/4 text-sm" maxFontSizeMultiplier={1.2}>
 					Automatically play the next story when the current one ends
 				</Text>
 			</View>
@@ -141,13 +126,13 @@ const LegalRow = ({
 	return (
 		<Pressable
 			onPress={handlePress}
-			className="w-full py-4 px-4 flex flex-row gap-x-4 items-center border-b border-black/20 bg-background/60"
+			className="w-full py-4 px-4 flex flex-row gap-x-4 items-center border-b border-foreground/20 "
 		>
 			<View className="flex-1 flex flex-col gap-y-0">
-				<Text className="text-foreground font-medium text-xl" maxFontSizeMultiplier={1.2}>
+				<Text className="text-foreground font-semibold text-xl" maxFontSizeMultiplier={1.2}>
 					{title}
 				</Text>
-				<Text className="text-foreground/80 w-3/4 text-sm" maxFontSizeMultiplier={1.2}>
+				<Text className="text-foreground w-3/4 text-sm" maxFontSizeMultiplier={1.2}>
 					{description}
 				</Text>
 			</View>
@@ -155,7 +140,7 @@ const LegalRow = ({
 				onPress={handlePress}
 				className="size-[34px] rounded-full active:bg-black/10 flex items-center justify-center"
 			>
-				<ChevronRight className="size-[24px] text-foreground/80" />
+				<ChevronRight className="size-[24px] text-foreground" />
 			</Pressable>
 		</Pressable>
 	);
@@ -183,13 +168,13 @@ const FeedbackRow = ({
 	return (
 		<Pressable
 			onPress={handlePress}
-			className="w-full py-4 px-4 flex flex-row gap-x-4 items-center border-b border-black/20 bg-background/60"
+			className="w-full py-4 px-4 flex flex-row gap-x-4 items-center border-b border-foreground/20 "
 		>
 			<View className="flex-1 flex flex-col gap-y-0">
-				<Text className="text-foreground font-medium text-xl" maxFontSizeMultiplier={1.2}>
+				<Text className="text-foreground font-semibold text-xl" maxFontSizeMultiplier={1.2}>
 					{title}
 				</Text>
-				<Text className="text-foreground/80 w-3/4 text-sm" maxFontSizeMultiplier={1.2}>
+				<Text className="text-foreground w-3/4 text-sm" maxFontSizeMultiplier={1.2}>
 					{description}
 				</Text>
 			</View>
@@ -197,7 +182,7 @@ const FeedbackRow = ({
 				onPress={handlePress}
 				className="size-[34px] rounded-full active:bg-black/10 flex items-center justify-center"
 			>
-				<ChevronRight className="size-[24px] text-foreground/80" />
+				<ChevronRight className="size-[24px] text-foreground" />
 			</Pressable>
 		</Pressable>
 	);
@@ -229,13 +214,13 @@ const ResetAppDataRow = ({ clickRef }: { clickRef: RefObject<boolean> }) => {
 	return (
 		<Pressable
 			onPress={handleResetAppData}
-			className="w-full py-4 px-4 flex flex-row gap-x-4 items-center border-b border-black/20 bg-background/60"
+			className="w-full py-4 px-4 flex flex-row gap-x-4 items-center border-b border-foreground/20 "
 		>
 			<View className="flex-1 flex flex-col gap-y-0">
-				<Text className="text-foreground font-medium text-xl" maxFontSizeMultiplier={1.2}>
+				<Text className="text-foreground font-semibold text-xl" maxFontSizeMultiplier={1.2}>
 					Reset account
 				</Text>
-				<Text className="text-foreground/80 w-3/4 text-sm" maxFontSizeMultiplier={1.2}>
+				<Text className="text-foreground w-3/4 text-sm" maxFontSizeMultiplier={1.2}>
 					Reset your app data
 				</Text>
 			</View>
@@ -260,15 +245,15 @@ const FreeUserSubscriptionRow = () => {
 	return (
 		<View
 			className={cn(
-				"w-full py-4 px-4 flex flex-row gap-x-4 items-start border-b border-black/20 bg-background/60",
+				"w-full py-4 px-4 flex flex-row gap-x-4 items-start border-b border-foreground/20 ",
 				!isIpad && "flex-1 self-stretch grow ",
 			)}
 		>
 			<View className="flex-1 flex flex-col gap-y-0">
-				<Text className="text-foreground font-medium text-xl" maxFontSizeMultiplier={1.2}>
+				<Text className="text-foreground font-semibold text-xl" maxFontSizeMultiplier={1.2}>
 					My Subscription
 				</Text>
-				<Text className="text-foreground/80 text-sm w-3/4" maxFontSizeMultiplier={1.2}>
+				<Text className="text-foreground text-sm w-3/4" maxFontSizeMultiplier={1.2}>
 					{"Upgrade to Gushi Premium to get access to our entire library of stories."}
 				</Text>
 			</View>
@@ -276,7 +261,7 @@ const FreeUserSubscriptionRow = () => {
 				onPress={presentPaywall}
 				className="size-[34px] rounded-full active:bg-black/10 flex items-center justify-center"
 			>
-				<ChevronRight className="size-[24px] text-foreground/80" />
+				<ChevronRight className="size-[24px] text-foreground" />
 			</Pressable>
 		</View>
 	);
@@ -340,8 +325,8 @@ const MonthlyUserSubscriptionRow = ({ clickRef }: { clickRef: RefObject<boolean>
 		if (loading) {
 			return (
 				<View className="flex flex-col gap-y-1.5 flex-1">
-					<Skeleton className="h-4 w-32 bg-black/10" />
-					<Skeleton className="h-3 w-16 bg-black/10" />
+					<Skeleton className="h-4 w-32 bg-foreground/20" />
+					<Skeleton className="h-3 w-16 bg-foreground/20" />
 				</View>
 			);
 		}
@@ -359,7 +344,7 @@ const MonthlyUserSubscriptionRow = ({ clickRef }: { clickRef: RefObject<boolean>
 				<Text className="text-border font-semibold text-lg" maxFontSizeMultiplier={1.2}>
 					{offering.product.title}
 				</Text>
-				<Text className="text-foreground/80 text-sm" maxFontSizeMultiplier={1.2}>
+				<Text className="text-foreground text-sm" maxFontSizeMultiplier={1.2}>
 					{offering.product.pricePerMonthString}/month
 				</Text>
 			</View>
@@ -369,15 +354,15 @@ const MonthlyUserSubscriptionRow = ({ clickRef }: { clickRef: RefObject<boolean>
 	return (
 		<View
 			className={cn(
-				"w-full py-4 px-4 flex flex-col gap-y-4  border-b border-black/20 bg-background/60",
+				"w-full py-4 px-4 flex flex-col gap-y-4  border-b border-foreground/20 ",
 				!isIpad && "flex-1 self-stretch grow ",
 			)}
 		>
-			<Text className="text-foreground font-medium text-xl" maxFontSizeMultiplier={1.2}>
+			<Text className="text-foreground font-semibold text-xl" maxFontSizeMultiplier={1.2}>
 				My Subscription
 			</Text>
 			<View className="flex flex-row gap-x-4 w-full items-start">
-				<View className="size-[56px] rounded-lg bg-black/10">
+				<View className="size-[56px] rounded-lg bg-foreground/20">
 					<Image
 						placeholder={{ blurhash: BLUR_HASH }}
 						transition={100}
@@ -392,7 +377,7 @@ const MonthlyUserSubscriptionRow = ({ clickRef }: { clickRef: RefObject<boolean>
 				{!loading && (
 					<Pressable
 						onPress={handleCancelSubscription}
-						className="px-8 py-1 min-h-10 border border-destructive rounded-full active:bg-black/10 self-center items-center justify-center"
+						className="px-8 py-1 min-h-10 border border-destructive rounded-full active:bg-foreground/10 self-center items-center justify-center"
 					>
 						<Text className="text-destructive text-sm" maxFontSizeMultiplier={1.2}>
 							{"Cancel"}
@@ -409,15 +394,15 @@ const LifetimeUserSubscriptionRow = () => {
 	return (
 		<View
 			className={cn(
-				"w-full py-4 px-4 flex flex-col gap-y-4  border-b border-black/20 bg-background/60",
+				"w-full py-4 px-4 flex flex-col gap-y-4  border-b border-foreground/20 ",
 				!isIpad && "flex-1 self-stretch grow ",
 			)}
 		>
-			<Text className="text-foreground font-medium text-xl" maxFontSizeMultiplier={1.2}>
+			<Text className="text-foreground font-semibold text-xl" maxFontSizeMultiplier={1.2}>
 				My Subscription
 			</Text>
 			<View className="flex flex-row gap-x-4 w-full items-start">
-				<View className="size-[56px] rounded-lg bg-black/10">
+				<View className="size-[56px] rounded-lg bg-foreground/20">
 					<Image
 						placeholder={{ blurhash: BLUR_HASH }}
 						transition={100}
@@ -431,7 +416,7 @@ const LifetimeUserSubscriptionRow = () => {
 					<Text className="text-border font-semibold text-lg" maxFontSizeMultiplier={1.2}>
 						{"Gushi Premium"}
 					</Text>
-					<Text className="text-foreground/80 text-sm" maxFontSizeMultiplier={1.2}>
+					<Text className="text-foreground text-sm" maxFontSizeMultiplier={1.2}>
 						{"Lifetime member"}
 					</Text>
 				</View>
