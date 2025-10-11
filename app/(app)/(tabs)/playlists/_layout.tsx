@@ -19,20 +19,6 @@ export default function PlaylistsLayout() {
 				}}
 			/>
 			<Stack.Screen name="[playlistId]" options={{ headerShown: false }} />
-			{/*<Stack.Screen
-				name="edit"
-				options={{
-					headerShown: false,
-					presentation: "modal",
-					sheetCornerRadius: 48,
-					sheetGrabberVisible: true,
-					animation: "slide_from_bottom",
-					animationDuration: 300,
-					contentStyle: {
-						height: "100%",
-					},
-				}}
-			/> */}
 		</Stack>
 	);
 }

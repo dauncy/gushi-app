@@ -7,15 +7,18 @@ import { toastConfig } from "@/components/ui/toast";
 import { useCustomAuth } from "@/context/AuthContext";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import { usePreventFormDismiss } from "@/hooks/use-prevent-form-dismiss";
 import { cn, getConvexSiteURL } from "@/lib/utils";
 import { useConvexMutation } from "@convex-dev/react-query";
-import { usePreventRemove } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
-import { useNavigation, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Pressable, ScrollView, View } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, Pressable, ScrollView, View } from "react-native";
 import Toast from "react-native-toast-message";
+
+const ALERT_TITLE = "Discard Changes";
+const ALERT_MESSAGE = "Are you sure you want to cancel this playlist?";
 
 export default function CreatePlaylistPage() {
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -27,7 +30,6 @@ export default function CreatePlaylistPage() {
 		(ImagePicker.ImagePickerAsset & { storageId: Id<"_storage">; fileId: Id<"files"> }) | null
 	>(null);
 	const [uploading, setUploading] = useState(false);
-	const navigation = useNavigation();
 	const isDirty = useMemo(() => {
 		return title.trim().length > 0 || image !== null;
 	}, [title, image]);
@@ -154,33 +156,7 @@ export default function CreatePlaylistPage() {
 		setIsSubmitting(false);
 	}, [isSubmitting, title, createPlaylist, image?.fileId, router]);
 
-	usePreventRemove(true, (data) => {
-		if (data.data.action.type === "POP_TO") {
-			navigation.dispatch(data.data.action);
-			return;
-		}
-		if (data.data.action.type === "GO_BACK") {
-			navigation.dispatch(data.data.action);
-			return;
-		}
-		if (!isDirty) {
-			navigation.dispatch(data.data.action);
-			return;
-		}
-		Alert.alert("Discard Changes", "Are you sure you want to cancel this playlist?", [
-			{
-				text: "Discard Changes",
-				style: "destructive",
-				onPress: () => {
-					navigation.dispatch(data.data.action);
-				},
-			},
-			{
-				text: "Cancel",
-				style: "cancel",
-			},
-		]);
-	});
+	usePreventFormDismiss({ isDirty, alertTitle: ALERT_TITLE, alertMessage: ALERT_MESSAGE });
 
 	return (
 		<>
@@ -198,8 +174,8 @@ export default function CreatePlaylistPage() {
 						backDisabled={backDisabled}
 						dismissTo="/playlists"
 						formTitle="Create a Playlist"
-						alertTitle="Discard Changes"
-						alertMessage="Are you sure you want to cancel this playlist?"
+						alertTitle={ALERT_TITLE}
+						alertMessage={ALERT_MESSAGE}
 						onSubmit={handleSubmit}
 					/>
 					<View className="flex-1 flex flex-col items-center  p-8 gap-y-8 w-full">

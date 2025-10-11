@@ -5,7 +5,7 @@ export default function PlaylistLayout() {
 		<Stack>
 			<Stack.Screen name="index" options={{ headerShown: false }} />
 			<Stack.Screen
-				name="add-songs"
+				name="add-stories"
 				options={{
 					headerShown: false,
 					presentation: "modal",

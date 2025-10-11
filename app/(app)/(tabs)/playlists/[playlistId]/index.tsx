@@ -94,7 +94,7 @@ const AddStoryButton = ({ playlistId }: { playlistId: string }) => {
 	const handlePress = useCallback(() => {
 		if (pressRef.current) return;
 		pressRef.current = true;
-		router.push(`/playlists/${playlistId}/add-songs`);
+		router.push(`/playlists/${playlistId}/add-stories`);
 		setTimeout(() => {
 			pressRef.current = false;
 		}, 500);

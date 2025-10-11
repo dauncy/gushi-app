@@ -3,15 +3,15 @@ import { Form, FormField, FormInput, FormItem, FormLabel, FormMessage } from "@/
 import { Textarea } from "@/components/ui/textarea";
 import { toastConfig } from "@/components/ui/toast";
 import { api } from "@/convex/_generated/api";
+import { usePreventFormDismiss } from "@/hooks/use-prevent-form-dismiss";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { usePreventRemove } from "@react-navigation/native";
 import { useMutation } from "convex/react";
 import * as Haptics from "expo-haptics";
-import { useGlobalSearchParams, useNavigation, useRouter } from "expo-router";
+import { useGlobalSearchParams, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { Alert, Keyboard, KeyboardAvoidingView, ScrollView, View } from "react-native";
+import { Keyboard, KeyboardAvoidingView, ScrollView, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 
@@ -29,8 +29,11 @@ const giveFeedbackSchema = z.object({
 
 const emailCheck = z.string().email();
 
+const ALERT_TITLE = "Discard Changes";
+const ALERT_MESSAGE_ISSUE = "Are you sure you want to cancel this report?";
+const ALERT_MESSAGE_FEATURE = "Are you sure you want to cancel this feedback?";
+
 export default function FeedbackPage() {
-	const navigation = useNavigation();
 	const submitFeedback = useMutation(api.feedback.mutations.createFeedback);
 	const { type } = useGlobalSearchParams<{ type: "feature" | "issue" }>();
 	const scrollViewRef = useRef<ScrollView>(null);
@@ -92,36 +95,10 @@ export default function FeedbackPage() {
 		await form.handleSubmit(onSubmit)();
 	}, [form, onSubmit]);
 
-	usePreventRemove(true, (data) => {
-		if (data.data.action.type === "POP_TO") {
-			navigation.dispatch(data.data.action);
-			return;
-		}
-		if (data.data.action.type === "GO_BACK") {
-			navigation.dispatch(data.data.action);
-			return;
-		}
-		if (!isDirty) {
-			navigation.dispatch(data.data.action);
-			return;
-		}
-		const msg =
-			type === "feature"
-				? "Are you sure you want to cancel this feedback?"
-				: "Are you sure you want to cancel this issue?";
-		Alert.alert("Discard Changes", msg, [
-			{
-				text: "Discard Changes",
-				style: "destructive",
-				onPress: () => {
-					navigation.dispatch(data.data.action);
-				},
-			},
-			{
-				text: "Cancel",
-				style: "cancel",
-			},
-		]);
+	usePreventFormDismiss({
+		isDirty,
+		alertTitle: ALERT_TITLE,
+		alertMessage: type === "feature" ? ALERT_MESSAGE_FEATURE : ALERT_MESSAGE_ISSUE,
 	});
 
 	return (
@@ -140,12 +117,8 @@ export default function FeedbackPage() {
 						backDisabled={pending}
 						dismissTo="/settings"
 						formTitle="Feedback"
-						alertTitle="Discard Changes"
-						alertMessage={
-							type === "feature"
-								? "Are you sure you want to cancel this feedback?"
-								: "Are you sure you want to cancel this report?"
-						}
+						alertTitle={ALERT_TITLE}
+						alertMessage={type === "feature" ? ALERT_MESSAGE_FEATURE : ALERT_MESSAGE_ISSUE}
 						onSubmit={handleSubmit}
 					/>
 					<View className="w-full flex flex-col gap-y-4 px-4 flex-1">

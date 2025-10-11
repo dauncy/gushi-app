@@ -10,8 +10,12 @@ export const getStories = query({
 	args: {
 		paginationOpts: paginationOptsValidator,
 		categoryId: v.optional(v.id("categories")),
+		includeFeatured: v.optional(v.boolean()),
 	},
-	handler: async (ctx, { paginationOpts, categoryId }): Promise<PaginationResult<StoryPreview>> => {
+	handler: async (
+		ctx,
+		{ paginationOpts, categoryId, includeFeatured = false },
+	): Promise<PaginationResult<StoryPreview>> => {
 		try {
 			await verifyAccess(ctx, { validateSubscription: false });
 			if (categoryId) {
@@ -43,12 +47,15 @@ export const getStories = query({
 					page: stories,
 				};
 			}
-
-			const storiesPage = await ctx.db
+			let query = ctx.db
 				.query("stories")
-				.withIndex("by_featured_enabled", (q) => q.eq("featured", false).eq("enabled", true))
-				.order("desc")
-				.paginate(paginationOpts);
+				.withIndex("by_featured_enabled", (q) => q.eq("featured", false).eq("enabled", true));
+
+			if (includeFeatured) {
+				query = ctx.db.query("stories").withIndex("by_enabled", (q) => q.eq("enabled", true));
+			}
+
+			const storiesPage = await query.order("desc").paginate(paginationOpts);
 
 			const stories = await Promise.all(
 				storiesPage.page.map(async (story) => {
