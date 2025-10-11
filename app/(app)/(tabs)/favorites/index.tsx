@@ -1,4 +1,5 @@
 import { AudioPreviewPlayer } from "@/components/audio/audio-preview";
+import { SecondaryHeader } from "@/components/nav/secondary-header";
 import { EnhancedStoryCard } from "@/components/stories/enhanced-story-card";
 import { StoryCardLoading } from "@/components/stories/story-card";
 import { Headphones } from "@/components/ui/icons/headphones-icon";
@@ -17,6 +18,7 @@ export default function FavoritesListPage() {
 	const router = useRouter();
 	return (
 		<View style={{ flex: 1 }} className="relative">
+			<SecondaryHeader title="Favorites" />
 			<FavoritesList />
 			<AudioPreviewPlayer
 				className="bottom-2"
@@ -76,7 +78,7 @@ const FavoritesList = () => {
 		};
 	}, [isLoading, refreshing, results.length]);
 	return (
-		<View style={{ flex: 1 }} className="relative bg-[#fffbf3] flex flex-col px-0 pt-4">
+		<View style={{ flex: 1 }} className="relative bg-[#fffbf3] flex flex-col px-0">
 			<View className="flex-1 bg-black/10 px-2">
 				<FlashList
 					showsVerticalScrollIndicator={false}
@@ -112,13 +114,11 @@ const FavoritesList = () => {
 						</>
 					}
 					ListFooterComponent={
-						<>
-							{status === "LoadingMore" ? (
-								<View className="flex flex-row items-center justify-center">
-									<ActivityIndicator size="small" color="#8b5cf6" />
-								</View>
-							) : null}
-						</>
+						status === "LoadingMore" ? (
+							<View className="flex flex-row items-center justify-center px-4 py-1.5">
+								<ActivityIndicator size="small" color="#ff78e5" />
+							</View>
+						) : null
 					}
 				/>
 			</View>

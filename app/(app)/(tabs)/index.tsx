@@ -161,13 +161,11 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 					</>
 				}
 				ListFooterComponent={
-					<>
-						{status === "LoadingMore" ? (
-							<View className="flex flex-row items-center justify-center">
-								<ActivityIndicator size="small" color="#8b5cf6" />
-							</View>
-						) : null}
-					</>
+					status === "LoadingMore" ? (
+						<View className="flex flex-row items-center justify-center px-4 py-1.5">
+							<ActivityIndicator size="small" color="#ff78e5" />
+						</View>
+					) : null
 				}
 			/>
 		</View>

@@ -1,7 +1,8 @@
 import { Id } from "@/convex/_generated/dataModel";
 import { query, QueryCtx } from "@/convex/_generated/server";
 import { verifyAccess } from "@/convex/common/utils";
-import { ConvexError, v } from "convex/values";
+import { paginationOptsValidator, PaginationResult } from "convex/server";
+import { ConvexError } from "convex/values";
 import { PlaylistPreview } from "./schema";
 
 const getPlaylistStoryCount = async (ctx: QueryCtx, playlistId: Id<"playlists">) => {
@@ -27,25 +28,18 @@ type PlaylistPromiseData = PlaylistStoryCount | PlaylistImageUrl;
 
 export const getUserPlaylists = query({
 	args: {
-		lastSeenOrder: v.optional(v.number()),
-		take: v.optional(v.number()),
+		paginationOpts: paginationOptsValidator,
 	},
-	handler: async (
-		ctx,
-		{ lastSeenOrder = 0, take = 10 },
-	): Promise<{
-		page: PlaylistPreview[];
-		lastSeenOrder: Id<"playlists"> | null;
-		done: boolean;
-	}> => {
+	handler: async (ctx, { paginationOpts }): Promise<PaginationResult<PlaylistPreview>> => {
 		try {
 			const { dbUser } = await verifyAccess(ctx, { validateSubscription: false });
 			const playlists = await ctx.db
 				.query("playlists")
-				.withIndex("by_user_order", (q) => q.eq("userId", dbUser._id).gt("order", lastSeenOrder))
-				.take(take);
+				.withIndex("by_user_order", (q) => q.eq("userId", dbUser._id))
+				.order("asc")
+				.paginate(paginationOpts);
 			const orderedPlaylists: PlaylistPreview[] = await Promise.all(
-				playlists
+				playlists.page
 					.sort((a, b) => a.order - b.order)
 					.map(async (playlist) => {
 						const promises: Promise<PlaylistPromiseData>[] = [
@@ -65,27 +59,25 @@ export const getUserPlaylists = query({
 						};
 					}),
 			);
-			const lastId = orderedPlaylists[orderedPlaylists.length - 1]?._id;
 			return {
+				...playlists,
 				page: orderedPlaylists,
-				lastSeenOrder: lastId ?? null,
-				done: orderedPlaylists.length < take,
 			};
 		} catch (error) {
 			if (error instanceof ConvexError) {
 				if (error.data.toLowerCase().includes("unauthorized")) {
 					return {
 						page: [],
-						lastSeenOrder: null,
-						done: true,
+						isDone: true,
+						continueCursor: "",
 					};
 				}
 			}
 			console.warn("[@/convex/playlists/queries.ts] getUserPlaylists error", error);
 			return {
 				page: [],
-				lastSeenOrder: null,
-				done: true,
+				isDone: true,
+				continueCursor: "",
 			};
 		}
 	},

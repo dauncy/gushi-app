@@ -1,4 +1,3 @@
-import { ArrowLeft } from "@/components/ui/icons/arrow-left-icon";
 import { ChevronRight } from "@/components/ui/icons/chevron-right-icon";
 import { Image } from "@/components/ui/image";
 import { useSubscription } from "@/context/SubscriptionContext";
@@ -12,6 +11,7 @@ import { Alert, Pressable, ScrollView, Switch, Text, View } from "react-native";
 import Purchases, { PurchasesPackage } from "react-native-purchases";
 
 import GushiThumbnail from "@/assets/images/thumbnail.png";
+import { SecondaryHeader } from "@/components/nav/secondary-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIsIpad } from "@/hooks/use-is-ipad";
 import { AUTOPLAY_KEY, BLUR_HASH } from "@/lib/constants";
@@ -37,55 +37,47 @@ export default function SettingsListPage() {
 	}, [router]);
 
 	return (
-		<View style={{ flex: 1 }} className="relative bg-[#fffbf3] flex flex-col px-0">
-			<View className="w-full px-4 p-4 relative items-center justify-center border-b border-black/20">
-				<Pressable
-					onPress={handleBack}
-					className="absolute left-4 size-[34px] rounded-full active:bg-black/10  z-50 flex items-center justify-center"
+		<View className="flex-1 relative bg-background">
+			<SecondaryHeader title="Settings" />
+			<View style={{ flex: 1 }} className="relative flex-col px-0 bg-background">
+				<ScrollView
+					contentContainerStyle={{
+						alignItems: "stretch",
+						flexGrow: 1,
+					}}
+					className="bg-black/10 gap-y-8 flex-1"
+					showsVerticalScrollIndicator={false}
+					alwaysBounceVertical={false}
 				>
-					<ArrowLeft className="size-[24px] text-foreground" />
-				</Pressable>
-				<Text className="font-semibold text-3xl text-foreground" allowFontScaling={false}>
-					{"Settings"}
-				</Text>
+					<AutoPlaySection />
+					<FeedbackRow
+						title="Report an issue"
+						description="Something not working the way it should? Let us know!"
+						link={"/settings/feedback?type=issue"}
+						clickRef={clickRef}
+					/>
+					<FeedbackRow
+						title="Provide feedback"
+						description="Shae your thoughts, give kudos, or request a feature!"
+						link={"/settings/feedback?type=feature"}
+						clickRef={clickRef}
+					/>
+					<LegalRow
+						title="Privacy Policy"
+						description="Read our privacy policy"
+						link={`${process.env.EXPO_PUBLIC_WEB_URL}/privacy`}
+						clickRef={clickRef}
+					/>
+					<LegalRow
+						title="Terms of Service"
+						description="Read our terms of service"
+						link={`${process.env.EXPO_PUBLIC_WEB_URL}/terms`}
+						clickRef={clickRef}
+					/>
+					<ResetAppDataRow clickRef={clickRef} />
+					<SubscriptionRow clickRef={clickRef} />
+				</ScrollView>
 			</View>
-			<ScrollView
-				contentContainerStyle={{
-					alignItems: "stretch",
-					flexGrow: 1,
-				}}
-				className="bg-black/10 gap-y-8 flex-1"
-				showsVerticalScrollIndicator={false}
-				alwaysBounceVertical={false}
-			>
-				<AutoPlaySection />
-				<FeedbackRow
-					title="Report an issue"
-					description="Something not working the way it should? Let us know!"
-					link={"/settings/feedback?type=issue"}
-					clickRef={clickRef}
-				/>
-				<FeedbackRow
-					title="Provide feedback"
-					description="Shae your thoughts, give kudos, or request a feature!"
-					link={"/settings/feedback?type=feature"}
-					clickRef={clickRef}
-				/>
-				<LegalRow
-					title="Privacy Policy"
-					description="Read our privacy policy"
-					link={`${process.env.EXPO_PUBLIC_WEB_URL}/privacy`}
-					clickRef={clickRef}
-				/>
-				<LegalRow
-					title="Terms of Service"
-					description="Read our terms of service"
-					link={`${process.env.EXPO_PUBLIC_WEB_URL}/terms`}
-					clickRef={clickRef}
-				/>
-				<ResetAppDataRow clickRef={clickRef} />
-				<SubscriptionRow clickRef={clickRef} />
-			</ScrollView>
 		</View>
 	);
 }

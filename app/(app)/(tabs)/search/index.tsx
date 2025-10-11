@@ -1,4 +1,5 @@
 import { AudioPreviewPlayer } from "@/components/audio/audio-preview";
+import { SecondaryHeader } from "@/components/nav/secondary-header";
 import { EnhancedStorySearchCard } from "@/components/stories/story-search-card";
 import { ScanSearch } from "@/components/ui/icons/scan-search";
 import { Search } from "@/components/ui/icons/search-icon";
@@ -132,36 +133,37 @@ export default function SearchPge() {
 
 	return (
 		<>
-			<View style={{ flex: 1 }} className="relative flex-col px-0 bg-background">
-				<View className="flex-1 bg-black/10">
-					<KeyboardAvoidingView behavior={"padding"} keyboardVerticalOffset={0} className="flex-1">
-						<View className="px-2 w-full bg-background py-4  border-b border-black/20">
-							<View className="relative flex flex-row items-center w-full">
-								<Search className="absolute left-2 text-black/30 size-5" color="red" />
-								<Input
-									ref={searchRef}
-									placeholder="Search stories"
-									className="px-10 w-full"
-									onChangeText={handleInputChange}
-									autoFocus={true}
-									autoCorrect={false}
-								/>
-								{input && input.trim() !== "" && (
-									<Pressable
-										style={{
-											shadowColor: "#000",
-											shadowOffset: { width: 0.75, height: 1.5 },
-											shadowOpacity: 0.4,
-											shadowRadius: 3.25,
-										}}
-										onPress={clearSearch}
-										className={"size-7 rounded-full bg-black/20 flex items-center justify-center absolute right-2 "}
-									>
-										<X className="text-background size-3" size={16} />
-									</Pressable>
-								)}
-							</View>
+			<View className="flex-1 relative bg-background">
+				<SecondaryHeader title="Search" className="border-b-0" />
+				<KeyboardAvoidingView behavior={"padding"} keyboardVerticalOffset={0} className="flex-1">
+					<View className="px-2 w-full bg-background pb-4  border-b border-black/20 flex flex-col gap-y-2">
+						<View className="relative flex flex-row items-center w-full">
+							<Search className="absolute left-2 text-black/30 size-5" color="red" />
+							<Input
+								ref={searchRef}
+								placeholder="Search stories"
+								className="px-10 w-full"
+								onChangeText={handleInputChange}
+								autoFocus={true}
+								autoCorrect={false}
+							/>
+							{input && input.trim() !== "" && (
+								<Pressable
+									style={{
+										shadowColor: "#000",
+										shadowOffset: { width: 0.75, height: 1.5 },
+										shadowOpacity: 0.4,
+										shadowRadius: 3.25,
+									}}
+									onPress={clearSearch}
+									className={"size-7 rounded-full bg-black/20 flex items-center justify-center absolute right-2 "}
+								>
+									<X className="text-background size-3" size={16} />
+								</Pressable>
+							)}
 						</View>
+					</View>
+					<View className="flex-1 bg-black/10">
 						<FlashList
 							refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor="#ff78e5" />}
 							extraData={{ isLoading, refreshing, search }}
@@ -177,21 +179,19 @@ export default function SearchPge() {
 								</>
 							}
 							ListFooterComponent={
-								<>
-									{status === "LoadingMore" ? (
-										<View className="flex flex-row items-center justify-center px-4 py-1.5">
-											<ActivityIndicator size={16} color="#ff78e5" />
-										</View>
-									) : null}
-								</>
+								status === "LoadingMore" ? (
+									<View className="flex flex-row items-center justify-center px-4 py-1.5">
+										<ActivityIndicator size="small" color="#ff78e5" />
+									</View>
+								) : null
 							}
 							onEndReached={onEndReached}
 							keyboardShouldPersistTaps={"handled"}
 							onScroll={handleScroll}
 							scrollEventThrottle={250}
 						/>
-					</KeyboardAvoidingView>
-				</View>
+					</View>
+				</KeyboardAvoidingView>
 			</View>
 			<AudioPreviewPlayer
 				onCardPress={(id) => {

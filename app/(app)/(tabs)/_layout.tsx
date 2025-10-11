@@ -75,6 +75,7 @@ export default function TabsLayout() {
 				<Tabs.Screen
 					name="favorites"
 					options={{
+						headerShown: false,
 						title: "Favorites",
 						tabBarAccessibilityLabel: "Favorites",
 						tabBarIcon: ({ color, size, focused }) => (
@@ -85,6 +86,7 @@ export default function TabsLayout() {
 				<Tabs.Screen
 					name="playlists"
 					options={{
+						headerShown: false,
 						title: "Playlists",
 						tabBarAccessibilityLabel: "Playlists",
 						tabBarIcon: ({ color, size, focused }) => (
@@ -96,6 +98,7 @@ export default function TabsLayout() {
 					name="search"
 					options={{
 						title: "Search",
+						headerShown: false,
 						tabBarAccessibilityLabel: "Search",
 						tabBarIcon: ({ color, size, focused }) => (
 							<Search size={size} className={focused ? "text-[#0395ff]" : "text-black/30"} />

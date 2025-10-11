@@ -1,3 +1,4 @@
+import { SecondaryHeader } from "@/components/nav/secondary-header";
 import { PlaylistCard, PlaylistCardLoading } from "@/components/playlists/playlist-card";
 import { Headphones } from "@/components/ui/icons/headphones-icon";
 import { Play } from "@/components/ui/icons/play-icon";
@@ -5,58 +6,84 @@ import { Playlist } from "@/components/ui/icons/playlist-icon";
 import { Plus } from "@/components/ui/icons/plus-icon";
 import { api } from "@/convex/_generated/api";
 import { PlaylistPreview } from "@/convex/playlists/schema";
-import { useConvexQuery } from "@/hooks/use-convexQuery";
+import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { useConvexMutation } from "@convex-dev/react-query";
 import { Link } from "expo-router";
-import { useCallback } from "react";
-import { Pressable, RefreshControl, Text, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator, Pressable, RefreshControl, Text, View } from "react-native";
 import DraggableFlatList from "react-native-draggable-flatlist";
+
 export default function PlaylistsListPage() {
+	const [isReordering, setIsReordering] = useState(false);
 	const reorderPlaylist = useConvexMutation(api.playlists.mutations.reorderPlaylist);
-	const {
-		data,
-		isLoading,
-		isRefetching: refreshing,
-		refetch,
-		isFetching,
-	} = useConvexQuery(
+	const [localResults, setLocalResults] = useState<PlaylistPreview[]>([]);
+	const { isLoading, refreshing, refresh, loadMore, results, status } = useConvexPaginatedQuery(
 		api.playlists.queries.getUserPlaylists,
 		{},
 		{
-			staleTime: 0,
+			initialNumItems: 10,
 		},
 	);
-	const results = data?.page ?? [];
-	const refresh = useCallback(async () => {
-		await refetch();
-	}, [refetch]);
 
 	const handleReorder = useCallback(
 		async (data: PlaylistPreview[]) => {
+			setLocalResults(data);
+			setIsReordering(true);
 			const playlistOrders = data.map((playlist, index) => ({
 				playlistId: playlist._id,
 				order: index + 1,
 			}));
+
 			await reorderPlaylist({ playlistOrders });
+			setTimeout(() => {
+				setIsReordering(false);
+			}, 350);
 		},
-		[reorderPlaylist],
+		[reorderPlaylist, setIsReordering, setLocalResults],
 	);
+
+	useEffect(() => {
+		if (!isReordering) {
+			setLocalResults(results);
+		}
+	}, [results, setLocalResults, isReordering]);
+
+	const onEndReached = useCallback(() => {
+		if (status === "CanLoadMore") {
+			loadMore(10);
+		}
+	}, [loadMore, status]);
+
 	return (
-		<View className="flex-1 pt-4 relative bg-background">
+		<View className="flex-1 relative bg-background">
+			<SecondaryHeader title="Playlists" />
 			<View style={{ flex: 1 }} className="relative flex-col px-0 bg-black/10">
 				<DraggableFlatList
 					contentContainerClassName=" h-full"
-					refreshControl={
-						<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refresh} tintColor="#ff78e5" />
-					}
-					data={results}
-					extraData={[refresh, isFetching, isLoading, refreshing]}
-					keyExtractor={(item) => item._id}
-					renderItem={({ item, drag, isActive }) => <PlaylistCard playlist={item} drag={drag} isActive={isActive} />}
-					ListEmptyComponent={<>{isLoading || refreshing ? <PlaylistsLoading /> : <EmptyState />}</>}
+					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor="#ff78e5" />}
+					onEndReached={onEndReached}
 					onDragEnd={({ data }) => {
 						handleReorder(data);
 					}}
+					data={localResults}
+					keyExtractor={(item) => item._id}
+					renderItem={({ item, isActive, drag }) => (
+						<PlaylistCard key={item._id} playlist={item} drag={drag} isActive={isActive} />
+					)}
+					ListEmptyComponent={
+						isLoading || refreshing || (localResults.length === 0 && results.length >= 0) ? (
+							<PlaylistsLoading />
+						) : (
+							<EmptyState />
+						)
+					}
+					ListFooterComponent={
+						status === "LoadingMore" ? (
+							<View className="flex flex-row items-center justify-center px-4 py-1.5">
+								<ActivityIndicator size="small" color="#ff78e5" />
+							</View>
+						) : null
+					}
 				/>
 			</View>
 			<Link asChild href="/playlists/create">
