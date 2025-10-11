@@ -24,7 +24,9 @@ export const SecondaryHeader = ({ title, className }: { title: string; className
 	}, [router]);
 
 	return (
-		<View className={cn("flex gap-x-2 flex-row w-full border-b border-black/20 py-4 px-2", className)}>
+		<View
+			className={cn("flex gap-x-2 flex-row w-full border-b-[0.5px] border-black/20 py-4 px-2 bg-background", className)}
+		>
 			<Pressable
 				onPress={handleBack}
 				className="size-[34px] -mt-2 rounded-full active:bg-black/10 flex items-center justify-center"

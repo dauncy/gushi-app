@@ -37,7 +37,7 @@ export default function PlaylistsListPage() {
 			await reorderPlaylist({ playlistOrders });
 			setTimeout(() => {
 				setIsReordering(false);
-			}, 350);
+			}, 500);
 		},
 		[reorderPlaylist, setIsReordering, setLocalResults],
 	);
@@ -55,9 +55,9 @@ export default function PlaylistsListPage() {
 	}, [loadMore, status]);
 
 	return (
-		<View className="flex-1 relative bg-background">
+		<View className="flex-1 relative bg-foreground/10">
 			<SecondaryHeader title="Playlists" />
-			<View style={{ flex: 1 }} className="relative flex-col px-0 bg-black/10">
+			<View style={{ flex: 1 }} className="relative flex-col px-0">
 				<DraggableFlatList
 					contentContainerClassName=" h-full"
 					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor="#ff78e5" />}

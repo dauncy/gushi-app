@@ -163,7 +163,7 @@ export default function SearchPge() {
 							)}
 						</View>
 					</View>
-					<View className="flex-1 bg-black/10">
+					<View className="flex-1 bg-foreground/10">
 						<FlashList
 							refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor="#ff78e5" />}
 							extraData={{ isLoading, refreshing, search }}

@@ -1,22 +1,17 @@
 import { Form, FormField, FormInput, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
+import { toastConfig } from "@/components/ui/toast";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { usePreventRemove } from "@react-navigation/native";
 import { useMutation } from "convex/react";
 import * as Haptics from "expo-haptics";
-import { useGlobalSearchParams, useRouter } from "expo-router";
-import { useEffect, useRef } from "react";
+import { useGlobalSearchParams, useNavigation, useRouter } from "expo-router";
+import { useCallback, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
-import {
-	ActivityIndicator,
-	Keyboard,
-	KeyboardAvoidingView,
-	ScrollView,
-	Text,
-	TouchableOpacity,
-	View,
-} from "react-native";
+import { Alert, Keyboard, KeyboardAvoidingView, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import Toast from "react-native-toast-message";
 import { z } from "zod";
 
 const giveFeedbackSchema = z.object({
@@ -34,22 +29,12 @@ const giveFeedbackSchema = z.object({
 const emailCheck = z.string().email();
 
 export default function FeedbackPage() {
+	const navigation = useNavigation();
 	const submitFeedback = useMutation(api.feedback.mutations.createFeedback);
 	const { type } = useGlobalSearchParams<{ type: "feature" | "issue" }>();
-	const navigateRef = useRef(true);
 	const scrollViewRef = useRef<ScrollView>(null);
 
 	const router = useRouter();
-
-	useEffect(() => {
-		const canNavigate = navigateRef.current;
-		if (canNavigate) {
-			return;
-		}
-		return () => {
-			navigateRef.current = false;
-		};
-	}, []);
 
 	const form = useForm<z.infer<typeof giveFeedbackSchema>>({
 		resolver: zodResolver(giveFeedbackSchema),
@@ -60,60 +45,101 @@ export default function FeedbackPage() {
 		},
 	});
 
+	const { title, body, email } = form.watch();
+
+	const isDirty = useMemo(() => {
+		return title.trim().length > 0 || body.trim().length > 0 || (email?.trim() ?? "").length > 0;
+	}, [title, body, email]);
+
+	const submitDisabled = useMemo(() => {
+		return title.trim().length <= 2 || body.trim().length <= 2;
+	}, [title, body]);
+
 	const pending = form.formState.isSubmitting || form.formState.isLoading;
 
-	const onSubmit = async (data: z.infer<typeof giveFeedbackSchema>) => {
-		const { title, body, email } = data;
-		Keyboard.dismiss();
-		let emailToSubmit = null;
-		if ((email ?? "").trim().length > 0) {
-			const emailResult = emailCheck.safeParse(email);
-			if (emailResult.success) {
-				emailToSubmit = email;
-			} else {
-				form.setError("email", { message: "Enter a valid email" });
-				return;
+	const onSubmit = useCallback(
+		async (data: z.infer<typeof giveFeedbackSchema>) => {
+			const { title, body, email } = data;
+			Keyboard.dismiss();
+			let emailToSubmit = null;
+			if ((email ?? "").trim().length > 0) {
+				const emailResult = emailCheck.safeParse(email);
+				if (emailResult.success) {
+					emailToSubmit = email;
+				} else {
+					form.setError("email", { message: "Enter a valid email" });
+					return;
+				}
 			}
-		}
 
-		await new Promise((resolve) => setTimeout(resolve, 1000));
-		await submitFeedback({
-			type,
-			title,
-			body,
-			email: emailToSubmit,
-		});
-		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+			await submitFeedback({
+				type,
+				title,
+				body,
+				email: emailToSubmit,
+			});
+			Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+			const text1 = type === "feature" ? "Feedback submitted" : "Issue reported";
+			const text2 = type === "feature" ? "Thank you for your feedback!" : "Thank you for your report!";
+			Toast.show({ type: "success", text1, text2 });
+			router.dismissTo("/settings");
+		},
+		[form, submitFeedback, type, router],
+	);
 
-		if (navigateRef.current) {
-			router.replace("/settings");
+	const handleSubmit = useCallback(async () => {
+		await form.handleSubmit(onSubmit)();
+	}, [form, onSubmit]);
+
+	usePreventRemove(true, (data) => {
+		if (data.data.action.type === "POP_TO") {
+			navigation.dispatch(data.data.action);
+			return;
 		}
-	};
+		if (data.data.action.type === "GO_BACK") {
+			navigation.dispatch(data.data.action);
+			return;
+		}
+		if (!isDirty) {
+			navigation.dispatch(data.data.action);
+			return;
+		}
+		const msg =
+			type === "feature"
+				? "Are you sure you want to cancel this feedback?"
+				: "Are you sure you want to cancel this issue?";
+		Alert.alert("Discard Changes", msg, [
+			{
+				text: "Discard Changes",
+				style: "destructive",
+				onPress: () => {
+					navigation.dispatch(data.data.action);
+				},
+			},
+			{
+				text: "Cancel",
+				style: "cancel",
+			},
+		]);
+	});
 
 	return (
-		<View className="flex-1 flex flex-col gap-y-12 bg-background">
-			<KeyboardAvoidingView className="flex-1" behavior={"padding"} keyboardVerticalOffset={0}>
+		<>
+			<KeyboardAvoidingView behavior={"padding"} keyboardVerticalOffset={0} className="flex-1 bg-background">
 				<ScrollView
 					ref={scrollViewRef}
-					className="flex-1"
-					keyboardShouldPersistTaps="handled"
-					alwaysBounceVertical={false}
+					className="flex-1 bg-background "
 					showsVerticalScrollIndicator={false}
-					contentContainerStyle={{
-						paddingBottom: 48,
-					}}
+					keyboardShouldPersistTaps="handled"
+					contentContainerStyle={{ flexGrow: 1, alignItems: "center", paddingBottom: 80 }}
 				>
-					<View className="w-full flex flex-col items-center">
-						<View className="w-full flex flex-col gap-y-2 p-4 pt-8 items-center">
-							<Text className="text-foreground text-xl font-medium">
-								{type === "feature" ? "Provide Feedback" : "Report an Issue"}
-							</Text>
-							<Text className="text-foreground/80 text-base w-2/3 text-center">
-								Help us improve the app! We want to hear from you.
-							</Text>
-						</View>
-						<View className="w-full h-[0.5px] bg-border" />
-					</View>
+					<PageHeader
+						type={type}
+						isDirty={isDirty}
+						submitDisabled={pending || submitDisabled}
+						backDisabled={pending}
+						onSubmit={handleSubmit}
+					/>
 					<View className="w-full flex flex-col gap-y-4 px-4 flex-1">
 						<Form {...form}>
 							<FormField
@@ -164,7 +190,7 @@ export default function FeedbackPage() {
 								name="body"
 								render={({ field }) => (
 									<FormItem className="w-full mt-5">
-										<FormLabel nativeID="message-label" disabled={pending}>
+										<FormLabel nativeID="message-label" disabled={pending} className={cn(pending && "opacity-50")}>
 											Message
 										</FormLabel>
 										<Textarea
@@ -186,26 +212,102 @@ export default function FeedbackPage() {
 								)}
 							/>
 						</Form>
-						<View className="w-full flex py-6  mt-auto ">
-							<TouchableOpacity
-								activeOpacity={0.8}
-								className="px-4 py-4 flex flex-row items-center gap-4 bg-secondary border border-border rounded-2xl justify-center shadow"
-								onPress={() => {
-									form.handleSubmit(onSubmit)();
-								}}
-							>
-								{pending ? (
-									<ActivityIndicator size="small" color={"#0395ff"} />
-								) : (
-									<Text className="text-border text-base font-bold" maxFontSizeMultiplier={1.2}>
-										{"Submit"}
-									</Text>
-								)}
-							</TouchableOpacity>
-						</View>
 					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
-		</View>
+			<Toast config={toastConfig} position={"top"} topOffset={48} />
+		</>
 	);
 }
+
+const PageHeader = ({
+	isDirty,
+	type,
+	submitDisabled,
+	backDisabled,
+	onSubmit,
+}: {
+	isDirty: boolean;
+	type: "feature" | "issue";
+	submitDisabled: boolean;
+	backDisabled: boolean;
+	onSubmit: () => Promise<void>;
+}) => {
+	const clickRef = useRef(false);
+	const router = useRouter();
+
+	const handleBack = useCallback(() => {
+		if (clickRef.current) return;
+		if (backDisabled) return;
+		clickRef.current = true;
+		if (!isDirty) {
+			if (router.canGoBack()) {
+				router.back();
+			} else {
+				router.dismissTo("/settings");
+			}
+			return;
+		}
+		Alert.alert("Discard Changes", "Are you sure you want to leave this page?", [
+			{
+				text: "Discard Changes",
+				style: "destructive",
+				onPress: () => {
+					if (router.canGoBack()) {
+						router.back();
+					} else {
+						router.dismissTo("/settings");
+					}
+					setTimeout(() => {
+						clickRef.current = false;
+					}, 500);
+				},
+			},
+			{
+				text: "Cancel",
+				style: "cancel",
+				onPress: () => {
+					clickRef.current = false;
+				},
+			},
+		]);
+	}, [router, isDirty, backDisabled]);
+
+	const handleSubmit = useCallback(() => {
+		if (clickRef.current) return;
+		clickRef.current = true;
+		onSubmit();
+		setTimeout(() => {
+			clickRef.current = false;
+		}, 500);
+	}, [onSubmit]);
+
+	return (
+		<View className="w-full px-4 p-4 items-center flex flex-row gap-x-4">
+			<TouchableOpacity
+				disabled={backDisabled}
+				className="mb-4 disabled:opacity-50"
+				activeOpacity={0.8}
+				onPress={handleBack}
+			>
+				<Text className="text-destructive/80 font-medium text-lg" maxFontSizeMultiplier={1.2}>
+					{"Cancel"}
+				</Text>
+			</TouchableOpacity>
+			<View className="flex-1 items-center justify-center">
+				<Text
+					style={{ fontFamily: "Baloo", lineHeight: 32, fontSize: 24 }}
+					className="text-foreground font-normal text-2xl"
+					maxFontSizeMultiplier={1.2}
+				>
+					{type === "feature" ? "Provide Feedback" : "Report an Issue"}
+				</Text>
+			</View>
+			<TouchableOpacity onPress={handleSubmit} className="mb-4 disabled:opacity-50" disabled={submitDisabled}>
+				<Text className="text-border font-semibold text-lg" maxFontSizeMultiplier={1.2}>
+					{"Submit"}
+				</Text>
+			</TouchableOpacity>
+		</View>
+	);
+};

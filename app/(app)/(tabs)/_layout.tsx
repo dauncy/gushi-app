@@ -22,13 +22,12 @@ export default function TabsLayout() {
 					header: () => <Header />,
 					tabBarShowLabel: true,
 					tabBarStyle: {
-						backgroundColor: "transparent",
+						backgroundColor: "#fffbf3",
 						height: 60,
-						borderWidth: 0,
-						borderColor: "transparent",
+						borderTopWidth: 0.5,
+						borderTopColor: "#00000020",
 						paddingTop: 10,
 						paddingBottom: 10,
-						borderTopWidth: 1,
 					},
 					tabBarAllowFontScaling: false,
 					tabBarIconStyle: {

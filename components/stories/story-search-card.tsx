@@ -22,13 +22,13 @@ import { StoryModal } from "./story-modal";
 
 const LockedStorySearchCard = ({ story }: { story: StoryPreview }) => {
 	return (
-		<View className="w-full border-b border-border p-2 py-4 pb-6 flex-row gap-x-4 bg-background/60 relative">
+		<View className="w-full  p-2 py-4 pb-6 flex-row gap-x-4 relative">
 			<StoryImagePreview size={"md"} imageUrl={story.imageUrl} blurHash={story.blurHash ?? undefined} />
 			<View className="flex flex-col gap-y-2 flex-1 mt-1">
 				<View className="flex-row flex flex-1 gap-x-4 items-center">
 					<View className="flex flex-col gap-y-1 flex-1">
 						<Text
-							className="text-foreground font-semibold"
+							className="text-foreground text-xl font-semibold"
 							numberOfLines={2}
 							ellipsizeMode="tail"
 							maxFontSizeMultiplier={1.2}
@@ -36,8 +36,8 @@ const LockedStorySearchCard = ({ story }: { story: StoryPreview }) => {
 							{story.title}
 						</Text>
 						<View className="flex flex-row gap-x-2 items-center mt-auto">
-							<Clock className="size-4 text-foreground/80" size={14} />
-							<Text className="text-foreground/80 text-sm" allowFontScaling={false}>
+							<Clock className="size-4 text-foreground/80" size={14} strokeWidth={2.5} />
+							<Text className="text-foreground/80 text-sm font-medium" allowFontScaling={false}>
 								{secondsToMinuteString(story.duration)}
 							</Text>
 						</View>
@@ -82,13 +82,13 @@ const LockedStorySearchCard = ({ story }: { story: StoryPreview }) => {
 
 const UnlockedStorySearchCard = ({ story }: { story: StoryPreview }) => {
 	return (
-		<View className="w-full border-b border-border p-2 py-4 pb-6  flex-row gap-x-4 bg-background/60">
+		<View className="w-full p-2 py-4 pb-6  flex-row gap-x-4 ">
 			<StoryImagePreview size={"md"} imageUrl={story.imageUrl} blurHash={story.blurHash ?? undefined} />
 			<View className="flex flex-col gap-y-2 flex-1 mt-1">
 				<View className="flex-row flex flex-1 gap-x-4 items-center">
 					<View className="flex flex-col gap-y-1 flex-1">
 						<Text
-							className="text-foreground font-semibold"
+							className="text-foreground text-xl font-semibold"
 							numberOfLines={2}
 							ellipsizeMode="tail"
 							maxFontSizeMultiplier={1.2}
@@ -96,8 +96,8 @@ const UnlockedStorySearchCard = ({ story }: { story: StoryPreview }) => {
 							{story.title}
 						</Text>
 						<View className="flex flex-row gap-x-2 items-center mt-auto">
-							<Clock className="size-4 text-foreground/80" size={14} />
-							<Text className="text-foreground/80 text-sm" allowFontScaling={false}>
+							<Clock className="size-4 text-foreground/80" size={14} strokeWidth={2.5} />
+							<Text className="text-foreground/80 text-sm font-medium" allowFontScaling={false}>
 								{secondsToMinuteString(story.duration)}
 							</Text>
 						</View>

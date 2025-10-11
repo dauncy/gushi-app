@@ -8,7 +8,7 @@ const Input = React.forwardRef<TextInput, TextInputProps & { className?: string 
 			<TextInput
 				ref={ref}
 				className={cn(
-					"h-12 web:w-full flex items-center rounded border-[0.5px] border-primary focus:border-2 focus:border-border bg-black/10 px-3 text-lg text-foreground placeholder:text-foreground/60",
+					"h-12 web:w-full flex items-center rounded border-[0.5px] border-primary focus:border-2 focus:border-border bg-foreground/10 px-3 text-lg text-foreground placeholder:text-foreground/60",
 					props.editable === false && "opacity-50 web:cursor-not-allowed",
 					className,
 				)}

@@ -140,6 +140,7 @@ export default function CreatePlaylistPage() {
 
 		if (error) {
 			Toast.show({ type: "error", text1: "Something went wrong", text2: error });
+			Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
 			setIsSubmitting(false);
 			return;
 		}
@@ -150,11 +151,13 @@ export default function CreatePlaylistPage() {
 				text1: "Something went wrong",
 				text2: "We hit a snag trying to create your playlist. Please try again later",
 			});
+			Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
 			setIsSubmitting(false);
 			return;
 		}
 
 		Toast.show({ type: "success", text1: "Playlist created", text2: "Your playlist has been created" });
+		Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 		router.dismissTo("/playlists");
 		setIsSubmitting(false);
 	}, [isSubmitting, title, createPlaylist, image?.fileId, router]);
@@ -206,7 +209,7 @@ export default function CreatePlaylistPage() {
 					<View className="flex-1 flex flex-col items-center  p-8 gap-y-8 w-full">
 						<View
 							className={cn(
-								"size-48 rounded-md bg-[#00000010] items-center justify-center relative",
+								"size-48 rounded-md bg-foreground/10 items-center justify-center relative",
 								isSubmitting && "opacity-50",
 							)}
 						>

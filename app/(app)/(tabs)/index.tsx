@@ -118,7 +118,7 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 		[isIpad],
 	);
 	return (
-		<View className="flex-1 bg-black/10 px-2">
+		<View className="flex-1 bg-foreground/10 px-2">
 			<FlashList
 				ref={storyListRef}
 				showsVerticalScrollIndicator={false}

@@ -14,7 +14,7 @@ const PlaylistImage = memo(({ imageUrl }: { imageUrl: string | null }) => {
 	const [imageError, setImageError] = useState(false);
 
 	return (
-		<View className="size-[56px] rounded-lg bg-foreground/10 flex items-center justify-center">
+		<View className="size-[64px] rounded-lg bg-foreground/10 flex items-center justify-center">
 			{imageUrl && !imageError ? (
 				<Image
 					source={{ uri: sanitizeStorageUrl(imageUrl) }}
@@ -23,7 +23,7 @@ const PlaylistImage = memo(({ imageUrl }: { imageUrl: string | null }) => {
 					onError={() => setImageError(true)}
 				/>
 			) : (
-				<Playlist className="text-border fill-border" strokeWidth={1.5} size={24} />
+				<Playlist className="text-border fill-border" strokeWidth={1.5} size={28} />
 			)}
 		</View>
 	);
@@ -57,8 +57,10 @@ const PlaylistStoryCount = memo(({ numStories }: { numStories: number }) => {
 		>
 			<Icon className={cn("text-foreground/80", numStories === 0 && "text-destructive")} size={12} />
 			<Text
-				className={cn("text-foreground/80 font-semiboldtext-sm", numStories === 0 && "text-destructive")}
+				className={cn("text-foreground/80 font-semibol text-sm", numStories === 0 && "text-destructive")}
 				maxFontSizeMultiplier={1.2}
+				numberOfLines={1}
+				ellipsizeMode="tail"
 			>
 				{text}
 			</Text>
@@ -105,22 +107,19 @@ export const PlaylistCard = ({
 			<Pressable
 				onLongPress={drag}
 				style={shadowStyle}
-				className={cn(
-					"w-full p-4 border-b-[0.5px] border-border bg-background/80 flex flex-row gap-x-4",
-					isActive && "opacity-80",
-				)}
+				className={cn("w-full p-4  flex flex-row gap-x-4", isActive && "opacity-80 bg-background")}
 			>
 				<PlaylistImage imageUrl={playlist.image} />
-				<View className="flex-1 flex flex-col gap-y-0.5 mt-1">
-					<Text className="text-foreground font-bold text-xl" maxFontSizeMultiplier={1.2}>
+				<View className="flex-1 flex flex-col gap-y-0.5">
+					<Text className="text-foreground font-semibold text-xl" maxFontSizeMultiplier={1.2}>
 						{playlist.name}
 					</Text>
-					<View className="flex items-start mt-0.5 flex-1">
+					<View className="flex items-start mt-1.5 flex-1">
 						<PlaylistStoryCount numStories={playlist.numStories} />
 					</View>
 				</View>
 				<View className="flex items-center justify-center">
-					<ChevronRight className="size-4 text-foreground" size={20} />
+					<ChevronRight className="size-4 text-foreground" size={24} />
 				</View>
 			</Pressable>
 		</Animated.View>
@@ -129,7 +128,7 @@ export const PlaylistCard = ({
 
 export const PlaylistCardLoading = () => {
 	return (
-		<View className="w-full p-4 border-b-[0.5px] border-border flex flex-row gap-x-4 bg-background/60">
+		<View className="w-full p-4 flex flex-row gap-x-4">
 			<Skeleton className="size-[56px] rounded-lg bg-black/10" />
 			<View className="flex-1 flex flex-col gap-y-1 mt-1">
 				<Skeleton className="h-4 w-32 bg-black/10" />
