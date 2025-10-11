@@ -138,7 +138,7 @@ const LegalRow = ({
 			</View>
 			<Pressable
 				onPress={handlePress}
-				className="size-[34px] rounded-full active:bg-black/10 flex items-center justify-center"
+				className="size-[34px] rounded-full active:bg-foreground/10 flex items-center justify-center"
 			>
 				<ChevronRight className="size-[24px] text-foreground" />
 			</Pressable>
@@ -180,7 +180,7 @@ const FeedbackRow = ({
 			</View>
 			<Pressable
 				onPress={handlePress}
-				className="size-[34px] rounded-full active:bg-black/10 flex items-center justify-center"
+				className="size-[34px] rounded-full active:bg-foreground/10 flex items-center justify-center"
 			>
 				<ChevronRight className="size-[24px] text-foreground" />
 			</Pressable>
@@ -259,7 +259,7 @@ const FreeUserSubscriptionRow = () => {
 			</View>
 			<Pressable
 				onPress={presentPaywall}
-				className="size-[34px] rounded-full active:bg-black/10 flex items-center justify-center"
+				className="size-[34px] rounded-full active:bg-foreground/10 flex items-center justify-center"
 			>
 				<ChevronRight className="size-[24px] text-foreground" />
 			</Pressable>

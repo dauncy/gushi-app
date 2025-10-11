@@ -156,7 +156,7 @@ export default function SearchPge() {
 										shadowRadius: 3.25,
 									}}
 									onPress={clearSearch}
-									className={"size-7 rounded-full bg-black/20 flex items-center justify-center absolute right-2 "}
+									className={"size-7 rounded-full bg-foreground/20 flex items-center justify-center absolute right-2 "}
 								>
 									<X className="text-background size-3" size={16} />
 								</Pressable>
@@ -210,18 +210,18 @@ const SearchLoading = () => {
 					key={`search-loading-${idx}`}
 					className="w-full border-b border-border p-2 py-4 pb-6  flex-row gap-x-4 items-start"
 				>
-					<Skeleton className="size-24 rounded-md bg-black/20 flex" />
+					<Skeleton className="size-24 rounded-md bg-foreground/20 flex" />
 					<View className="flex flex-col gap-y-2 flex-1 mt-1 w-full">
 						<View className="flex flex-col gap-y-1 flex-1 mt-1">
-							<Skeleton className="w-2/5 h-6 rounded-md bg-black/20" />
+							<Skeleton className="w-2/5 h-6 rounded-md bg-foreground/20" />
 							<View className="flex flex-row gap-x-2 items-center">
-								<Skeleton className="size-4 rounded-full bg-black/20" />
-								<Skeleton className="w-16 h-3 rounded-md bg-black/20" />
+								<Skeleton className="size-4 rounded-full bg-foreground/20" />
+								<Skeleton className="w-16 h-3 rounded-md bg-foreground/20" />
 							</View>
 						</View>
 						<View className="flex flex-col gap-y-1">
-							<Skeleton className="w-[92%] h-2 rounded-md bg-black/20" />
-							<Skeleton className="w-[86%] h-2 rounded-md bg-black/20" />
+							<Skeleton className="w-[92%] h-2 rounded-md bg-foreground/20" />
+							<Skeleton className="w-[86%] h-2 rounded-md bg-foreground/20" />
 						</View>
 					</View>
 				</View>

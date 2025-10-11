@@ -18,6 +18,7 @@ export default function PlaylistsLayout() {
 					},
 				}}
 			/>
+			<Stack.Screen name="[playlistId]" options={{ headerShown: false }} />
 			{/*<Stack.Screen
 				name="edit"
 				options={{

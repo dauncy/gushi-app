@@ -203,7 +203,7 @@ export default function FeedbackPage() {
 											value={field.value ?? ""}
 											placeholder={type === "feature" ? "What would you like to see?" : "What went wrong?"}
 											className={cn(
-												"w-full text-foreground rounded h-36 border-[0.5px] border-primary bg-black/10 placeholder:text-foreground/60 focus:border-2 focus:border-border",
+												"w-full text-foreground rounded h-36 border-[0.5px] border-primary bg-foreground/10 placeholder:text-foreground/60 focus:border-2 focus:border-border",
 												pending && "opacity-50",
 											)}
 										/>

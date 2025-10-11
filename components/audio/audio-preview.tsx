@@ -84,7 +84,7 @@ const PhonePlayer = ({ onCardPress }: { onCardPress?: (storyId: Id<"stories">) =
 				</View>
 				<View className="flex items-center justify-center flex-row gap-2 ml-auto">
 					<Pressable
-						className="size-8 rounded-full flex items-center justify-center p-2 active:bg-black/10"
+						className="size-8 rounded-full flex items-center justify-center p-2 active:bg-foreground/10"
 						onPress={() => {
 							if (isPlaying) {
 								pause();
@@ -101,7 +101,7 @@ const PhonePlayer = ({ onCardPress }: { onCardPress?: (storyId: Id<"stories">) =
 					</Pressable>
 
 					<Pressable
-						className="size-8 rounded-full flex items-center justify-center p-2 active:bg-black/10"
+						className="size-8 rounded-full flex items-center justify-center p-2 active:bg-foreground/10"
 						onPress={() => {
 							stop();
 						}}
@@ -175,7 +175,7 @@ const IpadPlayer = ({ onCardPress }: { onCardPress?: (storyId: Id<"stories">) =>
 				</View>
 				<View className="flex items-center justify-center flex-row gap-2 ml-auto">
 					<Pressable
-						className="size-8 rounded-full flex items-center justify-center p-2 active:bg-black/10"
+						className="size-8 rounded-full flex items-center justify-center p-2 active:bg-foreground/10"
 						onPress={() => {
 							if (isPlaying) {
 								pause();
@@ -192,7 +192,7 @@ const IpadPlayer = ({ onCardPress }: { onCardPress?: (storyId: Id<"stories">) =>
 					</Pressable>
 
 					<Pressable
-						className="size-8 rounded-full flex items-center justify-center p-2 active:bg-black/10"
+						className="size-8 rounded-full flex items-center justify-center p-2 active:bg-foreground/10"
 						onPress={() => {
 							stop();
 						}}

@@ -54,7 +54,7 @@ export const CategoriesSelector = memo(() => {
 				justifyContent: "space-between",
 				display: "flex",
 			}}
-			className="w-full p-1 bg-black/20 rounded-3xl overflow-hidden max-w-[468px]"
+			className="w-full p-1 bg-foreground/20 rounded-3xl overflow-hidden max-w-[468px]"
 		>
 			{isLoading ? (
 				<>
@@ -78,8 +78,8 @@ CategoriesSelector.displayName = "CategoriesSelector";
 const LoadingCategory = ({ last }: { last: boolean }) => {
 	return (
 		<View className="flex flex-col p-1 px-3.5 rounded-3xl items-center gap-y-2.5">
-			<Skeleton className=" rounded-full bg-black/20 w-[28px] h-[28px]" />
-			<Skeleton className={cn("w-[50px] h-3 rounded-md bg-black/20", last && "w-[88px]")} />
+			<Skeleton className=" rounded-full bg-foreground/20 w-[28px] h-[28px]" />
+			<Skeleton className={cn("w-[50px] h-3 rounded-md bg-foreground/20", last && "w-[88px]")} />
 		</View>
 	);
 };
@@ -106,7 +106,7 @@ const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
 	const color = colors.background;
 
 	const textStyle = { ...(selected ? { color, borderColor: colors.foreground } : {}) };
-	const iconcolor = selected ? colors.background : "#00000030";
+	const iconcolor = selected ? colors.background : "#0D331140";
 	return (
 		<TouchableOpacity
 			disabled={categoryData.soon}
@@ -127,7 +127,7 @@ const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
 				allowFontScaling={false}
 				style={textStyle}
 				className={cn(
-					"text-black/30 text-sm font-medium mt-auto capitalize",
+					"text-foreground/40 text-sm font-medium mt-auto capitalize",
 					selected && "font-semibold",
 					categoryData.soon && "opacity-50",
 				)}

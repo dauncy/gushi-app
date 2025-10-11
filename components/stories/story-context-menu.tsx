@@ -54,7 +54,10 @@ const ShareButton = ({ storyId, storyTitle }: { storyId: Id<"stories">; storyTit
 		shareStory({ storyId, storyTitle });
 	}, [shareStory, storyId, storyTitle]);
 	return (
-		<Pressable onPress={handleShare} className="p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-black/10">
+		<Pressable
+			onPress={handleShare}
+			className="p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-foreground/10"
+		>
 			<Share className="size-4 text-foreground" size={16} />
 			<Text
 				className="text-foreground font-medium"
@@ -90,7 +93,10 @@ const AddToFavoritesButton = ({ storyId }: { storyId: Id<"stories"> }) => {
 		<Pressable
 			disabled={isLoading || mutating}
 			onPress={toggleFavorite}
-			className={cn("p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-black/10", isLoading && "opacity-50")}
+			className={cn(
+				"p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-foreground/10",
+				isLoading && "opacity-50",
+			)}
 		>
 			<Star className={cn("size-4 text-foreground", fav && "fill-foreground")} size={16} />
 			<Text
@@ -133,7 +139,7 @@ const FullscreenButton = ({
 	return (
 		<Pressable
 			onPress={handleFullScreen}
-			className="p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-black/10"
+			className="p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-foreground/10"
 		>
 			<Fullscreen className="size-4 text-foreground" size={16} />
 			<Text
@@ -308,8 +314,8 @@ const AudioControlsRow = ({ story }: { story: StoryPreview }) => {
 				disabled={loading}
 				onPress={handlePlayOrPause}
 				className={cn(
-					"p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-black/10",
-					loading && "bg-black/10",
+					"p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-foreground/10",
+					loading && "bg-foreground/10",
 				)}
 			>
 				{playOrPauseIcon}
@@ -326,7 +332,7 @@ const AudioControlsRow = ({ story }: { story: StoryPreview }) => {
 				<Separator className="h-[2px]" />
 				<Pressable
 					onPress={handleStop}
-					className="p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-black/10 bg-background rounded-b-xl"
+					className="p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-foreground/10 bg-background rounded-b-xl"
 				>
 					<Stop className="size-4 text-foreground fill-foreground" size={16} />
 					<Text
@@ -364,7 +370,10 @@ const UnlockButton = ({
 		triggerClose();
 	}, [addCloseCallback, triggerClose]);
 	return (
-		<Pressable onPress={handleUnlock} className="p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-black/10">
+		<Pressable
+			onPress={handleUnlock}
+			className="p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-foreground/10"
+		>
 			<LockKeyholeOpen className="size-4 text-foreground" size={16} />
 			<Text
 				className="text-foreground font-medium"

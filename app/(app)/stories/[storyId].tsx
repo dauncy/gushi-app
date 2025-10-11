@@ -183,7 +183,7 @@ const ScrubbableProgress = ({
 			<View className="py-2">
 				<View
 					onLayout={onBarLayout}
-					className={className ?? "h-2 bg-black/10 w-full rounded-full overflow-hidden"}
+					className={className ?? "h-2 bg-foreground/10 w-full rounded-full overflow-hidden"}
 					style={{ position: "relative" }}
 				>
 					<Animated.View className={indicatorClassName ?? "bg-foreground/80 h-full"} style={indicatorStyle} />
@@ -261,7 +261,7 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 						uiTime={uiTime}
 						onPreview={handlePreview}
 						onCommit={handleCommit}
-						className="h-2 bg-black/10 w-full rounded-full overflow-hidden"
+						className="h-2 bg-foreground/10 w-full rounded-full overflow-hidden"
 						indicatorClassName="bg-foreground/80 h-full"
 					/>
 
@@ -273,7 +273,7 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 					<View className="flex w-full flex-col items-center py-4">
 						<Pressable
 							onPress={togglePlay}
-							className="size-20 active:bg-black/10 rounded-full flex items-center justify-center"
+							className="size-20 active:bg-foreground/10 rounded-full flex items-center justify-center"
 						>
 							{isPlaying ? (
 								<Pause className="text-foreground/80 fill-foreground/80" size={36} />
@@ -523,7 +523,7 @@ const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed
 						onPress={handleShare}
 						size="icon"
 						variant="ghost"
-						className="bg-black/10 rounded-full border border-foreground"
+						className="bg-foreground/10 rounded-full border border-foreground"
 					>
 						<Share className="text-foreground size-6" strokeWidth={1.5} size={20} />
 					</Button>
@@ -551,7 +551,7 @@ const FavoriteButton = ({ story }: { story: StoryExtended }) => {
 	}, [isFavorite, debounceToggle, setIsFavorite]);
 
 	if (isLoading) {
-		return <Skeleton className="size-10 rounded-full bg-black/20" />;
+		return <Skeleton className="size-10 rounded-full bg-foreground/20" />;
 	}
 
 	return (
@@ -559,7 +559,10 @@ const FavoriteButton = ({ story }: { story: StoryExtended }) => {
 			disabled={isLoading}
 			size="icon"
 			variant="ghost"
-			className={cn("bg-black/10 rounded-full border border-foreground", isFavorite && "bg-secondary border-border")}
+			className={cn(
+				"bg-foreground/10 rounded-full border border-foreground",
+				isFavorite && "bg-secondary border-border",
+			)}
 			onPress={toggleFavorite}
 		>
 			<Star
@@ -600,7 +603,7 @@ const StoryImage = ({
 
 	if (showFallback) {
 		return (
-			<View className="aspect-square w-full rounded-xl bg-black/10 flex items-center justify-center border border-border">
+			<View className="aspect-square w-full rounded-xl bg-foreground/10 flex items-center justify-center border border-border">
 				<Headphones className="text-border" strokeWidth={0.5} />
 			</View>
 		);
@@ -608,7 +611,7 @@ const StoryImage = ({
 
 	return (
 		<Animated.View style={[animatedStyle, { width: "100%", height: "100%" }]}>
-			<View className="w-full h-full rounded-xl bg-black/20">
+			<View className="w-full h-full rounded-xl bg-foreground/20">
 				<Image
 					source={{ uri: sanitizeStorageUrl(imageUrl) }}
 					className="w-full h-full rounded-xl"
@@ -624,30 +627,30 @@ const StoryImage = ({
 
 const StoryLoading = () => (
 	<View className="flex flex-1 flex-col items-center">
-		<Skeleton className="aspect-square w-full rounded-xl bg-black/20" />
+		<Skeleton className="aspect-square w-full rounded-xl bg-foreground/20" />
 		<View className="flex w-full mt-12 flex-row gap-x-8 justify-center">
 			<View className="flex flex-col flex-1 justify-center">
-				<Skeleton className="h-8 w-full rounded-xl bg-black/20" />
+				<Skeleton className="h-8 w-full rounded-xl bg-foreground/20" />
 			</View>
 			<View className="flex gap-x-4 flex-row items-center">
-				<Skeleton className="h-10 w-10 rounded-full bg-black/20" />
-				<Skeleton className="h-10 w-10 rounded-full bg-black/20" />
+				<Skeleton className="h-10 w-10 rounded-full bg-foreground/20" />
+				<Skeleton className="h-10 w-10 rounded-full bg-foreground/20" />
 			</View>
 		</View>
 		<View className="flex w-full mt-12 flex-col">
-			<Skeleton className="h-3 w-full rounded-full bg-black/20" />
+			<Skeleton className="h-3 w-full rounded-full bg-foreground/20" />
 			<View className="flex w-full flex-row justify-between mt-3">
-				<Skeleton className="h-1 w-16 flex rounded-full bg-black/20 flex" />
-				<Skeleton className="h-1 w-16 flex rounded-full bg-black/20 flex" />
+				<Skeleton className="h-1 w-16 flex rounded-full bg-foreground/20 flex" />
+				<Skeleton className="h-1 w-16 flex rounded-full bg-foreground/20 flex" />
 			</View>
 		</View>
 
 		<View className="flex w-full mt-12 flex-col items-center">
-			<Skeleton className="size-20 rounded-full bg-black/20" />
+			<Skeleton className="size-20 rounded-full bg-foreground/20" />
 		</View>
 
 		<View className="flex w-full mt-12 flex-col ">
-			<Skeleton className="w-20 h-9 rounded-full bg-black/20" />
+			<Skeleton className="w-20 h-9 rounded-full bg-foreground/20" />
 		</View>
 	</View>
 );
@@ -713,7 +716,7 @@ const StoryContentTablet = ({ story }: { story: StoryExtended }) => {
 					uiTime={uiTime}
 					onPreview={handlePreview}
 					onCommit={handleCommit}
-					className="h-2 bg-black/10 w-full rounded-full overflow-hidden"
+					className="h-2 bg-foreground/10 w-full rounded-full overflow-hidden"
 					indicatorClassName="bg-foreground/80 h-full"
 				/>
 
@@ -725,7 +728,7 @@ const StoryContentTablet = ({ story }: { story: StoryExtended }) => {
 				<View className="flex w-full flex-col items-center py-4">
 					<Pressable
 						onPress={togglePlay}
-						className="size-20 active:bg-black/10 rounded-full flex items-center justify-center"
+						className="size-20 active:bg-foreground/10 rounded-full flex items-center justify-center"
 					>
 						{isPlaying ? (
 							<Pause className="text-foreground/80 fill-foreground/80" size={36} />
@@ -738,7 +741,7 @@ const StoryContentTablet = ({ story }: { story: StoryExtended }) => {
 				{/* CC Toggle */}
 				<View className="flex w-full flex-col items-start pb-6 pl-2">
 					<Button
-						className={cn("bg-black/10 rounded-xl border border-foreground", showClosedCaption && "bg-foreground")}
+						className={cn("bg-foreground/10 rounded-xl border border-foreground", showClosedCaption && "bg-foreground")}
 						onPress={() => setShowClosedCaption((p) => !p)}
 					>
 						<LetterText
@@ -756,15 +759,15 @@ const StoryContentTablet = ({ story }: { story: StoryExtended }) => {
 const StoryTabletLoading = () => {
 	return (
 		<View className="flex flex-1 flex-col items-center">
-			<Skeleton className="aspect-square w-2/3 rounded-xl bg-black/20" />
+			<Skeleton className="aspect-square w-2/3 rounded-xl bg-foreground/20" />
 			<View className="flex w-2/3 mt-12 flex-row gap-x-8 mx-auto">
 				<View className="flex flex-col flex-1">
-					<Skeleton className="h-6 w-1/5 rounded-xl bg-black/20" />
-					<Skeleton className="h-4 w-2/5 rounded-xl bg-black/20 mt-2" />
+					<Skeleton className="h-6 w-1/5 rounded-xl bg-foreground/20" />
+					<Skeleton className="h-4 w-2/5 rounded-xl bg-foreground/20 mt-2" />
 				</View>
 				<View className="flex gap-x-4 flex-row items-center">
-					<Skeleton className="h-10 w-10 rounded-full bg-black/20" />
-					<Skeleton className="h-10 w-10 rounded-full bg-black/20" />
+					<Skeleton className="h-10 w-10 rounded-full bg-foreground/20" />
+					<Skeleton className="h-10 w-10 rounded-full bg-foreground/20" />
 				</View>
 			</View>
 		</View>
@@ -837,7 +840,7 @@ const StoryHeaderTablet = ({ story, isCollapsed }: { story: StoryExtended; isCol
 						onPress={handleShare}
 						size="icon"
 						variant="ghost"
-						className="bg-black/10 rounded-full border border-foreground"
+						className="bg-foreground/10 rounded-full border border-foreground"
 					>
 						<Share className="text-foreground/80 size-6" strokeWidth={1.5} size={20} />
 					</Button>

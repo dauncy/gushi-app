@@ -39,13 +39,13 @@ const StoryImagePreviewComp = ({
 	const showFallback = error || !imageUrl;
 	if (showFallback) {
 		return (
-			<View className={cn(imageVariants({ size }), "bg-black/20", className)}>
+			<View className={cn(imageVariants({ size }), "bg-foreground/20", className)}>
 				<FileX className="text-foreground/60" strokeWidth={1} size={36} />
 			</View>
 		);
 	}
 	return (
-		<View className={cn(imageVariants({ size }), "relative bg-slate-800", className)}>
+		<View className={cn(imageVariants({ size }), "relative bg-foreground/20", className)}>
 			<Image
 				cachePolicy={"memory-disk"}
 				source={{ uri: sanitizeStorageUrl(imageUrl) }}

@@ -1,6 +1,7 @@
 import { PlaylistPreview } from "@/convex/playlists/schema";
 import { cn, sanitizeStorageUrl } from "@/lib/utils";
-import { memo, useEffect, useMemo, useState } from "react";
+import * as Haptics from "expo-haptics";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { ChevronRight } from "../ui/icons/chevron-right-icon";
@@ -79,12 +80,20 @@ export const PlaylistCard = ({
 	isActive: boolean;
 }) => {
 	const scale = useSharedValue(1);
+	const wasActive = useRef(false);
 
 	useEffect(() => {
 		scale.value = withSpring(isActive ? 1.05 : 1, {
 			damping: 15,
 			stiffness: 150,
 		});
+
+		// Detect drop (when isActive goes from true to false)
+		if (wasActive.current && !isActive) {
+			Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+		}
+
+		wasActive.current = isActive;
 	}, [isActive, scale]);
 
 	const animatedStyle = useAnimatedStyle(() => {
@@ -102,10 +111,15 @@ export const PlaylistCard = ({
 			}
 		: {};
 
+	const handleLongPress = useCallback(async () => {
+		await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+		drag();
+	}, [drag]);
+
 	return (
 		<Animated.View style={animatedStyle}>
 			<Pressable
-				onLongPress={drag}
+				onLongPress={handleLongPress}
 				style={shadowStyle}
 				className={cn("w-full p-4  flex flex-row gap-x-4", isActive && "opacity-80 bg-background")}
 			>
@@ -129,13 +143,13 @@ export const PlaylistCard = ({
 export const PlaylistCardLoading = () => {
 	return (
 		<View className="w-full p-4 flex flex-row gap-x-4">
-			<Skeleton className="size-[56px] rounded-lg bg-black/10" />
+			<Skeleton className="size-[56px] rounded-lg bg-foreground/10" />
 			<View className="flex-1 flex flex-col gap-y-1 mt-1">
-				<Skeleton className="h-4 w-32 bg-black/10" />
-				<Skeleton className="h-3 w-16 bg-black/10" />
+				<Skeleton className="h-4 w-32 bg-foreground/10" />
+				<Skeleton className="h-3 w-16 bg-foreground/10" />
 			</View>
 			<View className="flex items-center justify-start">
-				<Skeleton className="size-[24px] rounded-full bg-black/10 mt-1" />
+				<Skeleton className="size-[24px] rounded-full bg-foreground/10 mt-1" />
 			</View>
 		</View>
 	);
