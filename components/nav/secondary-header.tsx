@@ -1,10 +1,20 @@
 import { ArrowLeft } from "@/components/ui/icons/arrow-left-icon";
 import { cn } from "@/lib/utils";
-import { useRouter } from "expo-router";
-import { useCallback, useRef } from "react";
+import { Href, useRouter } from "expo-router";
+import { ReactNode, useCallback, useRef } from "react";
 import { Pressable, Text, View } from "react-native";
 
-export const SecondaryHeader = ({ title, className }: { title: string; className?: string }) => {
+export const SecondaryHeader = ({
+	title,
+	className,
+	dismissTo = "/",
+	rightNode,
+}: {
+	title?: string;
+	className?: string;
+	dismissTo?: Href;
+	rightNode?: ReactNode;
+}) => {
 	const pressRef = useRef(false);
 	const router = useRouter();
 
@@ -16,12 +26,12 @@ export const SecondaryHeader = ({ title, className }: { title: string; className
 		if (router.canGoBack()) {
 			router.back();
 		} else {
-			router.dismissTo("/");
+			router.dismissTo(dismissTo);
 		}
 		setTimeout(() => {
 			pressRef.current = false;
 		}, 500);
-	}, [router]);
+	}, [router, dismissTo]);
 
 	return (
 		<View
@@ -36,13 +46,16 @@ export const SecondaryHeader = ({ title, className }: { title: string; className
 			>
 				<ArrowLeft className="size-[24px] text-foreground" />
 			</Pressable>
-			<Text
-				style={{ fontFamily: "Baloo", lineHeight: 32, fontSize: 24 }}
-				className="text-foreground"
-				allowFontScaling={false}
-			>
-				{title}
-			</Text>
+			{title && (
+				<Text
+					style={{ fontFamily: "Baloo", lineHeight: 32, fontSize: 24 }}
+					className="text-foreground"
+					allowFontScaling={false}
+				>
+					{title}
+				</Text>
+			)}
+			{rightNode && <View className="ml-auto -mt-2">{rightNode}</View>}
 		</View>
 	);
 };

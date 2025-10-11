@@ -5,6 +5,7 @@ import { SubscriptionProvider } from "@/context/SubscriptionContext";
 import { NAV_THEME } from "@/lib/constants";
 import { convex, queryClient } from "@/lib/convex.client";
 import { DarkTheme, Theme, ThemeProvider } from "@react-navigation/native";
+import { PortalHost } from "@rn-primitives/portal";
 import { QueryClientProvider } from "@tanstack/react-query";
 import * as Font from "expo-font";
 import { Slot } from "expo-router";
@@ -103,6 +104,7 @@ export default function RootLayout() {
 										<StatusBar style={"dark"} backgroundColor="#fffbf3" />
 										<Slot />
 										<Toast config={toastConfig} position={"top"} topOffset={48} />
+										<PortalHost />
 									</AudioProvider>
 								</SafeAreaView>
 							</GestureHandlerRootView>

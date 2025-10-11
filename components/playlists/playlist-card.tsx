@@ -1,6 +1,7 @@
 import { PlaylistPreview } from "@/convex/playlists/schema";
 import { cn, sanitizeStorageUrl } from "@/lib/utils";
 import * as Haptics from "expo-haptics";
+import { useRouter } from "expo-router";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
@@ -15,7 +16,7 @@ const PlaylistImage = memo(({ imageUrl }: { imageUrl: string | null }) => {
 	const [imageError, setImageError] = useState(false);
 
 	return (
-		<View className="size-[64px] rounded-lg bg-foreground/10 flex items-center justify-center">
+		<View className="size-[64px] rounded-lg bg-foreground/20 flex items-center justify-center">
 			{imageUrl && !imageError ? (
 				<Image
 					source={{ uri: sanitizeStorageUrl(imageUrl) }}
@@ -24,7 +25,7 @@ const PlaylistImage = memo(({ imageUrl }: { imageUrl: string | null }) => {
 					onError={() => setImageError(true)}
 				/>
 			) : (
-				<Playlist className="text-border fill-border" strokeWidth={1.5} size={28} />
+				<Playlist className="text-foreground/60 fill-foreground/60" strokeWidth={0.5} size={28} />
 			)}
 		</View>
 	);
@@ -81,6 +82,8 @@ export const PlaylistCard = ({
 }) => {
 	const scale = useSharedValue(1);
 	const wasActive = useRef(false);
+	const navigatePressRef = useRef(false);
+	const router = useRouter();
 
 	useEffect(() => {
 		scale.value = withSpring(isActive ? 1.05 : 1, {
@@ -116,9 +119,21 @@ export const PlaylistCard = ({
 		drag();
 	}, [drag]);
 
+	const handleNavigate = useCallback(() => {
+		if (navigatePressRef.current) {
+			return;
+		}
+		navigatePressRef.current = true;
+		router.push(`/playlists/${playlist._id}`);
+		setTimeout(() => {
+			navigatePressRef.current = false;
+		}, 500);
+	}, [playlist._id, router]);
+
 	return (
 		<Animated.View style={animatedStyle}>
 			<Pressable
+				onPress={handleNavigate}
 				onLongPress={handleLongPress}
 				style={shadowStyle}
 				className={cn("w-full p-4  flex flex-row gap-x-4", isActive && "opacity-80 bg-background")}

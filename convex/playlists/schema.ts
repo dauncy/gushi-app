@@ -29,7 +29,9 @@ export const playlistStories = defineTable(
 			storyId: zid("stories"),
 		}),
 	),
-).index("by_playlist_id", ["playlistId"]);
+)
+	.index("by_playlist_id", ["playlistId"])
+	.index("by_playlist_id_order", ["playlistId", "order"]);
 
 export type PlaylistPreview = Doc<"playlists"> & {
 	image: string | null;
