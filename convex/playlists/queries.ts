@@ -126,7 +126,10 @@ export const getPlaylistStories = query({
 		playlistId: v.id("playlists"),
 		paginationOpts: paginationOptsValidator,
 	},
-	handler: async (ctx, { playlistId, paginationOpts }): Promise<PaginationResult<StoryPreview>> => {
+	handler: async (
+		ctx,
+		{ playlistId, paginationOpts },
+	): Promise<PaginationResult<{ playlistStoryId: Id<"playlistStories">; story: StoryPreview }>> => {
 		try {
 			const { dbUser } = await verifyAccess(ctx, { validateSubscription: false });
 			await ensurePlaylistBelongsToUser(ctx, { playlistId, userId: dbUser._id });
@@ -141,12 +144,16 @@ export const getPlaylistStories = query({
 					if (!story) {
 						return null;
 					}
-					return await storyDocToStoryPreview(ctx, story);
+					const storyPreview = await storyDocToStoryPreview(ctx, story);
+					return {
+						playlistStoryId: playlistStory._id,
+						story: storyPreview,
+					};
 				}),
 			);
 			return {
 				...playlistStories,
-				page: stories.filter(Boolean) as StoryPreview[],
+				page: stories.filter(Boolean) as { playlistStoryId: Id<"playlistStories">; story: StoryPreview }[],
 			};
 		} catch (error) {
 			if (error instanceof ConvexError) {

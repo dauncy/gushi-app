@@ -21,6 +21,7 @@ import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 import { debounce } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+	ActivityIndicator,
 	KeyboardAvoidingView,
 	NativeScrollEvent,
 	NativeSyntheticEvent,
@@ -180,6 +181,27 @@ export default function AddStoriesPage() {
 		router.dismissTo(`/playlists/${playlistId}`);
 	}, [addStoriesToPlaylist, playlistId, selectedStoryIds, router]);
 
+	const listFooterComponent = useMemo(() => {
+		if (hasSearch) {
+			if (searchedStatus === "CanLoadMore") {
+				return (
+					<View className="flex flex-row items-center justify-center px-4 py-1.5">
+						<ActivityIndicator size="small" color="#ff78e5" />
+					</View>
+				);
+			}
+		}
+
+		if (defaultStatus === "CanLoadMore") {
+			return (
+				<View className="flex flex-row items-center justify-center px-4 py-1.5">
+					<ActivityIndicator size="small" color="#ff78e5" />
+				</View>
+			);
+		}
+		return null;
+	}, [defaultStatus, hasSearch, searchedStatus]);
+
 	if (!playlistId) {
 		return <Redirect href="/playlists" />;
 	}
@@ -242,6 +264,7 @@ export default function AddStoriesPage() {
 						onScroll={handleScroll}
 						onEndReached={handleLoadMore}
 						onEndReachedThreshold={0.5}
+						ListFooterComponent={listFooterComponent}
 					/>
 				</View>
 			</KeyboardAvoidingView>

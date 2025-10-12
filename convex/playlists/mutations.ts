@@ -44,7 +44,7 @@ export const createPlaylist = mutation({
 	},
 });
 
-export const reorderPlaylist = mutation({
+export const reorderPlaylists = mutation({
 	args: {
 		playlistOrders: v.array(
 			v.object({
@@ -112,6 +112,38 @@ export const addStoriesToPlaylist = mutation({
 				}
 			}
 			console.warn("[@/convex/playlists/mutations.ts]: addStoriesToPlaylist() => error", e);
+			return null;
+		}
+	},
+});
+
+export const reorderPlaylistStories = mutation({
+	args: {
+		playlistId: v.id("playlists"),
+		storyOrders: v.array(
+			v.object({
+				playlistStoryId: v.id("playlistStories"),
+				order: v.number(),
+			}),
+		),
+	},
+	handler: async (ctx, { playlistId, storyOrders }) => {
+		try {
+			const { dbUser } = await verifyAccess(ctx, { validateSubscription: false });
+			await ensurePlaylistBelongsToUser(ctx, { playlistId, userId: dbUser._id });
+			await Promise.all(
+				storyOrders.map(async (storyOrder) => {
+					await ctx.db.patch(storyOrder.playlistStoryId, { order: storyOrder.order });
+				}),
+			);
+			return { success: true };
+		} catch (e) {
+			if (e instanceof ConvexError) {
+				if (e.data.toLowerCase().includes("unauthorized")) {
+					return null;
+				}
+			}
+			console.warn("[@/convex/playlists/mutations.ts]: reorderPlaylistStories() => error", e);
 			return null;
 		}
 	},

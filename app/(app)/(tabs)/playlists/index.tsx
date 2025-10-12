@@ -15,7 +15,7 @@ import DraggableFlatList from "react-native-draggable-flatlist";
 
 export default function PlaylistsListPage() {
 	const [isReordering, setIsReordering] = useState(false);
-	const reorderPlaylist = useConvexMutation(api.playlists.mutations.reorderPlaylist);
+	const reorderPlaylists = useConvexMutation(api.playlists.mutations.reorderPlaylists);
 	const [localResults, setLocalResults] = useState<PlaylistPreview[]>([]);
 	const { isLoading, refreshing, refresh, loadMore, results, status } = useConvexPaginatedQuery(
 		api.playlists.queries.getUserPlaylists,
@@ -34,12 +34,12 @@ export default function PlaylistsListPage() {
 				order: index + 1,
 			}));
 
-			await reorderPlaylist({ playlistOrders });
+			await reorderPlaylists({ playlistOrders });
 			setTimeout(() => {
 				setIsReordering(false);
 			}, 500);
 		},
-		[reorderPlaylist, setIsReordering, setLocalResults],
+		[reorderPlaylists, setIsReordering, setLocalResults],
 	);
 
 	useEffect(() => {
