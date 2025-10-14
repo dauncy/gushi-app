@@ -22,10 +22,17 @@ import { useConvexMutation } from "@convex-dev/react-query";
 import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, LayoutChangeEvent, Pressable, RefreshControl, Text, View } from "react-native";
-import DraggableFlatList, { OpacityDecorator, ScaleDecorator } from "react-native-draggable-flatlist";
+import { ActivityIndicator, Pressable, RefreshControl, Text, View } from "react-native";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
-import Animated, { SharedValue, useAnimatedStyle } from "react-native-reanimated";
+import Animated, { runOnJS, SharedValue, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import ReorderableList, {
+	ReorderableListCellAnimations,
+	ReorderableListDragEndEvent,
+	ReorderableListDragStartEvent,
+	ReorderableListReorderEvent,
+	reorderItems,
+	useReorderableDrag,
+} from "react-native-reorderable-list";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PlaylistIdPage() {
@@ -136,7 +143,11 @@ const AddStoryButton = ({ playlistId }: { playlistId: string }) => {
 
 const PlaylistContent = ({ playlistId }: { playlistId: Id<"playlists"> }) => {
 	const [isReordering, setIsReordering] = useState(false);
-	const sizeMap = useRef<Map<string, number>>(new Map());
+	const scale = useSharedValue(1);
+	const shadowOpacity = useSharedValue(0);
+	const shadowRadius = useSharedValue(0);
+	const backgroundColor = useSharedValue("transparent");
+
 	const reorderPlaylistStories = useConvexMutation(api.playlists.mutations.reorderPlaylistStories);
 	const {
 		data: playlist,
@@ -165,17 +176,93 @@ const PlaylistContent = ({ playlistId }: { playlistId: Id<"playlists"> }) => {
 		[],
 	);
 
+	const dragStartHaptic = useCallback(async () => {
+		await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+	}, []);
+
+	const dragEndHaptic = useCallback(async () => {
+		await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+	}, []);
+
+	const handleDragStart = (_: ReorderableListDragStartEvent) => {
+		"worklet";
+
+		runOnJS(dragStartHaptic)();
+
+		scale.value = withSpring(1.05, {
+			stiffness: 200,
+			duration: 300,
+		});
+
+		shadowOpacity.value = withSpring(0.4, {
+			stiffness: 200,
+			duration: 300,
+		});
+
+		shadowRadius.value = withSpring(8, {
+			stiffness: 200,
+			duration: 300,
+		});
+
+		backgroundColor.value = withSpring("#fffbf3", {
+			stiffness: 200,
+			duration: 300,
+		});
+	};
+
+	const handleDragEnd = (_: ReorderableListDragEndEvent) => {
+		"worklet";
+
+		runOnJS(dragEndHaptic)();
+
+		scale.value = withSpring(1, {
+			stiffness: 200,
+			duration: 300,
+		});
+
+		shadowOpacity.value = withSpring(0, {
+			stiffness: 200,
+			duration: 300,
+		});
+
+		shadowRadius.value = withSpring(0, {
+			stiffness: 200,
+			duration: 300,
+		});
+
+		backgroundColor.value = withSpring("transparent", {
+			stiffness: 200,
+			duration: 300,
+		});
+	};
+
+	const cellAnimations = useMemo(
+		() => ({
+			opacity: 1,
+			transform: [{ scale }],
+			shadowOpacity,
+			shadowRadius,
+			shadowColor: "#000000",
+			shadowOffset: { width: 1.25, height: 2.75 },
+			backgroundColor,
+		}),
+		[scale, shadowOpacity, shadowRadius, backgroundColor],
+	);
+
 	const handleReorder = useCallback(
-		async (data: { playlistStoryId: Id<"playlistStories">; story: StoryPreview }[]) => {
-			const playlistStoryOrders = data.map((story, index) => ({
-				playlistStoryId: story.playlistStoryId,
+		async ({ from, to }: ReorderableListReorderEvent) => {
+			setIsReordering(true);
+			const data = reorderItems(localStories, from, to);
+			setLocalStories(data);
+			const playlistOrders = data.map((playlist, index) => ({
+				playlistStoryId: playlist.playlistStoryId,
 				order: index + 1,
 			}));
 
-			await reorderPlaylistStories({ playlistId, storyOrders: playlistStoryOrders });
+			await reorderPlaylistStories({ playlistId, storyOrders: playlistOrders });
 			setIsReordering(false);
 		},
-		[setIsReordering, reorderPlaylistStories, playlistId],
+		[setLocalStories, localStories, reorderPlaylistStories, playlistId],
 	);
 
 	useEffect(() => {
@@ -213,55 +300,27 @@ const PlaylistContent = ({ playlistId }: { playlistId: Id<"playlists"> }) => {
 	}, [refetchPlaylist, refresh]);
 
 	const renderItem = useCallback(
-		({
-			item,
-			isActive,
-			drag,
-		}: {
-			item: { playlistStoryId: Id<"playlistStories">; story: StoryPreview };
-			isActive: boolean;
-			drag: () => void;
-		}) => {
-			return (
-				<ScaleDecorator activeScale={1.03}>
-					<OpacityDecorator activeOpacity={0.96}>
-						<PlaylistStoryCard
-							story={item.story}
-							drag={drag}
-							isActive={isActive}
-							onLayout={(event) => {
-								sizeMap.current?.set(item.playlistStoryId, event.nativeEvent.layout.height);
-							}}
-						/>
-					</OpacityDecorator>
-				</ScaleDecorator>
-			);
+		({ item }: { item: { playlistStoryId: Id<"playlistStories">; story: StoryPreview } }) => {
+			return <PlaylistStoryCard story={item.story} />;
 		},
 		[],
 	);
 
 	return (
-		<DraggableFlatList
+		<ReorderableList
+			onReorder={handleReorder}
 			refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#ff78e5" />}
 			showsVerticalScrollIndicator={false}
-			contentContainerClassName="h-full"
 			contentContainerStyle={{ paddingTop: 16 }}
 			data={localStories}
-			keyExtractor={(item, idx) => `${item.playlistStoryId}-${idx}`}
+			keyExtractor={(item) => item.playlistStoryId}
 			renderItem={renderItem}
-			onDragBegin={() => setIsReordering(true)}
-			onDragEnd={async ({ data }) => {
-				setLocalStories(data);
-				await handleReorder(data);
-			}}
-			renderPlaceholder={(item) => {
-				const height = sizeMap.current?.get(item.item.playlistStoryId) ?? 88;
-				return <View style={{ height }}></View>;
-			}}
-			dragItemOverflow={true}
-			onEndReached={onEndReached}
+			onDragStart={handleDragStart}
+			onDragEnd={handleDragEnd}
+			cellAnimations={cellAnimations as ReorderableListCellAnimations}
 			ListHeaderComponent={listHeader}
 			ListEmptyComponent={listEmptyComponent}
+			onEndReached={onEndReached}
 			ListFooterComponent={
 				status === "LoadingMore" ? (
 					<View className="flex flex-row items-center justify-center px-4 py-1.5">
@@ -273,40 +332,12 @@ const PlaylistContent = ({ playlistId }: { playlistId: Id<"playlists"> }) => {
 	);
 };
 
-const PlaylistStoryCard = ({
-	story,
-	drag,
-	isActive,
-	onLayout,
-}: {
-	story: StoryPreview;
-	drag: () => void;
-	isActive: boolean;
-	onLayout: (event: LayoutChangeEvent) => void;
-}) => {
-	const wasActive = useRef(false);
+const PlaylistStoryCard = ({ story }: { story: StoryPreview }) => {
+	const drag = useReorderableDrag();
 	const [isSwiping, setIsSwiping] = useState(false);
 
-	useEffect(() => {
-		// Detect drop (when isActive goes from true to false)
-		if (wasActive.current && !isActive) {
-			Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-		}
-
-		wasActive.current = isActive;
-	}, [isActive]);
-
-	const shadowStyle = isActive
-		? {
-				shadowColor: "#000000",
-				shadowOffset: { width: 1.25, height: 2.75 },
-				shadowOpacity: 0.25,
-				shadowRadius: 5,
-			}
-		: {};
-
 	return (
-		<View className={cn("overflow-hidden", isSwiping && "bg-background/80 relative")} onLayout={onLayout}>
+		<View className={cn("overflow-hidden", isSwiping && "bg-background/80 relative")}>
 			<ReanimatedSwipeable
 				onSwipeableOpenStartDrag={() => setIsSwiping(true)}
 				onSwipeableCloseStartDrag={() => setIsSwiping(false)}
@@ -318,11 +349,7 @@ const PlaylistStoryCard = ({
 				overshootFriction={8}
 				renderRightActions={(progress, drag, methods) => <RightAction drag={drag} onPress={() => methods.close()} />}
 			>
-				<Pressable
-					style={shadowStyle}
-					onLongPress={drag}
-					className={cn("flex flex-row gap-x-4 w-full p-4", isActive && "opacity-80 bg-background")}
-				>
+				<Pressable onLongPress={drag} className={cn("flex flex-row gap-x-4 w-full p-4")}>
 					<StoryImagePreview imageUrl={story.imageUrl} blurHash={story.blurHash ?? undefined} size="sm" />
 					<View className="flex flex-col gap-y-2 flex-1">
 						<Text
@@ -389,13 +416,17 @@ const PlaylistHeader = ({ playlist }: { playlist: PlaylistPreview }) => {
 					/>
 				)}
 			</View>
-			<Text className="text-foreground font-semibold text-4xl mt-3" allowFontScaling={false}>
+			<Text
+				style={{ fontFamily: "Baloo", fontWeight: "bold", fontSize: 32, lineHeight: 48 }}
+				className="text-foreground mt-3"
+				allowFontScaling={false}
+			>
 				{playlist.name}
 			</Text>
 
 			<Pressable
 				disabled={playlist.numStories === 0}
-				className="disabled:opacity-50 border-2 border-border p-3 w-3/4 rounded-md mt-2.5 bg-secondary flex flex-row items-center  justify-center gap-x-2"
+				className="disabled:opacity-50 border-2 border-border p-3 w-3/4 rounded-full mt-2.5 bg-secondary flex flex-row items-center  justify-center gap-x-2"
 			>
 				<Play className="text-border fill-border" size={24} />
 				<Text className="text-border font-bold text-2xl">Play Playlist</Text>
@@ -466,9 +497,9 @@ const PlaylistStoriesLoading = () => {
 const PlaylistStoryLoading = () => {
 	return (
 		<View className="flex flex-row gap-x-4 w-full py-4">
-			<Skeleton className="size-[56px] rounded-lg bg-foreground/20" />
+			<Skeleton className="size-10 rounded-lg bg-foreground/20" />
 			<View className="flex flex-col gap-y-1 flex-1 mt-1">
-				<Skeleton className="h-4 w-32 rounded-md bg-foreground/20" />
+				<Skeleton className="h-3 w-32 rounded-md bg-foreground/20" />
 				<Skeleton className="h-3 w-16 rounded-md bg-foreground/20" />
 			</View>
 			<View className="flex items-center justify-start">

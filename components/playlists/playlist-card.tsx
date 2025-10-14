@@ -1,9 +1,9 @@
 import { PlaylistPreview } from "@/convex/playlists/schema";
+import { BLUR_HASH } from "@/lib/constants";
 import { cn, sanitizeStorageUrl } from "@/lib/utils";
-import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { LayoutChangeEvent, Pressable, Text, View } from "react-native";
+import { memo, useCallback, useMemo, useRef, useState } from "react";
+import { Pressable, Text, View } from "react-native";
 import { ChevronRight } from "../ui/icons/chevron-right-icon";
 import { CircleDashed } from "../ui/icons/circle-dashed";
 import { Playlist } from "../ui/icons/playlist-icon";
@@ -13,15 +13,17 @@ import { Skeleton } from "../ui/skeleton";
 
 const PlaylistImage = memo(({ imageUrl }: { imageUrl: string | null }) => {
 	const [imageError, setImageError] = useState(false);
-
 	return (
 		<View className="size-[64px] rounded-lg bg-foreground/20 flex items-center justify-center">
 			{imageUrl && !imageError ? (
 				<Image
+					cachePolicy={"disk"}
 					source={{ uri: sanitizeStorageUrl(imageUrl) }}
 					className="size-full rounded-lg"
 					contentFit="cover"
 					onError={() => setImageError(true)}
+					transition={0}
+					placeholder={{ blurhash: BLUR_HASH }}
 				/>
 			) : (
 				<Playlist className="text-foreground/60 fill-foreground/60" strokeWidth={0.5} size={28} />
@@ -70,41 +72,11 @@ const PlaylistStoryCount = memo(({ numStories }: { numStories: number }) => {
 });
 PlaylistStoryCount.displayName = "PlaylistStoryCount";
 
-export const PlaylistCard = ({
-	playlist,
-	drag,
-	isActive,
-	onLayout,
-}: {
-	playlist: PlaylistPreview;
-	drag: () => void;
-	isActive: boolean;
-	onLayout: (event: LayoutChangeEvent) => void;
-}) => {
-	const wasActive = useRef(false);
+export const PlaylistCard = ({ playlist, drag }: { playlist: PlaylistPreview; drag: () => void }) => {
 	const navigatePressRef = useRef(false);
 	const router = useRouter();
 
-	useEffect(() => {
-		// Detect drop (when isActive goes from true to false)
-		if (wasActive.current && !isActive) {
-			Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-		}
-
-		wasActive.current = isActive;
-	}, [isActive]);
-
-	const shadowStyle = isActive
-		? {
-				shadowColor: "#000000",
-				shadowOffset: { width: 1.25, height: 2.75 },
-				shadowOpacity: 0.25,
-				shadowRadius: 5,
-			}
-		: {};
-
 	const handleLongPress = useCallback(async () => {
-		await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 		drag();
 	}, [drag]);
 
@@ -121,11 +93,9 @@ export const PlaylistCard = ({
 
 	return (
 		<Pressable
-			onLayout={onLayout}
 			onPress={handleNavigate}
 			onLongPress={handleLongPress}
-			style={shadowStyle}
-			className={cn("w-full p-4  flex flex-row gap-x-4", isActive && "opacity-80 bg-background")}
+			className={cn("w-full p-4  flex flex-row gap-x-4")}
 		>
 			<PlaylistImage imageUrl={playlist.image} />
 			<View className="flex-1 flex flex-col gap-y-0.5">

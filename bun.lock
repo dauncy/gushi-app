@@ -61,6 +61,7 @@
         "react-native-purchases": "^9.0.0",
         "react-native-purchases-ui": "^9.0.0",
         "react-native-reanimated": "~3.17.4",
+        "react-native-reorderable-list": "^0.16.2",
         "react-native-safe-area-context": "5.4.0",
         "react-native-screens": "~4.11.1",
         "react-native-svg": "^15.12.0",
@@ -1903,6 +1904,8 @@
     "react-native-purchases-ui": ["react-native-purchases-ui@9.0.0", "", { "dependencies": { "@revenuecat/purchases-typescript-internal": "15.0.0" }, "peerDependencies": { "react": "*", "react-native": ">= 0.73.0", "react-native-purchases": "9.0.0", "react-native-web": "*" }, "optionalPeers": ["react-native-web"] }, "sha512-vgrI5F8R8diYCjt5F1JzDHRc/LDT43gMegDfzDYZvfF3qCzKdDEviaVKOsn3I3PTU1mI8uMSflA4H7cYeF9h3g=="],
 
     "react-native-reanimated": ["react-native-reanimated@3.17.5", "", { "dependencies": { "@babel/plugin-transform-arrow-functions": "^7.0.0-0", "@babel/plugin-transform-class-properties": "^7.0.0-0", "@babel/plugin-transform-classes": "^7.0.0-0", "@babel/plugin-transform-nullish-coalescing-operator": "^7.0.0-0", "@babel/plugin-transform-optional-chaining": "^7.0.0-0", "@babel/plugin-transform-shorthand-properties": "^7.0.0-0", "@babel/plugin-transform-template-literals": "^7.0.0-0", "@babel/plugin-transform-unicode-regex": "^7.0.0-0", "@babel/preset-typescript": "^7.16.7", "convert-source-map": "^2.0.0", "invariant": "^2.2.4", "react-native-is-edge-to-edge": "1.1.7" }, "peerDependencies": { "@babel/core": "^7.0.0-0", "react": "*", "react-native": "*" } }, "sha512-SxBK7wQfJ4UoWoJqQnmIC7ZjuNgVb9rcY5Xc67upXAFKftWg0rnkknTw6vgwnjRcvYThrjzUVti66XoZdDJGtw=="],
+
+    "react-native-reorderable-list": ["react-native-reorderable-list@0.16.2", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-gesture-handler": ">=2.12.0", "react-native-reanimated": ">=3.12.0" } }, "sha512-+MwIpFj9HZQl/oko/hgqolvMUIYrRyFWu88YTNnmzguEsTS2C+MslUu3rN9tKe+BlHfqSlgRYSbHZeBlnsSYBw=="],
 
     "react-native-safe-area-context": ["react-native-safe-area-context@5.4.0", "", { "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-JaEThVyJcLhA+vU0NU8bZ0a1ih6GiF4faZ+ArZLqpYbL6j7R3caRqj+mE3lEtKCuHgwjLg3bCxLL1GPUJZVqUA=="],
 

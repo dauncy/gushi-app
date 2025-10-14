@@ -8,13 +8,25 @@ import { api } from "@/convex/_generated/api";
 import { PlaylistPreview } from "@/convex/playlists/schema";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { useConvexMutation } from "@convex-dev/react-query";
+import * as Haptics from "expo-haptics";
 import { Link } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, RefreshControl, Text, View } from "react-native";
-import DraggableFlatList, { OpacityDecorator, ScaleDecorator } from "react-native-draggable-flatlist";
+import { runOnJS, useSharedValue, withSpring } from "react-native-reanimated";
+import ReorderableList, {
+	ReorderableListCellAnimations,
+	ReorderableListDragEndEvent,
+	ReorderableListDragStartEvent,
+	ReorderableListReorderEvent,
+	reorderItems,
+	useReorderableDrag,
+} from "react-native-reorderable-list";
 
 export default function PlaylistsListPage() {
-	const heightMap = useRef<Map<string, number>>(new Map());
+	const scale = useSharedValue(1);
+	const shadowOpacity = useSharedValue(0);
+	const shadowRadius = useSharedValue(0);
+	const backgroundColor = useSharedValue("transparent");
 	const [isReordering, setIsReordering] = useState(false);
 	const reorderPlaylists = useConvexMutation(api.playlists.mutations.reorderPlaylists);
 	const [localResults, setLocalResults] = useState<PlaylistPreview[]>([]);
@@ -26,8 +38,84 @@ export default function PlaylistsListPage() {
 		},
 	);
 
+	const dragStartHaptic = useCallback(async () => {
+		await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+	}, []);
+
+	const dragEndHaptic = useCallback(async () => {
+		await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+	}, []);
+
+	const handleDragStart = (_: ReorderableListDragStartEvent) => {
+		"worklet";
+
+		runOnJS(dragStartHaptic)();
+
+		scale.value = withSpring(1.05, {
+			stiffness: 200,
+			duration: 300,
+		});
+
+		shadowOpacity.value = withSpring(0.4, {
+			stiffness: 200,
+			duration: 300,
+		});
+
+		shadowRadius.value = withSpring(8, {
+			stiffness: 200,
+			duration: 300,
+		});
+
+		backgroundColor.value = withSpring("#fffbf3", {
+			stiffness: 200,
+			duration: 300,
+		});
+	};
+
+	const handleDragEnd = (_: ReorderableListDragEndEvent) => {
+		"worklet";
+
+		runOnJS(dragEndHaptic)();
+
+		scale.value = withSpring(1, {
+			stiffness: 200,
+			duration: 300,
+		});
+
+		shadowOpacity.value = withSpring(0, {
+			stiffness: 200,
+			duration: 300,
+		});
+
+		shadowRadius.value = withSpring(0, {
+			stiffness: 200,
+			duration: 300,
+		});
+
+		backgroundColor.value = withSpring("transparent", {
+			stiffness: 200,
+			duration: 300,
+		});
+	};
+
+	const cellAnimations = useMemo(
+		() => ({
+			opacity: 1,
+			transform: [{ scale }],
+			shadowOpacity,
+			shadowRadius,
+			shadowColor: "#000000",
+			shadowOffset: { width: 1.25, height: 2.75 },
+			backgroundColor,
+		}),
+		[scale, shadowOpacity, shadowRadius, backgroundColor],
+	);
+
 	const handleReorder = useCallback(
-		async (data: PlaylistPreview[]) => {
+		async ({ from, to }: ReorderableListReorderEvent) => {
+			setIsReordering(true);
+			const data = reorderItems(localResults, from, to);
+			setLocalResults(data);
 			const playlistOrders = data.map((playlist, index) => ({
 				playlistId: playlist._id,
 				order: index + 1,
@@ -36,7 +124,7 @@ export default function PlaylistsListPage() {
 			await reorderPlaylists({ playlistOrders });
 			setIsReordering(false);
 		},
-		[reorderPlaylists, setIsReordering],
+		[localResults, reorderPlaylists],
 	);
 
 	useEffect(() => {
@@ -52,47 +140,24 @@ export default function PlaylistsListPage() {
 		}
 	}, [loadMore, status, isReordering]);
 
-	const renderItem = useCallback(
-		({ item, isActive, drag }: { item: PlaylistPreview; isActive: boolean; drag: () => void }) => {
-			return (
-				<ScaleDecorator activeScale={1.03}>
-					<OpacityDecorator activeOpacity={0.96}>
-						<PlaylistCard
-							playlist={item}
-							drag={drag}
-							isActive={isActive}
-							onLayout={(event) => {
-								heightMap.current?.set(item._id, event.nativeEvent.layout.height);
-							}}
-						/>
-					</OpacityDecorator>
-				</ScaleDecorator>
-			);
-		},
-		[heightMap],
-	);
+	const renderItem = useCallback(({ item }: { item: PlaylistPreview }) => {
+		return <DraggableCard item={item} />;
+	}, []);
 
 	return (
 		<View className="flex-1 relative bg-foreground/10">
 			<SecondaryHeader title="Playlists" />
 			<View style={{ flex: 1 }} className="relative flex-col px-0">
-				<DraggableFlatList
-					renderPlaceholder={(item) => {
-						const height = heightMap.current?.get(item.item._id) ?? 88;
-						return <View style={{ height }}></View>;
-					}}
-					contentContainerClassName=" h-full"
+				<ReorderableList
 					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor="#ff78e5" />}
-					onEndReached={onEndReached}
-					onDragBegin={() => setIsReordering(true)}
-					dragItemOverflow={true}
-					onDragEnd={async ({ data }) => {
-						setLocalResults(data);
-						await handleReorder(data);
-					}}
+					onReorder={handleReorder}
 					data={localResults}
 					keyExtractor={(item) => item._id}
 					renderItem={renderItem}
+					onEndReached={onEndReached}
+					cellAnimations={cellAnimations as ReorderableListCellAnimations}
+					onDragStart={handleDragStart}
+					onDragEnd={handleDragEnd}
 					ListEmptyComponent={
 						isLoading || refreshing || (localResults.length === 0 && results.length >= 0) ? (
 							<PlaylistsLoading />
@@ -165,4 +230,9 @@ const EmptyState = () => {
 			</View>
 		</View>
 	);
+};
+
+const DraggableCard = ({ item }: { item: PlaylistPreview }) => {
+	const drag = useReorderableDrag();
+	return <PlaylistCard playlist={item} drag={drag} />;
 };

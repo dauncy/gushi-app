@@ -36,7 +36,6 @@ const StoryImagePreviewComp = ({
 	blurHash?: string;
 	transition?: number;
 }) => {
-	console.log("imageUrl", imageUrl);
 	const [error, setError] = useState(false);
 
 	const showFallback = error || !imageUrl;
