@@ -22,15 +22,16 @@ import { useConvexMutation } from "@convex-dev/react-query";
 import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
-import DraggableFlatList from "react-native-draggable-flatlist";
+import { ActivityIndicator, LayoutChangeEvent, Pressable, RefreshControl, Text, View } from "react-native";
+import DraggableFlatList, { OpacityDecorator, ScaleDecorator } from "react-native-draggable-flatlist";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
-import Animated, { SharedValue, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import Animated, { SharedValue, useAnimatedStyle } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PlaylistIdPage() {
 	const params = useLocalSearchParams();
 	const playlistId = params.playlistId as Id<"playlists">;
+
 	return (
 		<View className="flex-1 relative bg-foreground/10">
 			<SecondaryHeader
@@ -38,7 +39,7 @@ export default function PlaylistIdPage() {
 				rightNode={
 					<View className="flex-row flex items-center gap-x-2">
 						<AddStoryButton playlistId={params.playlistId as string} />
-						<PlaylistDropDownMenu />
+						<PlaylistDropDownMenu playlistId={playlistId} />
 					</View>
 				}
 			/>
@@ -49,7 +50,19 @@ export default function PlaylistIdPage() {
 	);
 }
 
-const PlaylistDropDownMenu = () => {
+const PlaylistDropDownMenu = ({ playlistId }: { playlistId: Id<"playlists"> }) => {
+	const pressRef = useRef(false);
+	const router = useRouter();
+
+	const handleEditPress = useCallback(() => {
+		if (pressRef.current) return;
+		pressRef.current = true;
+		router.push(`/playlists/${playlistId}/edit`);
+		setTimeout(() => {
+			pressRef.current = false;
+		}, 500);
+	}, [router, playlistId]);
+
 	const insets = useSafeAreaInsets();
 	const contentInsets = {
 		top: insets.top,
@@ -57,6 +70,7 @@ const PlaylistDropDownMenu = () => {
 		left: 4,
 		right: 4,
 	};
+
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
@@ -80,10 +94,15 @@ const PlaylistDropDownMenu = () => {
 					shadowRadius: 3.84,
 				}}
 			>
-				<Pressable className="flex flex-row items-center gap-2 p-4 w-full active:bg-foreground/10 rounded-t-md">
-					<TextCursorInput className="text-foreground" size={20} />
-					<Text className="text-foreground font-medium text-xl">Edit Playlist</Text>
-				</Pressable>
+				<PopoverTrigger asChild>
+					<Pressable
+						onPress={handleEditPress}
+						className="flex flex-row items-center gap-2 p-4 w-full active:bg-foreground/10 rounded-t-md"
+					>
+						<TextCursorInput className="text-foreground" size={20} />
+						<Text className="text-foreground font-medium text-xl">Edit Playlist</Text>
+					</Pressable>
+				</PopoverTrigger>
 				<Separator className="h-[0.5px]" />
 				<Pressable className="flex flex-row items-center gap-2 p-4 w-full active:bg-foreground/10 rounded-b-md">
 					<Trash2 className="text-destructive" size={20} />
@@ -117,6 +136,7 @@ const AddStoryButton = ({ playlistId }: { playlistId: string }) => {
 
 const PlaylistContent = ({ playlistId }: { playlistId: Id<"playlists"> }) => {
 	const [isReordering, setIsReordering] = useState(false);
+	const sizeMap = useRef<Map<string, number>>(new Map());
 	const reorderPlaylistStories = useConvexMutation(api.playlists.mutations.reorderPlaylistStories);
 	const {
 		data: playlist,
@@ -147,38 +167,29 @@ const PlaylistContent = ({ playlistId }: { playlistId: Id<"playlists"> }) => {
 
 	const handleReorder = useCallback(
 		async (data: { playlistStoryId: Id<"playlistStories">; story: StoryPreview }[]) => {
-			console.log("starting reorder");
-
-			setLocalStories(data);
-			setIsReordering(true);
-
 			const playlistStoryOrders = data.map((story, index) => ({
 				playlistStoryId: story.playlistStoryId,
 				order: index + 1,
 			}));
 
 			await reorderPlaylistStories({ playlistId, storyOrders: playlistStoryOrders });
-			setTimeout(() => {
-				setIsReordering(false);
-			}, 50);
+			setIsReordering(false);
 		},
-		[setIsReordering, setLocalStories, reorderPlaylistStories, playlistId],
+		[setIsReordering, reorderPlaylistStories, playlistId],
 	);
 
 	useEffect(() => {
-		console.log("isReordering", isReordering, { length: localStories.length });
-
 		if (!isReordering) {
-			console.log("setting list data");
 			setLocalStories(stories);
 		}
-	}, [stories, setLocalStories, isReordering, localStories.length]);
+	}, [stories, setLocalStories, isReordering]);
 
 	const onEndReached = useCallback(() => {
+		if (isReordering) return;
 		if (status === "CanLoadMore") {
 			loadMore(10);
 		}
-	}, [loadMore, status]);
+	}, [loadMore, status, isReordering]);
 
 	const listHeader = useMemo(() => {
 		if (playlistLoading || isRefetchingPlaylist || storiesLoading || refreshing) {
@@ -201,6 +212,34 @@ const PlaylistContent = ({ playlistId }: { playlistId: Id<"playlists"> }) => {
 		await Promise.all([refetchPlaylist(), refresh()]);
 	}, [refetchPlaylist, refresh]);
 
+	const renderItem = useCallback(
+		({
+			item,
+			isActive,
+			drag,
+		}: {
+			item: { playlistStoryId: Id<"playlistStories">; story: StoryPreview };
+			isActive: boolean;
+			drag: () => void;
+		}) => {
+			return (
+				<ScaleDecorator activeScale={1.03}>
+					<OpacityDecorator activeOpacity={0.96}>
+						<PlaylistStoryCard
+							story={item.story}
+							drag={drag}
+							isActive={isActive}
+							onLayout={(event) => {
+								sizeMap.current?.set(item.playlistStoryId, event.nativeEvent.layout.height);
+							}}
+						/>
+					</OpacityDecorator>
+				</ScaleDecorator>
+			);
+		},
+		[],
+	);
+
 	return (
 		<DraggableFlatList
 			refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#ff78e5" />}
@@ -208,13 +247,18 @@ const PlaylistContent = ({ playlistId }: { playlistId: Id<"playlists"> }) => {
 			contentContainerClassName="h-full"
 			contentContainerStyle={{ paddingTop: 16 }}
 			data={localStories}
-			keyExtractor={(item) => item.playlistStoryId}
-			renderItem={({ item, isActive, drag }) => (
-				<PlaylistStoryCard story={item.story} drag={drag} isActive={isActive} />
-			)}
-			onDragEnd={({ data }) => {
-				handleReorder(data);
+			keyExtractor={(item, idx) => `${item.playlistStoryId}-${idx}`}
+			renderItem={renderItem}
+			onDragBegin={() => setIsReordering(true)}
+			onDragEnd={async ({ data }) => {
+				setLocalStories(data);
+				await handleReorder(data);
 			}}
+			renderPlaceholder={(item) => {
+				const height = sizeMap.current?.get(item.item.playlistStoryId) ?? 88;
+				return <View style={{ height }}></View>;
+			}}
+			dragItemOverflow={true}
 			onEndReached={onEndReached}
 			ListHeaderComponent={listHeader}
 			ListEmptyComponent={listEmptyComponent}
@@ -229,30 +273,28 @@ const PlaylistContent = ({ playlistId }: { playlistId: Id<"playlists"> }) => {
 	);
 };
 
-const PlaylistStoryCard = ({ story, drag, isActive }: { story: StoryPreview; drag: () => void; isActive: boolean }) => {
-	const scale = useSharedValue(1);
+const PlaylistStoryCard = ({
+	story,
+	drag,
+	isActive,
+	onLayout,
+}: {
+	story: StoryPreview;
+	drag: () => void;
+	isActive: boolean;
+	onLayout: (event: LayoutChangeEvent) => void;
+}) => {
 	const wasActive = useRef(false);
 	const [isSwiping, setIsSwiping] = useState(false);
 
 	useEffect(() => {
-		scale.value = withSpring(isActive ? 1.05 : 1, {
-			damping: 15,
-			stiffness: 150,
-		});
-
 		// Detect drop (when isActive goes from true to false)
 		if (wasActive.current && !isActive) {
 			Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 		}
 
 		wasActive.current = isActive;
-	}, [isActive, scale]);
-
-	const animatedStyle = useAnimatedStyle(() => {
-		return {
-			transform: [{ scale: scale.value }],
-		};
-	});
+	}, [isActive]);
 
 	const shadowStyle = isActive
 		? {
@@ -264,14 +306,14 @@ const PlaylistStoryCard = ({ story, drag, isActive }: { story: StoryPreview; dra
 		: {};
 
 	return (
-		<Animated.View style={animatedStyle} className={cn("overflow-hidden", isSwiping && "bg-background/80 relative")}>
+		<View className={cn("overflow-hidden", isSwiping && "bg-background/80 relative")} onLayout={onLayout}>
 			<ReanimatedSwipeable
 				onSwipeableOpenStartDrag={() => setIsSwiping(true)}
 				onSwipeableCloseStartDrag={() => setIsSwiping(false)}
 				onSwipeableOpen={() => setIsSwiping(true)}
 				onSwipeableClose={() => setIsSwiping(false)}
 				friction={2}
-				rightThreshold={40}
+				rightThreshold={10}
 				overshootRight={true}
 				overshootFriction={8}
 				renderRightActions={(progress, drag, methods) => <RightAction drag={drag} onPress={() => methods.close()} />}
@@ -294,51 +336,24 @@ const PlaylistStoryCard = ({ story, drag, isActive }: { story: StoryPreview; dra
 					</View>
 				</Pressable>
 			</ReanimatedSwipeable>
-		</Animated.View>
+		</View>
 	);
 };
 
 const RightAction = ({ drag, onPress }: { drag: SharedValue<number>; onPress: () => void }) => {
 	const move = useAnimatedStyle(() => ({
-		transform: [{ translateX: drag.value }],
+		transform: [{ translateX: drag.value + 48 }],
 	}));
 
 	return (
-		// Width here controls how far the row can open
-		<View style={{ width: 100, height: "100%" }}>
-			{/* Full-bleed red background (not counted in layout, so no extra drag distance) */}
-			<Animated.View
-				pointerEvents="none"
-				className="bg-destructive"
-				style={[
-					StyleSheet.absoluteFillObject,
-					move,
-					{ right: -100 }, // extend to screen edge
-				]}
-			/>
-
-			{/* Actual actionable area */}
-			<Animated.View
-				style={[
-					move,
-					{
-						position: "absolute",
-						right: 0,
-						top: 0,
-						bottom: 0,
-						width: "100%",
-						justifyContent: "center",
-						alignItems: "center",
-					},
-				]}
-			>
+		<View style={{ width: 48, height: "100%" }} className="items-center justify-center">
+			<Animated.View className="bg-destructive w-[54px] h-full" style={[move]}>
 				<Pressable
 					onPress={onPress}
 					className="flex flex-row items-center justify-center gap-x-2"
 					style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
 				>
 					<Trash2 size={20} className="text-background" strokeWidth={2} />
-					<Text className="text-background font-bold text-lg">Remove</Text>
 				</Pressable>
 			</Animated.View>
 		</View>

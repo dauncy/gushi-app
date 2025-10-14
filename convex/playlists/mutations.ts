@@ -2,7 +2,12 @@ import { mutation } from "@/convex/_generated/server";
 import { verifyAccess } from "@/convex/common/utils";
 import { ConvexError, v } from "convex/values";
 import { Id } from "../_generated/dataModel";
-import { ensurePlaylistBelongsToUser, getLastPlaylistOrder, getLastPlaylistStoryOrder } from "./utils";
+import {
+	ensurePlaylistBelongsToUser,
+	ensurePlaylistTitleIsUnique,
+	getLastPlaylistOrder,
+	getLastPlaylistStoryOrder,
+} from "./utils";
 
 export const createPlaylist = mutation({
 	args: {
@@ -12,15 +17,9 @@ export const createPlaylist = mutation({
 	handler: async (ctx, args) => {
 		try {
 			const { dbUser } = await verifyAccess(ctx, { validateSubscription: false });
-			const maybeExistsByTitle = await ctx.db
-				.query("playlists")
-				.withIndex("by_user_title", (q) => q.eq("userId", dbUser._id).eq("name", args.title))
-				.unique();
-			if (maybeExistsByTitle) {
-				return {
-					data: null,
-					error: "Playlist with this title already exists",
-				};
+			const uniqueTitle = await ensurePlaylistTitleIsUnique(ctx, { title: args.title, userId: dbUser._id });
+			if (!uniqueTitle) {
+				return { data: null, error: "Playlist with this title already exists" };
 			}
 			const order = await getLastPlaylistOrder(ctx, dbUser._id);
 			const playlist = await ctx.db.insert("playlists", {
@@ -145,6 +144,34 @@ export const reorderPlaylistStories = mutation({
 			}
 			console.warn("[@/convex/playlists/mutations.ts]: reorderPlaylistStories() => error", e);
 			return null;
+		}
+	},
+});
+
+export const updatePlaylist = mutation({
+	args: {
+		playlistId: v.id("playlists"),
+		title: v.string(),
+		imageId: v.optional(v.id("files")),
+	},
+	handler: async (ctx, { playlistId, title, imageId }) => {
+		try {
+			const { dbUser } = await verifyAccess(ctx, { validateSubscription: false });
+			await ensurePlaylistBelongsToUser(ctx, { playlistId, userId: dbUser._id });
+			const uniqueTitle = await ensurePlaylistTitleIsUnique(ctx, { title, userId: dbUser._id, playlistId });
+			if (!uniqueTitle) {
+				return { data: null, error: "Playlist with this title already exists" };
+			}
+			await ctx.db.patch(playlistId, { name: title, imageId });
+			return { data: playlistId, error: null };
+		} catch (e) {
+			if (e instanceof ConvexError) {
+				if (e.data.toLowerCase().includes("unauthorized")) {
+					return { data: null, error: null };
+				}
+			}
+			console.warn("[@/convex/playlists/mutations.ts]: updatePlaylist() => error", e);
+			return { data: null, error: "Internal server error" };
 		}
 	},
 });

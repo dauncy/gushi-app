@@ -33,3 +33,20 @@ export const getLastPlaylistStoryOrder = async (ctx: QueryCtx, playlistId: Id<"p
 		.take(1);
 	return lastByOrder[0]?.order ?? 0;
 };
+
+export const ensurePlaylistTitleIsUnique = async (
+	ctx: QueryCtx,
+	{ title, userId, playlistId }: { title: string; userId: Id<"users">; playlistId?: Id<"playlists"> },
+) => {
+	const maybeExistsByTitle = await ctx.db
+		.query("playlists")
+		.withIndex("by_user_title", (q) => q.eq("userId", userId).eq("name", title))
+		.unique();
+	if (maybeExistsByTitle) {
+		if (maybeExistsByTitle._id === playlistId) {
+			return true;
+		}
+		return false;
+	}
+	return true;
+};

@@ -9,11 +9,12 @@ import { PlaylistPreview } from "@/convex/playlists/schema";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { useConvexMutation } from "@convex-dev/react-query";
 import { Link } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, RefreshControl, Text, View } from "react-native";
-import DraggableFlatList from "react-native-draggable-flatlist";
+import DraggableFlatList, { OpacityDecorator, ScaleDecorator } from "react-native-draggable-flatlist";
 
 export default function PlaylistsListPage() {
+	const heightMap = useRef<Map<string, number>>(new Map());
 	const [isReordering, setIsReordering] = useState(false);
 	const reorderPlaylists = useConvexMutation(api.playlists.mutations.reorderPlaylists);
 	const [localResults, setLocalResults] = useState<PlaylistPreview[]>([]);
@@ -27,19 +28,15 @@ export default function PlaylistsListPage() {
 
 	const handleReorder = useCallback(
 		async (data: PlaylistPreview[]) => {
-			setLocalResults(data);
-			setIsReordering(true);
 			const playlistOrders = data.map((playlist, index) => ({
 				playlistId: playlist._id,
 				order: index + 1,
 			}));
 
 			await reorderPlaylists({ playlistOrders });
-			setTimeout(() => {
-				setIsReordering(false);
-			}, 500);
+			setIsReordering(false);
 		},
-		[reorderPlaylists, setIsReordering, setLocalResults],
+		[reorderPlaylists, setIsReordering],
 	);
 
 	useEffect(() => {
@@ -49,27 +46,53 @@ export default function PlaylistsListPage() {
 	}, [results, setLocalResults, isReordering]);
 
 	const onEndReached = useCallback(() => {
+		if (isReordering) return;
 		if (status === "CanLoadMore") {
 			loadMore(10);
 		}
-	}, [loadMore, status]);
+	}, [loadMore, status, isReordering]);
+
+	const renderItem = useCallback(
+		({ item, isActive, drag }: { item: PlaylistPreview; isActive: boolean; drag: () => void }) => {
+			return (
+				<ScaleDecorator activeScale={1.03}>
+					<OpacityDecorator activeOpacity={0.96}>
+						<PlaylistCard
+							playlist={item}
+							drag={drag}
+							isActive={isActive}
+							onLayout={(event) => {
+								heightMap.current?.set(item._id, event.nativeEvent.layout.height);
+							}}
+						/>
+					</OpacityDecorator>
+				</ScaleDecorator>
+			);
+		},
+		[heightMap],
+	);
 
 	return (
 		<View className="flex-1 relative bg-foreground/10">
 			<SecondaryHeader title="Playlists" />
 			<View style={{ flex: 1 }} className="relative flex-col px-0">
 				<DraggableFlatList
+					renderPlaceholder={(item) => {
+						const height = heightMap.current?.get(item.item._id) ?? 88;
+						return <View style={{ height }}></View>;
+					}}
 					contentContainerClassName=" h-full"
 					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor="#ff78e5" />}
 					onEndReached={onEndReached}
-					onDragEnd={({ data }) => {
-						handleReorder(data);
+					onDragBegin={() => setIsReordering(true)}
+					dragItemOverflow={true}
+					onDragEnd={async ({ data }) => {
+						setLocalResults(data);
+						await handleReorder(data);
 					}}
 					data={localResults}
 					keyExtractor={(item) => item._id}
-					renderItem={({ item, isActive, drag }) => (
-						<PlaylistCard key={item._id} playlist={item} drag={drag} isActive={isActive} />
-					)}
+					renderItem={renderItem}
 					ListEmptyComponent={
 						isLoading || refreshing || (localResults.length === 0 && results.length >= 0) ? (
 							<PlaylistsLoading />

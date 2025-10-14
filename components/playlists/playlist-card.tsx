@@ -3,8 +3,7 @@ import { cn, sanitizeStorageUrl } from "@/lib/utils";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, Text, View } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import { LayoutChangeEvent, Pressable, Text, View } from "react-native";
 import { ChevronRight } from "../ui/icons/chevron-right-icon";
 import { CircleDashed } from "../ui/icons/circle-dashed";
 import { Playlist } from "../ui/icons/playlist-icon";
@@ -53,13 +52,13 @@ const PlaylistStoryCount = memo(({ numStories }: { numStories: number }) => {
 	return (
 		<View
 			className={cn(
-				"flex flex-row items-center gap-x-1 px-1.5 py-0.5 rounded-md bg-secondary border border-foreground/10",
-				numStories === 0 && "bg-foreground/10",
+				"flex flex-row items-center gap-x-1 px-1.5 py-0.5 rounded-md bg-transparent border border-transparent",
+				numStories === 0 && "bg-foreground/10 border-foreground/10",
 			)}
 		>
-			<Icon className={cn("text-foreground/80", numStories === 0 && "text-destructive")} size={12} />
+			<Icon className={cn("text-foreground/80", numStories === 0 && "text-destructive")} size={12} strokeWidth={2.5} />
 			<Text
-				className={cn("text-foreground/80 font-semibol text-sm", numStories === 0 && "text-destructive")}
+				className={cn("text-foreground/80 font-semibold text-sm", numStories === 0 && "text-destructive")}
 				maxFontSizeMultiplier={1.2}
 				numberOfLines={1}
 				ellipsizeMode="tail"
@@ -75,35 +74,25 @@ export const PlaylistCard = ({
 	playlist,
 	drag,
 	isActive,
+	onLayout,
 }: {
 	playlist: PlaylistPreview;
 	drag: () => void;
 	isActive: boolean;
+	onLayout: (event: LayoutChangeEvent) => void;
 }) => {
-	const scale = useSharedValue(1);
 	const wasActive = useRef(false);
 	const navigatePressRef = useRef(false);
 	const router = useRouter();
 
 	useEffect(() => {
-		scale.value = withSpring(isActive ? 1.05 : 1, {
-			damping: 15,
-			stiffness: 150,
-		});
-
 		// Detect drop (when isActive goes from true to false)
 		if (wasActive.current && !isActive) {
 			Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 		}
 
 		wasActive.current = isActive;
-	}, [isActive, scale]);
-
-	const animatedStyle = useAnimatedStyle(() => {
-		return {
-			transform: [{ scale: scale.value }],
-		};
-	});
+	}, [isActive]);
 
 	const shadowStyle = isActive
 		? {
@@ -131,27 +120,26 @@ export const PlaylistCard = ({
 	}, [playlist._id, router]);
 
 	return (
-		<Animated.View style={animatedStyle}>
-			<Pressable
-				onPress={handleNavigate}
-				onLongPress={handleLongPress}
-				style={shadowStyle}
-				className={cn("w-full p-4  flex flex-row gap-x-4", isActive && "opacity-80 bg-background")}
-			>
-				<PlaylistImage imageUrl={playlist.image} />
-				<View className="flex-1 flex flex-col gap-y-0.5">
-					<Text className="text-foreground font-semibold text-xl" maxFontSizeMultiplier={1.2}>
-						{playlist.name}
-					</Text>
-					<View className="flex items-start mt-1.5 flex-1">
-						<PlaylistStoryCount numStories={playlist.numStories} />
-					</View>
+		<Pressable
+			onLayout={onLayout}
+			onPress={handleNavigate}
+			onLongPress={handleLongPress}
+			style={shadowStyle}
+			className={cn("w-full p-4  flex flex-row gap-x-4", isActive && "opacity-80 bg-background")}
+		>
+			<PlaylistImage imageUrl={playlist.image} />
+			<View className="flex-1 flex flex-col gap-y-0.5">
+				<Text className="text-foreground font-semibold text-xl" maxFontSizeMultiplier={1.2}>
+					{playlist.name}
+				</Text>
+				<View className="flex items-start mt-0 flex-1">
+					<PlaylistStoryCount numStories={playlist.numStories} />
 				</View>
-				<View className="flex items-center justify-center">
-					<ChevronRight className="size-4 text-foreground" size={24} />
-				</View>
-			</Pressable>
-		</Animated.View>
+			</View>
+			<View className="flex items-center justify-center">
+				<ChevronRight className="size-4 text-foreground" size={24} />
+			</View>
+		</Pressable>
 	);
 };
 

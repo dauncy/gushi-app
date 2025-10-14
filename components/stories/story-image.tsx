@@ -27,13 +27,16 @@ const StoryImagePreviewComp = ({
 	size = "default",
 	active = false,
 	className = "",
+	transition = 100,
 }: {
 	imageUrl: string | null;
 	size?: "default" | "sm" | "md" | "featured";
 	active?: boolean;
 	className?: string;
 	blurHash?: string;
+	transition?: number;
 }) => {
+	console.log("imageUrl", imageUrl);
 	const [error, setError] = useState(false);
 
 	const showFallback = error || !imageUrl;
@@ -47,12 +50,12 @@ const StoryImagePreviewComp = ({
 	return (
 		<View className={cn(imageVariants({ size }), "relative bg-foreground/20", className)}>
 			<Image
-				cachePolicy={"memory-disk"}
+				cachePolicy={"disk"}
 				source={{ uri: sanitizeStorageUrl(imageUrl) }}
 				className={cn(imageVariants({ size }))}
 				onError={() => setError(true)}
 				placeholder={{ blurhash: blurHash }}
-				transition={100}
+				transition={transition}
 			/>
 			{active && (
 				<View
