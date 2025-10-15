@@ -21,7 +21,7 @@ import { cn, sanitizeStorageUrl } from "@/lib/utils";
 import { useConvexMutation } from "@convex-dev/react-query";
 import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, RefreshControl, Text, View } from "react-native";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import Animated, { runOnJS, SharedValue, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
@@ -37,7 +37,25 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PlaylistIdPage() {
 	const params = useLocalSearchParams();
+	const clickRef = useRef(false);
+	const [deleting, setDeleting] = useState(false);
+	const deletePlaylist = useConvexMutation(api.playlists.mutations.deletePlaylist);
+
+	const router = useRouter();
 	const playlistId = params.playlistId as Id<"playlists">;
+
+	const handleDelete = useCallback(async () => {
+		if (clickRef.current) return;
+		clickRef.current = true;
+		setDeleting(true);
+		await deletePlaylist({ playlistId });
+		setDeleting(false);
+		router.dismissTo("/playlists");
+	}, [playlistId, deletePlaylist, setDeleting, router]);
+
+	if (!playlistId) {
+		return null;
+	}
 
 	return (
 		<View className="flex-1 relative bg-foreground/10">
@@ -45,30 +63,45 @@ export default function PlaylistIdPage() {
 				dismissTo={"/playlists"}
 				rightNode={
 					<View className="flex-row flex items-center gap-x-2">
-						<AddStoryButton playlistId={params.playlistId as string} />
-						<PlaylistDropDownMenu playlistId={playlistId} />
+						<AddStoryButton playlistId={params.playlistId as string} pressRef={clickRef} disabled={deleting} />
+						<PlaylistDropDownMenu
+							deleting={deleting}
+							playlistId={playlistId}
+							pressRef={clickRef}
+							onDeletePress={handleDelete}
+						/>
 					</View>
 				}
 			/>
 			<View style={{ flex: 1 }} className="relative flex-col px-0">
-				<PlaylistContent playlistId={playlistId} />
+				<PlaylistContent playlistId={playlistId} disabled={deleting} />
 			</View>
 		</View>
 	);
 }
 
-const PlaylistDropDownMenu = ({ playlistId }: { playlistId: Id<"playlists"> }) => {
-	const pressRef = useRef(false);
+const PlaylistDropDownMenu = ({
+	deleting = false,
+	playlistId,
+	pressRef,
+	onDeletePress,
+}: {
+	deleting: boolean;
+	playlistId: Id<"playlists">;
+	pressRef: RefObject<boolean>;
+	onDeletePress: () => Promise<void>;
+}) => {
 	const router = useRouter();
 
 	const handleEditPress = useCallback(() => {
 		if (pressRef.current) return;
+		if (deleting) return;
 		pressRef.current = true;
 		router.push(`/playlists/${playlistId}/edit`);
 		setTimeout(() => {
 			pressRef.current = false;
 		}, 500);
-	}, [router, playlistId]);
+	}, [pressRef, deleting, router, playlistId]);
 
 	const insets = useSafeAreaInsets();
 	const contentInsets = {
@@ -81,7 +114,10 @@ const PlaylistDropDownMenu = ({ playlistId }: { playlistId: Id<"playlists"> }) =
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
-				<Pressable className="size-[34px] flex items-center justify-center active:bg-foreground/10 rounded-full">
+				<Pressable
+					disabled={deleting}
+					className="size-[34px] flex items-center justify-center active:bg-foreground/10 rounded-full disabled:opacity-50"
+				>
 					<EllipsisVertical className="size-[24px] text-foreground" />
 				</Pressable>
 			</PopoverTrigger>
@@ -89,7 +125,7 @@ const PlaylistDropDownMenu = ({ playlistId }: { playlistId: Id<"playlists"> }) =
 				insets={contentInsets}
 				sideOffset={2}
 				alignOffset={-16}
-				className="w-54 bg-background rounded-xl border-[0.5px] flex flex-col p-0"
+				className={cn("w-54 bg-background rounded-xl border-[0.5px] flex flex-col p-0", deleting && "opacity-50")}
 				align="end"
 				style={{
 					shadowColor: "#000",
@@ -103,6 +139,7 @@ const PlaylistDropDownMenu = ({ playlistId }: { playlistId: Id<"playlists"> }) =
 			>
 				<PopoverTrigger asChild>
 					<Pressable
+						disabled={deleting}
 						onPress={handleEditPress}
 						className="flex flex-row items-center gap-2 p-4 w-full active:bg-foreground/10 rounded-t-md"
 					>
@@ -111,8 +148,16 @@ const PlaylistDropDownMenu = ({ playlistId }: { playlistId: Id<"playlists"> }) =
 					</Pressable>
 				</PopoverTrigger>
 				<Separator className="h-[0.5px]" />
-				<Pressable className="flex flex-row items-center gap-2 p-4 w-full active:bg-foreground/10 rounded-b-md">
-					<Trash2 className="text-destructive" size={20} />
+				<Pressable
+					disabled={deleting}
+					className="flex flex-row items-center gap-2 p-4 w-full active:bg-foreground/10 rounded-b-md disabled:opacity-50"
+					onPress={onDeletePress}
+				>
+					{deleting ? (
+						<ActivityIndicator size={20} color="#ff78e5" />
+					) : (
+						<Trash2 className="text-destructive" size={20} />
+					)}
 					<Text className="text-destructive font-medium text-xl">Delete Playlist</Text>
 				</Pressable>
 			</PopoverContent>
@@ -120,28 +165,36 @@ const PlaylistDropDownMenu = ({ playlistId }: { playlistId: Id<"playlists"> }) =
 	);
 };
 
-const AddStoryButton = ({ playlistId }: { playlistId: string }) => {
+const AddStoryButton = ({
+	playlistId,
+	pressRef,
+	disabled = false,
+}: {
+	playlistId: string;
+	pressRef: RefObject<boolean>;
+	disabled: boolean;
+}) => {
 	const router = useRouter();
-	const pressRef = useRef(false);
 	const handlePress = useCallback(() => {
-		if (pressRef.current) return;
+		if (pressRef.current || disabled) return;
 		pressRef.current = true;
 		router.push(`/playlists/${playlistId}/add-stories`);
 		setTimeout(() => {
 			pressRef.current = false;
 		}, 500);
-	}, [router, playlistId]);
+	}, [router, playlistId, pressRef, disabled]);
 	return (
 		<Pressable
+			disabled={disabled}
 			onPress={handlePress}
-			className="size-[34px] flex  items-center justify-center rounded-full active:bg-foreground/10"
+			className="size-[34px] flex  items-center justify-center rounded-full active:bg-foreground/10 disabled:opacity-50"
 		>
 			<Plus className="text-border" size={24} strokeWidth={2.5} />
 		</Pressable>
 	);
 };
 
-const PlaylistContent = ({ playlistId }: { playlistId: Id<"playlists"> }) => {
+const PlaylistContent = ({ playlistId, disabled = false }: { playlistId: Id<"playlists">; disabled: boolean }) => {
 	const [isReordering, setIsReordering] = useState(false);
 	const scale = useSharedValue(1);
 	const shadowOpacity = useSharedValue(0);
@@ -177,12 +230,14 @@ const PlaylistContent = ({ playlistId }: { playlistId: Id<"playlists"> }) => {
 	);
 
 	const dragStartHaptic = useCallback(async () => {
+		if (disabled) return;
 		await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-	}, []);
+	}, [disabled]);
 
 	const dragEndHaptic = useCallback(async () => {
+		if (disabled) return;
 		await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-	}, []);
+	}, [disabled]);
 
 	const handleDragStart = (_: ReorderableListDragStartEvent) => {
 		"worklet";
@@ -251,6 +306,7 @@ const PlaylistContent = ({ playlistId }: { playlistId: Id<"playlists"> }) => {
 
 	const handleReorder = useCallback(
 		async ({ from, to }: ReorderableListReorderEvent) => {
+			if (disabled) return;
 			setIsReordering(true);
 			const data = reorderItems(localStories, from, to);
 			setLocalStories(data);
@@ -262,21 +318,23 @@ const PlaylistContent = ({ playlistId }: { playlistId: Id<"playlists"> }) => {
 			await reorderPlaylistStories({ playlistId, storyOrders: playlistOrders });
 			setIsReordering(false);
 		},
-		[setLocalStories, localStories, reorderPlaylistStories, playlistId],
+		[disabled, localStories, reorderPlaylistStories, playlistId],
 	);
 
 	useEffect(() => {
+		if (disabled) return;
 		if (!isReordering) {
 			setLocalStories(stories);
 		}
-	}, [stories, setLocalStories, isReordering]);
+	}, [stories, setLocalStories, isReordering, disabled]);
 
 	const onEndReached = useCallback(() => {
+		if (disabled) return;
 		if (isReordering) return;
 		if (status === "CanLoadMore") {
 			loadMore(10);
 		}
-	}, [loadMore, status, isReordering]);
+	}, [disabled, isReordering, status, loadMore]);
 
 	const listHeader = useMemo(() => {
 		if (playlistLoading || isRefetchingPlaylist || storiesLoading || refreshing) {
@@ -296,18 +354,20 @@ const PlaylistContent = ({ playlistId }: { playlistId: Id<"playlists"> }) => {
 	}, [storiesLoading, refreshing, isRefetchingPlaylist, playlistLoading]);
 
 	const handleRefresh = useCallback(async () => {
+		if (disabled) return;
 		await Promise.all([refetchPlaylist(), refresh()]);
-	}, [refetchPlaylist, refresh]);
+	}, [disabled, refetchPlaylist, refresh]);
 
 	const renderItem = useCallback(
 		({ item }: { item: { playlistStoryId: Id<"playlistStories">; story: StoryPreview } }) => {
-			return <PlaylistStoryCard story={item.story} />;
+			return <PlaylistStoryCard story={item.story} disabled={disabled} />;
 		},
-		[],
+		[disabled],
 	);
 
 	return (
 		<ReorderableList
+			dragEnabled={!disabled}
 			onReorder={handleReorder}
 			refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#ff78e5" />}
 			showsVerticalScrollIndicator={false}
@@ -332,13 +392,14 @@ const PlaylistContent = ({ playlistId }: { playlistId: Id<"playlists"> }) => {
 	);
 };
 
-const PlaylistStoryCard = ({ story }: { story: StoryPreview }) => {
+const PlaylistStoryCard = ({ story, disabled = false }: { story: StoryPreview; disabled: boolean }) => {
 	const drag = useReorderableDrag();
 	const [isSwiping, setIsSwiping] = useState(false);
 
 	return (
-		<View className={cn("overflow-hidden", isSwiping && "bg-background/80 relative")}>
+		<View className={cn("overflow-hidden", isSwiping && "bg-background/80 relative", disabled && "opacity-50")}>
 			<ReanimatedSwipeable
+				enabled={!disabled}
 				onSwipeableOpenStartDrag={() => setIsSwiping(true)}
 				onSwipeableCloseStartDrag={() => setIsSwiping(false)}
 				onSwipeableOpen={() => setIsSwiping(true)}

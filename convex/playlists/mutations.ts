@@ -1,6 +1,7 @@
-import { mutation } from "@/convex/_generated/server";
+import { internalMutation, mutation } from "@/convex/_generated/server";
 import { verifyAccess } from "@/convex/common/utils";
 import { ConvexError, v } from "convex/values";
+import { internal } from "../_generated/api";
 import { Id } from "../_generated/dataModel";
 import {
 	ensurePlaylistBelongsToUser,
@@ -172,6 +173,87 @@ export const updatePlaylist = mutation({
 			}
 			console.warn("[@/convex/playlists/mutations.ts]: updatePlaylist() => error", e);
 			return { data: null, error: "Internal server error" };
+		}
+	},
+});
+
+export const deletePlaylistStories = internalMutation({
+	args: {
+		playlistId: v.id("playlists"),
+	},
+	handler: async (ctx, { playlistId }) => {
+		const playlistStories = await ctx.db
+			.query("playlistStories")
+			.withIndex("by_playlist_id", (q) => q.eq("playlistId", playlistId))
+			.collect();
+		await Promise.all(playlistStories.map((playlistStory) => ctx.db.delete(playlistStory._id)));
+		return null;
+	},
+});
+
+export const reorderPlaylistOrders = internalMutation({
+	args: {
+		userId: v.id("users"),
+	},
+	handler: async (ctx, { userId }) => {
+		// Fetch in sorted order by (userId, order)
+		const items = await ctx.db
+			.query("playlists")
+			.withIndex("by_user_order", (q) => q.eq("userId", userId))
+			.collect();
+
+		// Reassign contiguous orders [0..n-1], preserving relative order
+		const updates: Promise<any>[] = [];
+		for (let i = 0; i < items.length; i++) {
+			const p = items[i];
+			if (!p) continue;
+			if (p.order !== i) {
+				updates.push(
+					ctx.db.patch(p._id, {
+						order: i,
+						// optional: bump updatedAt if you track reorders as updates
+						updatedAt: new Date().toISOString(),
+					}),
+				);
+			}
+		}
+
+		if (updates.length) {
+			await Promise.all(updates);
+		}
+
+		return { total: items.length, changed: updates.length };
+	},
+});
+
+export const deletePlaylist = mutation({
+	args: {
+		playlistId: v.id("playlists"),
+	},
+	handler: async (ctx, { playlistId }) => {
+		try {
+			const { dbUser } = await verifyAccess(ctx, { validateSubscription: false });
+			await ensurePlaylistBelongsToUser(ctx, { playlistId, userId: dbUser._id });
+			await ctx.db.delete(playlistId);
+			await Promise.all([
+				ctx.scheduler.runAfter(0, internal.playlists.mutations.reorderPlaylistOrders, { userId: dbUser._id }),
+				ctx.scheduler.runAfter(0, internal.playlists.mutations.deletePlaylistStories, { playlistId }),
+			]);
+			return null;
+		} catch (e) {
+			if (e instanceof ConvexError) {
+				if (e.data.toLowerCase().includes("unauthorized")) {
+					return null;
+				}
+				if (e.data.toLowerCase().includes("playlist not found")) {
+					return null;
+				}
+				if (e.data.toLowerCase().includes("playlist does not belong to user")) {
+					return null;
+				}
+			}
+			console.warn("[@/convex/playlists/mutations.ts]: deletePlaylist() => error", e);
+			return null;
 		}
 	},
 });

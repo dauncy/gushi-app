@@ -22,7 +22,7 @@ export const getLastPlaylistOrder = async (ctx: QueryCtx, userId: Id<"users">) =
 		.withIndex("by_user_order", (q) => q.eq("userId", userId))
 		.order("desc")
 		.take(1);
-	return lastByOrder[0]?.order ?? 0;
+	return lastByOrder[0]?.order ?? -1;
 };
 
 export const getLastPlaylistStoryOrder = async (ctx: QueryCtx, playlistId: Id<"playlists">) => {
