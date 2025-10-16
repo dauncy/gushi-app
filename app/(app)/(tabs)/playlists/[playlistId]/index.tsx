@@ -49,6 +49,7 @@ export default function PlaylistIdPage() {
 		clickRef.current = true;
 		setDeleting(true);
 		await deletePlaylist({ playlistId });
+		Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 		setDeleting(false);
 		router.dismissTo("/playlists");
 	}, [playlistId, deletePlaylist, setDeleting, router]);
