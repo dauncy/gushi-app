@@ -31,7 +31,8 @@ export const playlistStories = defineTable(
 	),
 )
 	.index("by_playlist_id", ["playlistId"])
-	.index("by_playlist_id_order", ["playlistId", "order"]);
+	.index("by_playlist_id_order", ["playlistId", "order"])
+	.index("by_playlist_id_story_id", ["playlistId", "storyId"]);
 
 export type PlaylistPreview = Doc<"playlists"> & {
 	image: string | null;

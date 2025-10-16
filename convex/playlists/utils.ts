@@ -31,7 +31,7 @@ export const getLastPlaylistStoryOrder = async (ctx: QueryCtx, playlistId: Id<"p
 		.withIndex("by_playlist_id_order", (q) => q.eq("playlistId", playlistId))
 		.order("desc")
 		.take(1);
-	return lastByOrder[0]?.order ?? 0;
+	return lastByOrder[0]?.order ?? -1;
 };
 
 export const ensurePlaylistTitleIsUnique = async (

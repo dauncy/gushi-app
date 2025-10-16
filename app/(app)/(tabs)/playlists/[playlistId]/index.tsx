@@ -313,7 +313,7 @@ const PlaylistContent = ({ playlistId, disabled = false }: { playlistId: Id<"pla
 			setLocalStories(data);
 			const playlistOrders = data.map((playlist, index) => ({
 				playlistStoryId: playlist.playlistStoryId,
-				order: index + 1,
+				order: index,
 			}));
 
 			await reorderPlaylistStories({ playlistId, storyOrders: playlistOrders });
@@ -325,9 +325,27 @@ const PlaylistContent = ({ playlistId, disabled = false }: { playlistId: Id<"pla
 	useEffect(() => {
 		if (disabled) return;
 		if (!isReordering) {
-			setLocalStories(stories);
+			let isDifferent = false;
+			if (stories.length !== localStories.length) {
+				isDifferent = true;
+			}
+			for (let i = 0; i < stories.length; i++) {
+				const story = stories[i];
+				const localStory = localStories[i];
+				if (!story || !localStory) {
+					continue;
+				}
+				if (story.playlistStoryId !== localStory.playlistStoryId) {
+					isDifferent = true;
+					break;
+				}
+			}
+			console.log("isDifferent", isDifferent);
+			if (isDifferent) {
+				setLocalStories(stories);
+			}
 		}
-	}, [stories, setLocalStories, isReordering, disabled]);
+	}, [stories, setLocalStories, isReordering, disabled, localStories]);
 
 	const onEndReached = useCallback(() => {
 		if (disabled) return;
@@ -452,7 +470,13 @@ const PlaylistStoryCard = ({
 				)}
 			>
 				<Pressable onLongPress={drag} className={cn("flex flex-row gap-x-4 w-full p-4")}>
-					<StoryImagePreview imageUrl={story.imageUrl} blurHash={story.blurHash ?? undefined} size="sm" />
+					<StoryImagePreview
+						transition={0}
+						imageUrl={story.imageUrl}
+						blurHash={story.blurHash ?? undefined}
+						size="sm"
+						recyclingKey={story._id}
+					/>
 					<View className="flex flex-col gap-y-2 flex-1">
 						<Text
 							className="text-foreground text-xl font-semibold"

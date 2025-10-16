@@ -1,36 +1,37 @@
 import { PlaylistPreview } from "@/convex/playlists/schema";
-import { BLUR_HASH } from "@/lib/constants";
 import { cn, sanitizeStorageUrl } from "@/lib/utils";
 import { useRouter } from "expo-router";
 import { memo, useCallback, useMemo, useRef, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Image, Pressable, Text, View } from "react-native";
 import { ChevronRight } from "../ui/icons/chevron-right-icon";
 import { CircleDashed } from "../ui/icons/circle-dashed";
 import { Playlist } from "../ui/icons/playlist-icon";
 import { Scroll } from "../ui/icons/scroll-icon";
-import { Image } from "../ui/image";
 import { Skeleton } from "../ui/skeleton";
+
+const areImagePropsEqual = (oldProps: { imageUrl: string | null }, newProps: { imageUrl: string | null }) => {
+	return oldProps.imageUrl === newProps.imageUrl;
+};
 
 const PlaylistImage = memo(({ imageUrl }: { imageUrl: string | null }) => {
 	const [imageError, setImageError] = useState(false);
+
 	return (
 		<View className="size-[64px] rounded-lg bg-foreground/20 flex items-center justify-center">
 			{imageUrl && !imageError ? (
 				<Image
-					cachePolicy={"disk"}
 					source={{ uri: sanitizeStorageUrl(imageUrl) }}
 					className="size-full rounded-lg"
-					contentFit="cover"
+					resizeMode="cover"
 					onError={() => setImageError(true)}
-					transition={0}
-					placeholder={{ blurhash: BLUR_HASH }}
 				/>
 			) : (
 				<Playlist className="text-foreground/60 fill-foreground/60" strokeWidth={0.5} size={28} />
 			)}
 		</View>
 	);
-});
+}, areImagePropsEqual);
+
 PlaylistImage.displayName = "PlaylistImage";
 
 const PlaylistStoryCount = memo(({ numStories }: { numStories: number }) => {
@@ -75,7 +76,6 @@ PlaylistStoryCount.displayName = "PlaylistStoryCount";
 export const PlaylistCard = ({ playlist, drag }: { playlist: PlaylistPreview; drag: () => void }) => {
 	const navigatePressRef = useRef(false);
 	const router = useRouter();
-
 	const handleLongPress = useCallback(async () => {
 		drag();
 	}, [drag]);
@@ -93,8 +93,8 @@ export const PlaylistCard = ({ playlist, drag }: { playlist: PlaylistPreview; dr
 
 	return (
 		<Pressable
-			onPress={handleNavigate}
 			onLongPress={handleLongPress}
+			onPress={handleNavigate}
 			className={cn("w-full p-4  flex flex-row gap-x-4")}
 		>
 			<PlaylistImage imageUrl={playlist.image} />

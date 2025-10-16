@@ -174,3 +174,35 @@ export const getPlaylistStories = query({
 		}
 	},
 });
+
+export const checkStoryInPlaylist = query({
+	args: {
+		playlistId: v.id("playlists"),
+		storyId: v.id("stories"),
+	},
+	handler: async (ctx, { playlistId, storyId }): Promise<boolean> => {
+		try {
+			const { dbUser } = await verifyAccess(ctx, { validateSubscription: false });
+			await ensurePlaylistBelongsToUser(ctx, { playlistId, userId: dbUser._id });
+			const playlistStory = await ctx.db
+				.query("playlistStories")
+				.withIndex("by_playlist_id_story_id", (q) => q.eq("playlistId", playlistId).eq("storyId", storyId))
+				.first();
+			return !!playlistStory;
+		} catch (e) {
+			if (e instanceof ConvexError) {
+				if (e.data.toLowerCase().includes("unauthorized")) {
+					return false;
+				}
+				if (e.data.toLowerCase().includes("playlist not found")) {
+					return false;
+				}
+				if (e.data.toLowerCase().includes("playlist does not belong to user")) {
+					return false;
+				}
+			}
+			console.warn("[@/convex/playlists/queries.ts] checkStoryInPlaylist error", e);
+			return false;
+		}
+	},
+});

@@ -12,6 +12,7 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { StoryPreview } from "@/convex/stories";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
+import { useConvexQuery } from "@/hooks/use-convexQuery";
 import { usePreventFormDismiss } from "@/hooks/use-prevent-form-dismiss";
 import { cn } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
@@ -22,6 +23,7 @@ import { debounce } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
 	ActivityIndicator,
+	Alert,
 	KeyboardAvoidingView,
 	NativeScrollEvent,
 	NativeSyntheticEvent,
@@ -253,6 +255,7 @@ export default function AddStoriesPage() {
 						data={listData}
 						renderItem={({ item }) => (
 							<BasicStoryCard
+								playlistId={playlistId}
 								story={item}
 								toggleStory={toggleStory}
 								selected={selectedStoryIds.includes(item._id)}
@@ -290,15 +293,21 @@ const LoadingList = () => {
 
 const BasicStoryCard = ({
 	story,
+	playlistId,
 	toggleStory,
 	selected,
 	disabled = false,
 }: {
 	story: StoryPreview;
+	playlistId: Id<"playlists">;
 	toggleStory: (storyId: Id<"stories">) => void;
 	selected: boolean;
 	disabled: boolean;
 }) => {
+	const { data: inPlaylist, isLoading: checkingInPlaylist } = useConvexQuery(
+		api.playlists.queries.checkStoryInPlaylist,
+		{ playlistId, storyId: story._id },
+	);
 	const animatedValue = useSharedValue(selected ? 1 : 0);
 
 	useEffect(() => {
@@ -327,14 +336,35 @@ const BasicStoryCard = ({
 	});
 
 	const handlePress = useCallback(async () => {
-		if (disabled) return;
+		if (disabled || checkingInPlaylist) return;
+		if (inPlaylist) {
+			Alert.alert(
+				"Story already in playlist",
+				"This story is already in your playlist. Would you like to add it again?",
+				[
+					{
+						text: "Add again",
+						style: "destructive",
+						onPress: async () => {
+							await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+							toggleStory(story._id);
+						},
+					},
+					{
+						text: "Cancel",
+						style: "cancel",
+					},
+				],
+			);
+			return;
+		}
 		await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 		toggleStory(story._id);
-	}, [disabled, toggleStory, story._id]);
+	}, [disabled, checkingInPlaylist, inPlaylist, toggleStory, story._id]);
 
 	return (
 		<Pressable
-			disabled={disabled}
+			disabled={disabled || checkingInPlaylist}
 			onPress={handlePress}
 			className={cn(
 				"w-full flex flex-row gap-x-4 px-2 py-4 items-center",

@@ -31,7 +31,7 @@ export default function CreatePlaylistPage() {
 			}
 			Toast.show({ type: "success", text1: "Playlist created", text2: "Your playlist has been created" });
 			await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-			router.push(`/playlists/${data}`);
+			router.dismissTo(`/playlists/${data}`);
 		},
 		[createPlaylist, router],
 	);

@@ -11,7 +11,7 @@ import { useConvexMutation } from "@convex-dev/react-query";
 import * as Haptics from "expo-haptics";
 import { Link } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Pressable, RefreshControl, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, RefreshControl, Text, View, ViewStyle } from "react-native";
 import { runOnJS, useSharedValue, withSpring } from "react-native-reanimated";
 import ReorderableList, {
 	ReorderableListCellAnimations,
@@ -118,7 +118,7 @@ export default function PlaylistsListPage() {
 			setLocalResults(data);
 			const playlistOrders = data.map((playlist, index) => ({
 				playlistId: playlist._id,
-				order: index + 1,
+				order: index,
 			}));
 
 			await reorderPlaylists({ playlistOrders });
@@ -144,11 +144,62 @@ export default function PlaylistsListPage() {
 		return <DraggableCard item={item} />;
 	}, []);
 
+	const listEmptyComponent = useMemo(() => {
+		if (isLoading || refreshing) {
+			return <PlaylistsLoading />;
+		}
+
+		if (localResults.length === 0 && results.length > 0) {
+			return <PlaylistsLoading />;
+		}
+
+		return <EmptyState />;
+	}, [isLoading, refreshing, localResults, results]);
+
+	const contentContainerStyle: ViewStyle | undefined = useMemo(() => {
+		if (isLoading) {
+			return {
+				paddingTop: 0,
+				display: "contents",
+			};
+		}
+		if (refreshing) {
+			return {
+				paddingTop: 0,
+				display: "contents",
+			};
+		}
+
+		if (localResults.length === 0 && results.length > 0) {
+			return {
+				paddingTop: 0,
+				display: "contents",
+			};
+		}
+
+		if (results.length > 0 && localResults.length > 0) {
+			return {
+				paddingBottom: 80,
+				paddingTop: 8,
+			};
+		}
+		return {
+			paddingTop: 0,
+			paddingBottom: 0,
+			display: "flex",
+			flex: 1,
+			alignItems: "center",
+			justifyContent: "center",
+		};
+	}, [isLoading, localResults.length, refreshing, results.length]);
+
 	return (
 		<View className="flex-1 relative bg-foreground/10">
 			<SecondaryHeader title="Playlists" />
 			<View style={{ flex: 1 }} className="relative flex-col px-0">
 				<ReorderableList
+					showsVerticalScrollIndicator={false}
+					contentContainerStyle={contentContainerStyle}
 					refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor="#ff78e5" />}
 					onReorder={handleReorder}
 					data={localResults}
@@ -158,13 +209,7 @@ export default function PlaylistsListPage() {
 					cellAnimations={cellAnimations as ReorderableListCellAnimations}
 					onDragStart={handleDragStart}
 					onDragEnd={handleDragEnd}
-					ListEmptyComponent={
-						isLoading || refreshing || (localResults.length === 0 && results.length >= 0) ? (
-							<PlaylistsLoading />
-						) : (
-							<EmptyState />
-						)
-					}
+					ListEmptyComponent={listEmptyComponent}
 					ListFooterComponent={
 						status === "LoadingMore" ? (
 							<View className="flex flex-row items-center justify-center px-4 py-1.5">
