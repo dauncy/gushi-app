@@ -69,9 +69,9 @@ const StoryImagePreviewComp = ({
 				className={classes}
 				onError={() => setError(true)}
 				placeholder={placeholder}
-				transition={transition}
-				contentFit="contain"
-				placeholderContentFit="contain"
+				transition={null}
+				contentFit={"scale-down"}
+				placeholderContentFit={"scale-down"}
 			/>
 			{active && (
 				<View
