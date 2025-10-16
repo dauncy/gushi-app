@@ -52,11 +52,24 @@ const StoryImagePreviewComp = ({
 		[disablePlaceholder, blurHash],
 	);
 
+	const fallbackSize = useMemo(() => {
+		if (size === "default") {
+			return 20;
+		}
+		if (size === "sm") {
+			return 16;
+		}
+		if (size === "md") {
+			return 24;
+		}
+		return 48;
+	}, [size]);
+
 	const showFallback = error || !imageUrl;
 	if (showFallback) {
 		return (
 			<View className={cn(imageVariants({ size }), "bg-foreground/20", className)}>
-				<FileX className="text-foreground/60" strokeWidth={1} size={36} />
+				<FileX className="text-foreground/60" strokeWidth={1} size={fallbackSize} />
 			</View>
 		);
 	}
