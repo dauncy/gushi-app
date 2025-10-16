@@ -203,7 +203,7 @@ export const reorderPlaylistOrders = internalMutation({
 			.collect();
 
 		// Reassign contiguous orders [0..n-1], preserving relative order
-		const updates: Promise<any>[] = [];
+		const updates: Promise<void>[] = [];
 		for (let i = 0; i < items.length; i++) {
 			const p = items[i];
 			if (!p) continue;
@@ -253,6 +253,62 @@ export const deletePlaylist = mutation({
 				}
 			}
 			console.warn("[@/convex/playlists/mutations.ts]: deletePlaylist() => error", e);
+			return null;
+		}
+	},
+});
+
+export const reorderPlaylistStoriesOrders = internalMutation({
+	args: {
+		playlistId: v.id("playlists"),
+	},
+	handler: async (ctx, { playlistId }) => {
+		const playlistStories = await ctx.db
+			.query("playlistStories")
+			.withIndex("by_playlist_id_order", (q) => q.eq("playlistId", playlistId))
+			.order("asc")
+			.collect();
+
+		const updates: Promise<void>[] = [];
+		for (let i = 0; i < playlistStories.length; i++) {
+			const playlistStory = playlistStories[i];
+			if (!playlistStory) continue;
+			if (playlistStory.order !== i) {
+				updates.push(ctx.db.patch(playlistStory._id, { order: i }));
+			}
+		}
+		if (updates.length) {
+			await Promise.all(updates);
+		}
+		return null;
+	},
+});
+
+export const removePlaylistStoryFromPlaylist = mutation({
+	args: {
+		playlistId: v.id("playlists"),
+		playlistStoryId: v.id("playlistStories"),
+	},
+	handler: async (ctx, { playlistId, playlistStoryId }) => {
+		try {
+			const { dbUser } = await verifyAccess(ctx, { validateSubscription: false });
+			await ensurePlaylistBelongsToUser(ctx, { playlistId, userId: dbUser._id });
+			await ctx.db.delete(playlistStoryId);
+			await ctx.scheduler.runAfter(0, internal.playlists.mutations.reorderPlaylistStoriesOrders, { playlistId });
+			return null;
+		} catch (e) {
+			if (e instanceof ConvexError) {
+				if (e.data.toLowerCase().includes("unauthorized")) {
+					return null;
+				}
+				if (e.data.toLowerCase().includes("playlist not found")) {
+					return null;
+				}
+				if (e.data.toLowerCase().includes("playlist does not belong to user")) {
+					return null;
+				}
+			}
+			console.warn("[@/convex/playlists/mutations.ts]: removePlaylistStoryFromPlaylist() => error", e);
 			return null;
 		}
 	},

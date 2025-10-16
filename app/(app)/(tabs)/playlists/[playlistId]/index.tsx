@@ -361,9 +361,16 @@ const PlaylistContent = ({ playlistId, disabled = false }: { playlistId: Id<"pla
 
 	const renderItem = useCallback(
 		({ item }: { item: { playlistStoryId: Id<"playlistStories">; story: StoryPreview } }) => {
-			return <PlaylistStoryCard story={item.story} disabled={disabled} />;
+			return (
+				<PlaylistStoryCard
+					story={item.story}
+					disabled={disabled}
+					playlistStoryId={item.playlistStoryId}
+					playlistId={playlistId}
+				/>
+			);
 		},
-		[disabled],
+		[disabled, playlistId],
 	);
 
 	return (
@@ -393,12 +400,43 @@ const PlaylistContent = ({ playlistId, disabled = false }: { playlistId: Id<"pla
 	);
 };
 
-const PlaylistStoryCard = ({ story, disabled = false }: { story: StoryPreview; disabled: boolean }) => {
+const PlaylistStoryCard = ({
+	playlistStoryId,
+	playlistId,
+	story,
+	disabled = false,
+}: {
+	playlistStoryId: Id<"playlistStories">;
+	playlistId: Id<"playlists">;
+	story: StoryPreview;
+	disabled: boolean;
+}) => {
 	const drag = useReorderableDrag();
 	const [isSwiping, setIsSwiping] = useState(false);
+	const [deleting, setDeleting] = useState(false);
+	const removePlaylistStoryFromPlaylist = useConvexMutation(api.playlists.mutations.removePlaylistStoryFromPlaylist);
+
+	const handleDelete = useCallback(
+		async (onDelete: () => void) => {
+			if (deleting) return;
+			setDeleting(true);
+			await removePlaylistStoryFromPlaylist({ playlistId, playlistStoryId: playlistStoryId });
+			onDelete();
+			setDeleting(false);
+			await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+		},
+		[deleting, playlistId, playlistStoryId, removePlaylistStoryFromPlaylist],
+	);
 
 	return (
-		<View className={cn("overflow-hidden", isSwiping && "bg-background/80 relative", disabled && "opacity-50")}>
+		<View
+			className={cn(
+				"overflow-hidden",
+				isSwiping && "bg-background/80 relative",
+				disabled && "opacity-50",
+				deleting && "opacity-50",
+			)}
+		>
 			<ReanimatedSwipeable
 				enabled={!disabled}
 				onSwipeableOpenStartDrag={() => setIsSwiping(true)}
@@ -409,7 +447,9 @@ const PlaylistStoryCard = ({ story, disabled = false }: { story: StoryPreview; d
 				rightThreshold={10}
 				overshootRight={true}
 				overshootFriction={8}
-				renderRightActions={(progress, drag, methods) => <RightAction drag={drag} onPress={() => methods.close()} />}
+				renderRightActions={(progress, drag, methods) => (
+					<RightAction drag={drag} onPress={async () => await handleDelete(() => methods.close())} loading={deleting} />
+				)}
 			>
 				<Pressable onLongPress={drag} className={cn("flex flex-row gap-x-4 w-full p-4")}>
 					<StoryImagePreview imageUrl={story.imageUrl} blurHash={story.blurHash ?? undefined} size="sm" />
@@ -429,7 +469,15 @@ const PlaylistStoryCard = ({ story, disabled = false }: { story: StoryPreview; d
 	);
 };
 
-const RightAction = ({ drag, onPress }: { drag: SharedValue<number>; onPress: () => void }) => {
+const RightAction = ({
+	drag,
+	onPress,
+	loading = false,
+}: {
+	drag: SharedValue<number>;
+	onPress: () => Promise<void>;
+	loading: boolean;
+}) => {
 	const move = useAnimatedStyle(() => ({
 		transform: [{ translateX: drag.value + 48 }],
 	}));
@@ -438,11 +486,16 @@ const RightAction = ({ drag, onPress }: { drag: SharedValue<number>; onPress: ()
 		<View style={{ width: 48, height: "100%" }} className="items-center justify-center">
 			<Animated.View className="bg-destructive w-[54px] h-full" style={[move]}>
 				<Pressable
+					disabled={loading}
 					onPress={onPress}
 					className="flex flex-row items-center justify-center gap-x-2"
 					style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
 				>
-					<Trash2 size={20} className="text-background" strokeWidth={2} />
+					{loading ? (
+						<ActivityIndicator size={20} color="#ff78e5" />
+					) : (
+						<Trash2 size={20} className="text-background" strokeWidth={2} />
+					)}
 				</Pressable>
 			</Animated.View>
 		</View>
