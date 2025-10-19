@@ -1,18 +1,21 @@
+import { AudioPreviewPlayer } from "@/components/audio/audio-preview";
 import { SecondaryHeader } from "@/components/nav/secondary-header";
 import { PlaylistCard, PlaylistCardLoading } from "@/components/playlists/playlist-card";
 import { Headphones } from "@/components/ui/icons/headphones-icon";
 import { Play } from "@/components/ui/icons/play-icon";
 import { Playlist } from "@/components/ui/icons/playlist-icon";
 import { Plus } from "@/components/ui/icons/plus-icon";
+import { audioStore } from "@/context/AudioContext";
 import { api } from "@/convex/_generated/api";
 import { PlaylistPreview } from "@/convex/playlists/schema";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { useConvexMutation } from "@convex-dev/react-query";
+import { useStore } from "@tanstack/react-store";
 import * as Haptics from "expo-haptics";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, RefreshControl, Text, View, ViewStyle } from "react-native";
-import { runOnJS, useSharedValue, withSpring } from "react-native-reanimated";
+import Animated, { Easing, runOnJS, useSharedValue, withDelay, withSpring, withTiming } from "react-native-reanimated";
 import ReorderableList, {
 	ReorderableListCellAnimations,
 	ReorderableListDragEndEvent,
@@ -23,6 +26,7 @@ import ReorderableList, {
 } from "react-native-reorderable-list";
 
 export default function PlaylistsListPage() {
+	const router = useRouter();
 	const scale = useSharedValue(1);
 	const shadowOpacity = useSharedValue(0);
 	const shadowRadius = useSharedValue(0);
@@ -219,20 +223,12 @@ export default function PlaylistsListPage() {
 					}
 				/>
 			</View>
-			<Link asChild href="/playlists/create">
-				<Pressable
-					className="size-[44px] bg-border absolute bottom-4 right-4 rounded-xl flex items-center justify-center"
-					style={{
-						shadowColor: "#0395ff",
-						shadowOffset: { width: 0, height: 2 },
-						shadowOpacity: 0.25,
-						shadowRadius: 3.84,
-						elevation: 5,
-					}}
-				>
-					<Plus size={24} className="text-background" />
-				</Pressable>
-			</Link>
+			<AddPlaylistButton />
+			<AudioPreviewPlayer
+				onCardPress={(id) => {
+					router.push(`/stories/${id}`);
+				}}
+			/>
 		</View>
 	);
 }
@@ -280,4 +276,48 @@ const EmptyState = () => {
 const DraggableCard = ({ item }: { item: PlaylistPreview }) => {
 	const drag = useReorderableDrag();
 	return <PlaylistCard playlist={item} drag={drag} />;
+};
+
+const AddPlaylistButton = () => {
+	const storyId = useStore(audioStore, (state) => state.story.id);
+
+	const bottomPosition = useSharedValue(16);
+	useEffect(() => {
+		if (storyId) {
+			bottomPosition.value = withDelay(
+				0,
+				withTiming(72, {
+					duration: 250,
+					easing: Easing.out(Easing.cubic),
+				}),
+			);
+		} else {
+			bottomPosition.value = withDelay(
+				100,
+				withTiming(16, {
+					duration: 250,
+					easing: Easing.out(Easing.cubic),
+				}),
+			);
+		}
+	}, [storyId, bottomPosition]);
+
+	return (
+		<Animated.View style={{ position: "absolute", bottom: bottomPosition, right: 16 }}>
+			<Link asChild href="/playlists/create">
+				<Pressable
+					className="size-[44px] bg-border rounded-xl flex items-center justify-center"
+					style={{
+						shadowColor: "#0395ff",
+						shadowOffset: { width: 0, height: 2 },
+						shadowOpacity: 0.25,
+						shadowRadius: 3.84,
+						elevation: 5,
+					}}
+				>
+					<Plus size={24} className="text-background" />
+				</Pressable>
+			</Link>
+		</Animated.View>
+	);
 };

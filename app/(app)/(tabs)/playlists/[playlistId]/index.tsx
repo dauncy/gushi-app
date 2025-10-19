@@ -1,5 +1,5 @@
 import { SecondaryHeader } from "@/components/nav/secondary-header";
-import { StoryImagePreview } from "@/components/stories/story-image";
+import { PlaylistStoryCard, PlaylistStoryLoading } from "@/components/playlists/playlist-story-card";
 import { EllipsisVertical } from "@/components/ui/icons/ellipsis-vertical";
 import { Play } from "@/components/ui/icons/play-icon";
 import { Playlist } from "@/components/ui/icons/playlist-icon";
@@ -23,15 +23,13 @@ import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, RefreshControl, Text, View } from "react-native";
-import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
-import Animated, { runOnJS, SharedValue, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import { runOnJS, useSharedValue, withSpring } from "react-native-reanimated";
 import ReorderableList, {
 	ReorderableListCellAnimations,
 	ReorderableListDragEndEvent,
 	ReorderableListDragStartEvent,
 	ReorderableListReorderEvent,
 	reorderItems,
-	useReorderableDrag,
 } from "react-native-reorderable-list";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -126,7 +124,7 @@ const PlaylistDropDownMenu = ({
 				insets={contentInsets}
 				sideOffset={2}
 				alignOffset={-16}
-				className={cn("w-54 bg-background rounded-xl border-[0.5px] flex flex-col p-0", deleting && "opacity-50")}
+				className={cn("w-54 bg-background rounded-xl border-2 flex flex-col p-0", deleting && "opacity-50")}
 				align="end"
 				style={{
 					shadowColor: "#000",
@@ -148,7 +146,7 @@ const PlaylistDropDownMenu = ({
 						<Text className="text-foreground font-medium text-xl">Edit Playlist</Text>
 					</Pressable>
 				</PopoverTrigger>
-				<Separator className="h-[0.5px]" />
+				<Separator className="h-[2px]" />
 				<Pressable
 					disabled={deleting}
 					className="flex flex-row items-center gap-2 p-4 w-full active:bg-foreground/10 rounded-b-md disabled:opacity-50"
@@ -340,7 +338,6 @@ const PlaylistContent = ({ playlistId, disabled = false }: { playlistId: Id<"pla
 					break;
 				}
 			}
-			console.log("isDifferent", isDifferent);
 			if (isDifferent) {
 				setLocalStories(stories);
 			}
@@ -415,114 +412,6 @@ const PlaylistContent = ({ playlistId, disabled = false }: { playlistId: Id<"pla
 				) : null
 			}
 		/>
-	);
-};
-
-const PlaylistStoryCard = ({
-	playlistStoryId,
-	playlistId,
-	story,
-	disabled = false,
-}: {
-	playlistStoryId: Id<"playlistStories">;
-	playlistId: Id<"playlists">;
-	story: StoryPreview;
-	disabled: boolean;
-}) => {
-	const drag = useReorderableDrag();
-	const [isSwiping, setIsSwiping] = useState(false);
-	const [deleting, setDeleting] = useState(false);
-	const removePlaylistStoryFromPlaylist = useConvexMutation(api.playlists.mutations.removePlaylistStoryFromPlaylist);
-
-	const handleDelete = useCallback(
-		async (onDelete: () => void) => {
-			if (deleting) return;
-			setDeleting(true);
-			await removePlaylistStoryFromPlaylist({ playlistId, playlistStoryId: playlistStoryId });
-			onDelete();
-			setDeleting(false);
-			await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-		},
-		[deleting, playlistId, playlistStoryId, removePlaylistStoryFromPlaylist],
-	);
-
-	return (
-		<View
-			className={cn(
-				"overflow-hidden",
-				isSwiping && "bg-background/80 relative",
-				disabled && "opacity-50",
-				deleting && "opacity-50",
-			)}
-		>
-			<ReanimatedSwipeable
-				enabled={!disabled}
-				onSwipeableOpenStartDrag={() => setIsSwiping(true)}
-				onSwipeableCloseStartDrag={() => setIsSwiping(false)}
-				onSwipeableOpen={() => setIsSwiping(true)}
-				onSwipeableClose={() => setIsSwiping(false)}
-				friction={2}
-				rightThreshold={10}
-				overshootRight={true}
-				overshootFriction={8}
-				renderRightActions={(progress, drag, methods) => (
-					<RightAction drag={drag} onPress={async () => await handleDelete(() => methods.close())} loading={deleting} />
-				)}
-			>
-				<Pressable onLongPress={drag} className={cn("flex flex-row gap-x-4 w-full p-4")}>
-					<StoryImagePreview
-						transition={0}
-						imageUrl={story.imageUrl}
-						blurHash={story.blurHash ?? undefined}
-						size="sm"
-						recyclingKey={story._id}
-					/>
-					<View className="flex flex-col gap-y-2 flex-1">
-						<Text
-							className="text-foreground text-xl font-semibold"
-							numberOfLines={2}
-							ellipsizeMode="tail"
-							maxFontSizeMultiplier={1.2}
-						>
-							{story.title}
-						</Text>
-					</View>
-				</Pressable>
-			</ReanimatedSwipeable>
-		</View>
-	);
-};
-
-const RightAction = ({
-	drag,
-	onPress,
-	loading = false,
-}: {
-	drag: SharedValue<number>;
-	onPress: () => Promise<void>;
-	loading: boolean;
-}) => {
-	const move = useAnimatedStyle(() => ({
-		transform: [{ translateX: drag.value + 48 }],
-	}));
-
-	return (
-		<View style={{ width: 48, height: "100%" }} className="items-center justify-center">
-			<Animated.View className="bg-destructive w-[54px] h-full" style={[move]}>
-				<Pressable
-					disabled={loading}
-					onPress={onPress}
-					className="flex flex-row items-center justify-center gap-x-2"
-					style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-				>
-					{loading ? (
-						<ActivityIndicator size={20} color="#ff78e5" />
-					) : (
-						<Trash2 size={20} className="text-background" strokeWidth={2} />
-					)}
-				</Pressable>
-			</Animated.View>
-		</View>
 	);
 };
 
@@ -629,21 +518,6 @@ const PlaylistStoriesLoading = () => {
 			{Array.from({ length: 10 }).map((_, index) => (
 				<PlaylistStoryLoading key={`playlist-story-loading-${index}`} />
 			))}
-		</View>
-	);
-};
-
-const PlaylistStoryLoading = () => {
-	return (
-		<View className="flex flex-row gap-x-4 w-full py-4">
-			<Skeleton className="size-10 rounded-lg bg-foreground/20" />
-			<View className="flex flex-col gap-y-1 flex-1 mt-1">
-				<Skeleton className="h-3 w-32 rounded-md bg-foreground/20" />
-				<Skeleton className="h-3 w-16 rounded-md bg-foreground/20" />
-			</View>
-			<View className="flex items-center justify-start">
-				<Skeleton className="size-[34px] rounded-full bg-foreground/20" />
-			</View>
 		</View>
 	);
 };

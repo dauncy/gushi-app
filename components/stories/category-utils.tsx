@@ -18,7 +18,7 @@ export const CategoryToColor = {
 		foreground: "#fffbf3",
 	},
 	adventure: {
-		background: "#ceef32",
-		foreground: "#0395ff",
+		background: "#0D331180",
+		foreground: "#fffbf3",
 	},
 };

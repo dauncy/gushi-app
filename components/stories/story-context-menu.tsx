@@ -48,11 +48,20 @@ const DescriptionRow = ({ description }: { description: string }) => {
 	);
 };
 
-const ShareButton = ({ storyId, storyTitle }: { storyId: Id<"stories">; storyTitle: string }) => {
+const ShareButton = ({
+	storyId,
+	storyTitle,
+	onSharePress,
+}: {
+	storyId: Id<"stories">;
+	storyTitle: string;
+	onSharePress?: () => void;
+}) => {
 	const { shareStory } = useShareStory();
 	const handleShare = useCallback(async () => {
 		shareStory({ storyId, storyTitle });
-	}, [shareStory, storyId, storyTitle]);
+		onSharePress?.();
+	}, [onSharePress, shareStory, storyId, storyTitle]);
 	return (
 		<Pressable
 			onPress={handleShare}
@@ -390,16 +399,18 @@ const LockedStoryContextMenu = ({
 	story,
 	addCloseCallback,
 	triggerClose,
+	onSharePress,
 }: {
 	story: StoryPreview;
 	addCloseCallback: (name: string, callback: (...args: any[]) => void) => void;
 	triggerClose: () => void;
+	onSharePress?: () => void;
 }) => {
 	return (
 		<View className="bg-background w-full rounded-xl border-2 border-border">
 			{story.description && <DescriptionRow description={story.description} />}
 			{story.description && <Separator className="h-[2px]" />}
-			<ShareButton storyId={story._id} storyTitle={story.title} />
+			<ShareButton storyId={story._id} storyTitle={story.title} onSharePress={onSharePress} />
 			<Separator className="h-[2px]" />
 			<UnlockButton storyId={story._id} addCloseCallback={addCloseCallback} triggerClose={triggerClose} />
 		</View>
@@ -410,16 +421,18 @@ const UnlockedStoryContextMenu = ({
 	story,
 	addCloseCallback,
 	triggerClose,
+	onSharePress,
 }: {
 	story: StoryPreview;
 	addCloseCallback: (name: string, callback: (...args: any[]) => void) => void;
 	triggerClose: () => void;
+	onSharePress?: () => void;
 }) => {
 	return (
 		<View className="bg-background w-full rounded-xl border-2 border-border">
 			{story.description && <DescriptionRow description={story.description} />}
 			{story.description && <Separator className="h-[2px]" />}
-			<ShareButton storyId={story._id} storyTitle={story.title} />
+			<ShareButton storyId={story._id} storyTitle={story.title} onSharePress={onSharePress} />
 			<Separator className="h-[2px]" />
 			<AddToFavoritesButton storyId={story._id} />
 			<Separator className="h-[2px]" />
@@ -434,10 +447,12 @@ export const StoryContextMenu = ({
 	story,
 	addCloseCallback,
 	triggerClose,
+	onSharePress,
 }: {
 	story: StoryPreview;
 	addCloseCallback: (name: string, callback: (...args: any[]) => void) => void;
 	triggerClose: () => void;
+	onSharePress?: () => void;
 }) => {
 	const { hasSubscription } = useSubscription();
 
@@ -452,8 +467,22 @@ export const StoryContextMenu = ({
 	}, [story.audioUrl, story.subscription_required, hasSubscription]);
 
 	if (locked) {
-		return <LockedStoryContextMenu addCloseCallback={addCloseCallback} story={story} triggerClose={triggerClose} />;
+		return (
+			<LockedStoryContextMenu
+				addCloseCallback={addCloseCallback}
+				story={story}
+				triggerClose={triggerClose}
+				onSharePress={onSharePress}
+			/>
+		);
 	}
 
-	return <UnlockedStoryContextMenu addCloseCallback={addCloseCallback} story={story} triggerClose={triggerClose} />;
+	return (
+		<UnlockedStoryContextMenu
+			addCloseCallback={addCloseCallback}
+			story={story}
+			triggerClose={triggerClose}
+			onSharePress={onSharePress}
+		/>
+	);
 };
