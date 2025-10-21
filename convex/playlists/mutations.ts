@@ -14,9 +14,11 @@ export const createPlaylist = mutation({
 	args: {
 		title: v.string(),
 		imageId: v.optional(v.id("files")),
+		storyId: v.optional(v.id("stories")),
 	},
 	handler: async (ctx, args) => {
 		try {
+			const storyToAdd = args.storyId;
 			const { dbUser } = await verifyAccess(ctx, { validateSubscription: false });
 			const uniqueTitle = await ensurePlaylistTitleIsUnique(ctx, { title: args.title, userId: dbUser._id });
 			if (!uniqueTitle) {
@@ -31,6 +33,15 @@ export const createPlaylist = mutation({
 				createdAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString(),
 			});
+			if (storyToAdd) {
+				await ctx.db.insert("playlistStories", {
+					playlistId: playlist,
+					storyId: storyToAdd,
+					order: 0,
+					createdAt: new Date().toISOString(),
+					updatedAt: new Date().toISOString(),
+				});
+			}
 			return { data: playlist, error: null };
 		} catch (e) {
 			if (e instanceof ConvexError) {
@@ -309,6 +320,46 @@ export const removePlaylistStoryFromPlaylist = mutation({
 				}
 			}
 			console.warn("[@/convex/playlists/mutations.ts]: removePlaylistStoryFromPlaylist() => error", e);
+			return null;
+		}
+	},
+});
+
+export const addStoryToPlaylists = mutation({
+	args: {
+		storyId: v.id("stories"),
+		playlistIds: v.array(v.id("playlists")),
+	},
+	handler: async (ctx, { storyId, playlistIds }) => {
+		try {
+			const { dbUser } = await verifyAccess(ctx, { validateSubscription: false });
+			await Promise.all(
+				playlistIds.map(async (playlistId) => {
+					await ensurePlaylistBelongsToUser(ctx, { playlistId, userId: dbUser._id });
+					const order = await getLastPlaylistStoryOrder(ctx, playlistId);
+					await ctx.db.insert("playlistStories", {
+						playlistId,
+						storyId,
+						order: order + 1,
+						createdAt: new Date().toISOString(),
+						updatedAt: new Date().toISOString(),
+					});
+				}),
+			);
+			return null;
+		} catch (e) {
+			if (e instanceof ConvexError) {
+				if (e.data.toLowerCase().includes("unauthorized")) {
+					return null;
+				}
+				if (e.data.toLowerCase().includes("playlist not found")) {
+					return null;
+				}
+				if (e.data.toLowerCase().includes("playlist does not belong to user")) {
+					return null;
+				}
+			}
+			console.warn("[@/convex/playlists/mutations.ts]: addStoryToPlaylists() => error", e);
 			return null;
 		}
 	},

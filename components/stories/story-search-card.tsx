@@ -143,7 +143,6 @@ export const EnhancedStorySearchCard = ({ story, onCardPress }: { story: StoryPr
 		.minDuration(500)
 		.onStart(() => {
 			"worklet";
-			console.log("long press");
 			scale.value = withSequence(
 				withTiming(0.95, { duration: 100 }),
 				withSpring(0.95, { damping: 10, stiffness: 200 }),

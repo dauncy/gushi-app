@@ -3,7 +3,7 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useConvexMutation } from "@convex-dev/react-query";
 import * as Haptics from "expo-haptics";
-import { useRouter } from "expo-router";
+import { useGlobalSearchParams, useRouter } from "expo-router";
 import { useCallback } from "react";
 import Toast from "react-native-toast-message";
 
@@ -11,11 +11,16 @@ const ALERT_TITLE = "Discard Changes";
 const ALERT_MESSAGE = "Are you sure you want to cancel this playlist?";
 
 export default function CreatePlaylistPage() {
+	const params = useGlobalSearchParams();
 	const createPlaylist = useConvexMutation(api.playlists.mutations.createPlaylist);
 	const router = useRouter();
 	const handleSubmit = useCallback(
 		async ({ title, imageId }: { title: string; imageId?: Id<"files"> }) => {
-			const { data, error } = await createPlaylist({ title, imageId });
+			let storyId: Id<"stories"> | undefined;
+			if (params.storyId) {
+				storyId = params.storyId as Id<"stories">;
+			}
+			const { data, error } = await createPlaylist({ title, imageId, storyId });
 			if (error) {
 				Toast.show({ type: "error", text1: "Failed to create playlist", text2: error });
 				return;
@@ -33,7 +38,7 @@ export default function CreatePlaylistPage() {
 			await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 			router.dismissTo(`/playlists/${data}`);
 		},
-		[createPlaylist, router],
+		[createPlaylist, params?.storyId, router],
 	);
 
 	return (

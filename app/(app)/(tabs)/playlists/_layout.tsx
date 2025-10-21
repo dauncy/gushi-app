@@ -9,7 +9,6 @@ export default function PlaylistsLayout() {
 				options={{
 					headerShown: false,
 					presentation: "modal",
-					sheetCornerRadius: 48,
 					sheetGrabberVisible: true,
 					animation: "slide_from_bottom",
 					animationDuration: 300,

@@ -40,7 +40,6 @@ export const loginHttp = httpAction(async (ctx, req) => {
 		return new Response("Revenuecat user ID is required", { status: 401 });
 	}
 	const customer = await getCustomerCached(ctx, { revenuecatUserId: revenuecat_user_id });
-
 	if (!customer) {
 		return new Response("Customer not found", { status: 404 });
 	}

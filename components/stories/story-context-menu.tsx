@@ -16,13 +16,14 @@ import { useShareStory } from "@/hooks/use-share-story";
 import { NAV_THEME } from "@/lib/constants";
 import { cn, sanitizeStorageUrl } from "@/lib/utils";
 import * as Haptics from "expo-haptics";
-import { router } from "expo-router";
+import { router, useRouter } from "expo-router";
 import { debounce } from "lodash";
 import { Star } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { State } from "react-native-track-player";
+import { Playlist } from "../ui/icons/playlist-icon";
 
 const DescriptionRow = ({ description }: { description: string }) => {
 	return (
@@ -114,6 +115,46 @@ const AddToFavoritesButton = ({ storyId }: { storyId: Id<"stories"> }) => {
 				maxFontSizeMultiplier={1.2}
 			>
 				{text}
+			</Text>
+		</Pressable>
+	);
+};
+
+const AddToPlaylistButton = ({
+	storyId,
+	addCloseCallback,
+	triggerClose,
+}: {
+	storyId: Id<"stories">;
+	addCloseCallback: (name: string, callback: (...args: any[]) => void) => void;
+	triggerClose: () => void;
+}) => {
+	const pressRef = useRef<boolean>(null);
+	const router = useRouter();
+	const handleAddToPlaylist = useCallback(() => {
+		if (pressRef.current) {
+			return;
+		}
+		pressRef.current = true;
+		addCloseCallback("add-to-playlist", () => {
+			pressRef.current = false;
+			router.push(`/stories/add-to-playlist?storyId=${storyId}`);
+		});
+		triggerClose();
+	}, [addCloseCallback, router, storyId, triggerClose]);
+
+	return (
+		<Pressable
+			onPress={handleAddToPlaylist}
+			className={cn("p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-foreground/10")}
+		>
+			<Playlist className="size-4 text-foreground" size={16} />
+			<Text
+				className="text-foreground font-medium"
+				style={{ fontSize: 14, lineHeight: 16 }}
+				maxFontSizeMultiplier={1.2}
+			>
+				{"Add to playlist"}
 			</Text>
 		</Pressable>
 	);
@@ -435,6 +476,8 @@ const UnlockedStoryContextMenu = ({
 			<ShareButton storyId={story._id} storyTitle={story.title} onSharePress={onSharePress} />
 			<Separator className="h-[2px]" />
 			<AddToFavoritesButton storyId={story._id} />
+			<Separator className="h-[2px]" />
+			<AddToPlaylistButton storyId={story._id} addCloseCallback={addCloseCallback} triggerClose={triggerClose} />
 			<Separator className="h-[2px]" />
 			<FullscreenButton addCloseCallback={addCloseCallback} story={story} triggerClose={triggerClose} />
 			<Separator className="h-[2px]" />

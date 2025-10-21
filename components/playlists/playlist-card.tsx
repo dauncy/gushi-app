@@ -1,5 +1,6 @@
 import { PlaylistPreview } from "@/convex/playlists/schema";
 import { cn, sanitizeStorageUrl } from "@/lib/utils";
+import { cva } from "class-variance-authority";
 import { useRouter } from "expo-router";
 import { memo, useCallback, useMemo, useRef, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
@@ -13,24 +14,43 @@ const areImagePropsEqual = (oldProps: { imageUrl: string | null }, newProps: { i
 	return oldProps.imageUrl === newProps.imageUrl;
 };
 
-const PlaylistImage = memo(({ imageUrl }: { imageUrl: string | null }) => {
-	const [imageError, setImageError] = useState(false);
+const imageVariants = cva("flex items-center justify-center", {
+	variants: {
+		size: {
+			default: "size-[64px] ",
+			sm: "size-10 ",
+		},
+		rounded: {
+			default: "rounded-lg",
+			sm: "rounded-md",
+		},
+	},
+	defaultVariants: {
+		size: "default",
+		rounded: "default",
+	},
+});
 
-	return (
-		<View className="size-[64px] rounded-lg bg-foreground/20 flex items-center justify-center">
-			{imageUrl && !imageError ? (
-				<Image
-					source={{ uri: sanitizeStorageUrl(imageUrl) }}
-					className="size-full rounded-lg"
-					resizeMode="cover"
-					onError={() => setImageError(true)}
-				/>
-			) : (
-				<Playlist className="text-foreground/60 fill-foreground/60" strokeWidth={0.5} size={28} />
-			)}
-		</View>
-	);
-}, areImagePropsEqual);
+export const PlaylistImage = memo(
+	({ imageUrl, size = "default" }: { imageUrl: string | null; size?: "sm" | "default" }) => {
+		const [imageError, setImageError] = useState(false);
+		return (
+			<View className={cn("bg-foreground/20 flex items-center justify-center", imageVariants({ size, rounded: size }))}>
+				{imageUrl && !imageError ? (
+					<Image
+						source={{ uri: sanitizeStorageUrl(imageUrl) }}
+						className={cn("size-full", imageVariants({ rounded: size, size }))}
+						resizeMode="cover"
+						onError={() => setImageError(true)}
+					/>
+				) : (
+					<Playlist className="text-foreground/60 fill-foreground/60" strokeWidth={0.5} size={28} />
+				)}
+			</View>
+		);
+	},
+	areImagePropsEqual,
+);
 
 PlaylistImage.displayName = "PlaylistImage";
 

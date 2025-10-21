@@ -21,7 +21,7 @@ function Skeleton({ className, ...props }: Omit<React.ComponentPropsWithoutRef<t
 		opacity: sv.value,
 	}));
 
-	return <Animated.View style={style} className={cn("rounded-md bg-slate-800", className)} {...props} />;
+	return <Animated.View style={style} className={cn("rounded-md bg-foreground/20", className)} {...props} />;
 }
 
 export { Skeleton };

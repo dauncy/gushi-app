@@ -51,7 +51,7 @@ const FavoritesList = () => {
 	const contentContainerStyle: ViewStyle | undefined = useMemo(() => {
 		if (isLoading) {
 			return {
-				paddingTop: 8,
+				paddingTop: 16,
 				display: "contents",
 			};
 		}
@@ -65,7 +65,6 @@ const FavoritesList = () => {
 			return {
 				paddingBottom: 80,
 				paddingTop: 8,
-				display: "contents",
 			};
 		}
 		return {
@@ -77,6 +76,7 @@ const FavoritesList = () => {
 			justifyContent: "center",
 		};
 	}, [isLoading, refreshing, results.length]);
+
 	return (
 		<View style={{ flex: 1 }} className="relative bg-[#fffbf3] flex flex-col px-0">
 			<View className="flex-1 bg-foreground/10 px-2">

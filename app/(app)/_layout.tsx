@@ -1,10 +1,12 @@
 import { NAV_THEME } from "@/lib/constants";
 import { useConvexAuth } from "convex/react";
-import { Stack } from "expo-router";
+import { Stack, usePathname } from "expo-router";
 import { ReactNode } from "react";
 import { ActivityIndicator, View } from "react-native";
 
 export default function AppLayout() {
+	const pathname = usePathname();
+	const onAddToPlaylist = pathname.includes("add-to-playlist");
 	return (
 		<Stack
 			screenOptions={{
@@ -21,7 +23,6 @@ export default function AppLayout() {
 				options={{
 					headerShown: false,
 					presentation: "formSheet",
-					sheetCornerRadius: 48,
 					gestureEnabled: true,
 					animation: "slide_from_bottom",
 					animationDuration: 300,
@@ -40,7 +41,11 @@ export default function AppLayout() {
 					headerShown: false,
 					fullScreenGestureEnabled: true,
 					sheetGrabberVisible: true,
-					sheetCornerRadius: 48,
+					...(!onAddToPlaylist
+						? {
+								sheetCornerRadius: 36,
+							}
+						: {}),
 					headerLargeTitleShadowVisible: true,
 					presentation: "formSheet",
 					contentStyle: {
