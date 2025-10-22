@@ -22,7 +22,17 @@ import { Trash2 } from "../ui/icons/trash-icon";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Skeleton } from "../ui/skeleton";
 
-const LockedPlaylistStoryCard = ({ story, drag }: { story: StoryPreview; drag: () => void }) => {
+const LockedPlaylistStoryCard = ({
+	story,
+	drag,
+	playlistId,
+	playlistStoryId,
+}: {
+	story: StoryPreview;
+	drag: () => void;
+	playlistId?: Id<"playlists">;
+	playlistStoryId?: Id<"playlistStories">;
+}) => {
 	const { presentPaywall } = usePresentPaywall();
 	const handlePress = useCallback(() => {
 		presentPaywall();
@@ -48,7 +58,7 @@ const LockedPlaylistStoryCard = ({ story, drag }: { story: StoryPreview; drag: (
 			</View>
 			<View className="flex items-center justify-center relative ">
 				<View className="absolute right-0 " style={{ zIndex: 4 }}>
-					<PlayistStoryContextMenu story={story} />
+					<PlayistStoryContextMenu story={story} playlistId={playlistId} playlistStoryId={playlistStoryId} />
 				</View>
 			</View>
 
@@ -79,7 +89,17 @@ const LockedPlaylistStoryCard = ({ story, drag }: { story: StoryPreview; drag: (
 	);
 };
 
-const UnlockedPlaylistStoryCard = ({ story, drag }: { story: StoryPreview; drag: () => void }) => {
+const UnlockedPlaylistStoryCard = ({
+	story,
+	drag,
+	playlistId,
+	playlistStoryId,
+}: {
+	story: StoryPreview;
+	drag: () => void;
+	playlistId?: Id<"playlists">;
+	playlistStoryId?: Id<"playlistStories">;
+}) => {
 	return (
 		<Pressable onLongPress={drag} className={cn("flex flex-row gap-x-4 w-full p-4")}>
 			<StoryImagePreview
@@ -100,7 +120,7 @@ const UnlockedPlaylistStoryCard = ({ story, drag }: { story: StoryPreview; drag:
 				</Text>
 			</View>
 			<View className="flex items-center justify-center">
-				<PlayistStoryContextMenu story={story} />
+				<PlayistStoryContextMenu story={story} playlistId={playlistId} playlistStoryId={playlistStoryId} />
 			</View>
 		</Pressable>
 	);
@@ -169,16 +189,34 @@ export const PlaylistStoryCard = ({
 				)}
 			>
 				{locked ? (
-					<LockedPlaylistStoryCard story={story} drag={drag} />
+					<LockedPlaylistStoryCard
+						story={story}
+						drag={drag}
+						playlistId={playlistId}
+						playlistStoryId={playlistStoryId}
+					/>
 				) : (
-					<UnlockedPlaylistStoryCard story={story} drag={drag} />
+					<UnlockedPlaylistStoryCard
+						story={story}
+						drag={drag}
+						playlistId={playlistId}
+						playlistStoryId={playlistStoryId}
+					/>
 				)}
 			</ReanimatedSwipeable>
 		</View>
 	);
 };
 
-const PlayistStoryContextMenu = ({ story }: { story: StoryPreview }) => {
+const PlayistStoryContextMenu = ({
+	story,
+	playlistId,
+	playlistStoryId,
+}: {
+	story: StoryPreview;
+	playlistId?: Id<"playlists">;
+	playlistStoryId?: Id<"playlistStories">;
+}) => {
 	const onCloseCallbacsk = useRef<Map<string, () => void>>(new Map());
 	const popoverTriggerRef = useRef<TriggerRef>(null);
 	const insets = useSafeAreaInsets();
@@ -209,6 +247,7 @@ const PlayistStoryContextMenu = ({ story }: { story: StoryPreview }) => {
 				side="bottom"
 			>
 				<StoryContextMenu
+					currentPlaylistId={playlistId}
 					onSharePress={() => popoverTriggerRef.current?.close()}
 					story={story}
 					addCloseCallback={(name, callback) => {
@@ -219,6 +258,7 @@ const PlayistStoryContextMenu = ({ story }: { story: StoryPreview }) => {
 						onCloseCallbacsk.current.forEach((callback) => callback());
 						onCloseCallbacsk.current.clear();
 					}}
+					playlistStoryId={playlistStoryId}
 				/>
 			</PopoverContent>
 		</Popover>

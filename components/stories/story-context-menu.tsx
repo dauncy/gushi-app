@@ -8,6 +8,7 @@ import { Stop } from "@/components/ui/icons/stop-icon";
 import { Separator } from "@/components/ui/separator";
 import { setAudioStoryData, setAudioUrl, useAudio, useAudioPlayState, useIsStoryActive } from "@/context/AudioContext";
 import { useSubscription } from "@/context/SubscriptionContext";
+import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { StoryPreview } from "@/convex/stories/schema";
 import { useFavorite } from "@/hooks/use-favorite";
@@ -15,6 +16,7 @@ import { usePlayInFullscreen } from "@/hooks/use-play-in-fullscreen";
 import { useShareStory } from "@/hooks/use-share-story";
 import { NAV_THEME } from "@/lib/constants";
 import { cn, sanitizeStorageUrl } from "@/lib/utils";
+import { useConvexMutation } from "@convex-dev/react-query";
 import * as Haptics from "expo-haptics";
 import { router, useRouter } from "expo-router";
 import { debounce } from "lodash";
@@ -24,6 +26,7 @@ import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { State } from "react-native-track-player";
 import { Playlist } from "../ui/icons/playlist-icon";
+import { Trash2 } from "../ui/icons/trash-icon";
 
 const DescriptionRow = ({ description }: { description: string }) => {
 	return (
@@ -436,13 +439,57 @@ const UnlockButton = ({
 	);
 };
 
+const RemoveFromPlaylistButton = ({
+	currentPlaylistId,
+	playlistStoryId,
+	triggerClose,
+}: {
+	storyId: Id<"stories">;
+	currentPlaylistId: Id<"playlists">;
+	playlistStoryId: Id<"playlistStories">;
+	triggerClose: () => void;
+}) => {
+	const [removing, setRemoving] = useState(false);
+	const removePlaylistStoryFromPlaylist = useConvexMutation(api.playlists.mutations.removePlaylistStoryFromPlaylist);
+
+	const handleRemoveFromPlaylist = useCallback(async () => {
+		if (removing) return;
+		setRemoving(true);
+		await removePlaylistStoryFromPlaylist({ playlistId: currentPlaylistId, playlistStoryId: playlistStoryId });
+		setRemoving(false);
+		triggerClose();
+	}, [currentPlaylistId, playlistStoryId, removePlaylistStoryFromPlaylist, removing, triggerClose]);
+
+	return (
+		<Pressable
+			disabled={removing}
+			onPress={handleRemoveFromPlaylist}
+			className="p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-foreground/10 disabled:opacity-50"
+		>
+			{removing && <ActivityIndicator size={16} color={"#ff78e5"} />}
+			<Trash2 className="size-4 text-foreground" size={16} />
+			<Text
+				className="text-foreground font-medium"
+				style={{ fontSize: 14, lineHeight: 16 }}
+				maxFontSizeMultiplier={1.2}
+			>
+				Remove from playlist
+			</Text>
+		</Pressable>
+	);
+};
+
 const LockedStoryContextMenu = ({
+	currentPlaylistId,
+	playlistStoryId,
 	story,
 	addCloseCallback,
 	triggerClose,
 	onSharePress,
 }: {
 	story: StoryPreview;
+	currentPlaylistId?: Id<"playlists">;
+	playlistStoryId?: Id<"playlistStories">;
 	addCloseCallback: (name: string, callback: (...args: any[]) => void) => void;
 	triggerClose: () => void;
 	onSharePress?: () => void;
@@ -451,6 +498,17 @@ const LockedStoryContextMenu = ({
 		<View className="bg-background w-full rounded-xl border-2 border-border">
 			{story.description && <DescriptionRow description={story.description} />}
 			{story.description && <Separator className="h-[2px]" />}
+			{currentPlaylistId && playlistStoryId && (
+				<>
+					<RemoveFromPlaylistButton
+						storyId={story._id}
+						currentPlaylistId={currentPlaylistId}
+						playlistStoryId={playlistStoryId}
+						triggerClose={triggerClose}
+					/>
+					<Separator className="h-[2px]" />
+				</>
+			)}
 			<ShareButton storyId={story._id} storyTitle={story.title} onSharePress={onSharePress} />
 			<Separator className="h-[2px]" />
 			<UnlockButton storyId={story._id} addCloseCallback={addCloseCallback} triggerClose={triggerClose} />
@@ -459,11 +517,15 @@ const LockedStoryContextMenu = ({
 };
 
 const UnlockedStoryContextMenu = ({
+	currentPlaylistId,
+	playlistStoryId,
 	story,
 	addCloseCallback,
 	triggerClose,
 	onSharePress,
 }: {
+	currentPlaylistId?: Id<"playlists">;
+	playlistStoryId?: Id<"playlistStories">;
 	story: StoryPreview;
 	addCloseCallback: (name: string, callback: (...args: any[]) => void) => void;
 	triggerClose: () => void;
@@ -473,6 +535,17 @@ const UnlockedStoryContextMenu = ({
 		<View className="bg-background w-full rounded-xl border-2 border-border">
 			{story.description && <DescriptionRow description={story.description} />}
 			{story.description && <Separator className="h-[2px]" />}
+			{currentPlaylistId && playlistStoryId && (
+				<>
+					<RemoveFromPlaylistButton
+						storyId={story._id}
+						currentPlaylistId={currentPlaylistId}
+						playlistStoryId={playlistStoryId}
+						triggerClose={triggerClose}
+					/>
+					<Separator className="h-[2px]" />
+				</>
+			)}
 			<ShareButton storyId={story._id} storyTitle={story.title} onSharePress={onSharePress} />
 			<Separator className="h-[2px]" />
 			<AddToFavoritesButton storyId={story._id} />
@@ -491,11 +564,15 @@ export const StoryContextMenu = ({
 	addCloseCallback,
 	triggerClose,
 	onSharePress,
+	currentPlaylistId,
+	playlistStoryId,
 }: {
 	story: StoryPreview;
 	addCloseCallback: (name: string, callback: (...args: any[]) => void) => void;
 	triggerClose: () => void;
 	onSharePress?: () => void;
+	currentPlaylistId?: Id<"playlists">;
+	playlistStoryId?: Id<"playlistStories">;
 }) => {
 	const { hasSubscription } = useSubscription();
 
@@ -516,12 +593,16 @@ export const StoryContextMenu = ({
 				story={story}
 				triggerClose={triggerClose}
 				onSharePress={onSharePress}
+				currentPlaylistId={currentPlaylistId}
+				playlistStoryId={playlistStoryId}
 			/>
 		);
 	}
 
 	return (
 		<UnlockedStoryContextMenu
+			currentPlaylistId={currentPlaylistId}
+			playlistStoryId={playlistStoryId}
 			addCloseCallback={addCloseCallback}
 			story={story}
 			triggerClose={triggerClose}
