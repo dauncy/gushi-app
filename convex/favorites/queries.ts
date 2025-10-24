@@ -66,11 +66,19 @@ export const getFavoriteStatusByStoryId = query({
 		storyId: v.id("stories"),
 	},
 	handler: async (ctx, { storyId }) => {
-		const { dbUser } = await verifyAccess(ctx, { validateSubscription: false });
-		const favorite = await ctx.db
-			.query("favorites")
-			.withIndex("by_user_story", (q) => q.eq("userId", dbUser._id).eq("storyId", storyId))
-			.first();
-		return favorite;
+		try {
+			const { dbUser } = await verifyAccess(ctx, { validateSubscription: false });
+			const favorite = await ctx.db
+				.query("favorites")
+				.withIndex("by_user_story", (q) => q.eq("userId", dbUser._id).eq("storyId", storyId))
+				.first();
+			return favorite;
+		} catch (e) {
+			if (e instanceof ConvexError && e.data.toLowerCase().includes("unauthorized")) {
+				return null;
+			}
+			console.warn("[convex/favorites/queries.ts]: getFavoriteStatusByStoryId() => error", e);
+			return null;
+		}
 	},
 });

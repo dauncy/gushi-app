@@ -1,3 +1,4 @@
+import { AudioPreviewPlayer } from "@/components/audio/audio-preview";
 import { SecondaryHeader } from "@/components/nav/secondary-header";
 import { PlaylistStoryCard, PlaylistStoryLoading } from "@/components/playlists/playlist-story-card";
 import { EllipsisVertical } from "@/components/ui/icons/ellipsis-vertical";
@@ -5,12 +6,14 @@ import { Play } from "@/components/ui/icons/play-icon";
 import { Playlist } from "@/components/ui/icons/playlist-icon";
 import { Plus } from "@/components/ui/icons/plus-icon";
 import { Scroll } from "@/components/ui/icons/scroll-icon";
+import { Stop } from "@/components/ui/icons/stop-icon";
 import { TextCursorInput } from "@/components/ui/icons/text-cursor-input";
 import { Trash2 } from "@/components/ui/icons/trash-icon";
 import { Image } from "@/components/ui/image";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAudio, useHasActiveQueue, useIsPlaylistActive } from "@/context/AudioContext";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { PlaylistPreview } from "@/convex/playlists/schema";
@@ -22,7 +25,7 @@ import { useConvexMutation } from "@convex-dev/react-query";
 import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Pressable, RefreshControl, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Pressable, RefreshControl, Text, View, ViewStyle } from "react-native";
 import { runOnJS, useSharedValue, withSpring } from "react-native-reanimated";
 import ReorderableList, {
 	ReorderableListCellAnimations,
@@ -38,7 +41,7 @@ export default function PlaylistIdPage() {
 	const clickRef = useRef(false);
 	const [deleting, setDeleting] = useState(false);
 	const deletePlaylist = useConvexMutation(api.playlists.mutations.deletePlaylist);
-
+	const { clearQueue } = useAudio();
 	const router = useRouter();
 	const playlistId = params.playlistId as Id<"playlists">;
 
@@ -47,10 +50,11 @@ export default function PlaylistIdPage() {
 		clickRef.current = true;
 		setDeleting(true);
 		await deletePlaylist({ playlistId });
+		await clearQueue();
 		Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 		setDeleting(false);
 		router.dismissTo("/playlists");
-	}, [playlistId, deletePlaylist, setDeleting, router]);
+	}, [playlistId, deletePlaylist, setDeleting, router, clearQueue]);
 
 	if (!playlistId) {
 		return null;
@@ -74,6 +78,11 @@ export default function PlaylistIdPage() {
 			/>
 			<View style={{ flex: 1 }} className="relative flex-col px-0">
 				<PlaylistContent playlistId={playlistId} disabled={deleting} />
+				<AudioPreviewPlayer
+					onCardPress={(id) => {
+						router.push(`/stories/${id}`);
+					}}
+				/>
 			</View>
 		</View>
 	);
@@ -194,11 +203,13 @@ const AddStoryButton = ({
 };
 
 const PlaylistContent = ({ playlistId, disabled = false }: { playlistId: Id<"playlists">; disabled: boolean }) => {
+	const hasAudioPlayer = useHasActiveQueue();
 	const [isReordering, setIsReordering] = useState(false);
 	const scale = useSharedValue(1);
 	const shadowOpacity = useSharedValue(0);
 	const shadowRadius = useSharedValue(0);
 	const backgroundColor = useSharedValue("transparent");
+	const { setQueue } = useAudio();
 
 	const reorderPlaylistStories = useConvexMutation(api.playlists.mutations.reorderPlaylistStories);
 	const {
@@ -366,18 +377,43 @@ const PlaylistContent = ({ playlistId, disabled = false }: { playlistId: Id<"pla
 		if (storiesLoading || refreshing || isRefetchingPlaylist || playlistLoading) {
 			return <PlaylistStoriesLoading />;
 		}
+		if (localStories.length === 0 && stories.length > 0) {
+			return <PlaylistStoriesLoading />;
+		}
 		return <PlaylistEmptyState />;
-	}, [storiesLoading, refreshing, isRefetchingPlaylist, playlistLoading]);
+	}, [storiesLoading, refreshing, isRefetchingPlaylist, playlistLoading, localStories.length, stories.length]);
 
 	const handleRefresh = useCallback(async () => {
 		if (disabled) return;
 		await Promise.all([refetchPlaylist(), refresh()]);
 	}, [disabled, refetchPlaylist, refresh]);
 
+	const startPlaylistAtIndex = useCallback(
+		async (playlistStoryId: Id<"playlistStories">) => {
+			if (disabled) return;
+			const index = localStories.findIndex((story) => story.playlistStoryId === playlistStoryId);
+			if (index < 0) return;
+			await setQueue(
+				localStories.map((story) => ({
+					playlistStoryId: story.playlistStoryId,
+					playlistId: playlistId,
+					id: story.story._id,
+					title: story.story.title ?? "",
+					imageUrl: sanitizeStorageUrl(story.story.imageUrl ?? ""),
+					url: sanitizeStorageUrl(story.story.audioUrl ?? ""),
+				})),
+				index,
+				true,
+			);
+		},
+		[disabled, setQueue, localStories, playlistId],
+	);
+
 	const renderItem = useCallback(
 		({ item }: { item: { playlistStoryId: Id<"playlistStories">; story: StoryPreview } }) => {
 			return (
 				<PlaylistStoryCard
+					startPlaylistAtIndex={startPlaylistAtIndex}
 					story={item.story}
 					disabled={disabled}
 					playlistStoryId={item.playlistStoryId}
@@ -385,8 +421,15 @@ const PlaylistContent = ({ playlistId, disabled = false }: { playlistId: Id<"pla
 				/>
 			);
 		},
-		[disabled, playlistId],
+		[disabled, playlistId, startPlaylistAtIndex],
 	);
+
+	const contentContainerStyle: ViewStyle | undefined = useMemo(() => {
+		if (hasAudioPlayer) {
+			return { paddingTop: 16, paddingBottom: 80 };
+		}
+		return { paddingTop: 16, paddingBottom: 0 };
+	}, [hasAudioPlayer]);
 
 	return (
 		<ReorderableList
@@ -394,7 +437,7 @@ const PlaylistContent = ({ playlistId, disabled = false }: { playlistId: Id<"pla
 			onReorder={handleReorder}
 			refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#ff78e5" />}
 			showsVerticalScrollIndicator={false}
-			contentContainerStyle={{ paddingTop: 16 }}
+			contentContainerStyle={contentContainerStyle}
 			data={localStories}
 			keyExtractor={(item) => item.playlistStoryId}
 			renderItem={renderItem}
@@ -417,6 +460,113 @@ const PlaylistContent = ({ playlistId, disabled = false }: { playlistId: Id<"pla
 
 const PlaylistHeader = ({ playlist }: { playlist: PlaylistPreview }) => {
 	const [imageError, setImageError] = useState(false);
+	const isPlaylistActive = useIsPlaylistActive({ playlistId: playlist._id });
+	const { setQueue, stop, addTracks } = useAudio();
+	const { data: queue, isLoading } = useConvexQuery(api.playlists.queries.getPlaylistAsQueue, {
+		playlistId: playlist._id,
+	});
+	const [loadingQueue, setLoadingQueue] = useState(false);
+	const [localQueue, setLocalQueue] = useState<
+		{
+			id: Id<"stories">;
+			title: string;
+			imageUrl: string | null;
+			audioUrl: string;
+			playlistStoryId: Id<"playlistStories">;
+		}[]
+	>([]);
+
+	useEffect(() => {
+		if (!queue) {
+			return;
+		}
+		if (localQueue.length === 0) {
+			setLocalQueue(queue ?? []);
+			return;
+		}
+
+		let isDifferent = false;
+		if (localQueue.length > queue.length) {
+			isDifferent = true;
+		}
+		for (let i = 0; i < localQueue.length; i++) {
+			const localStory = localQueue[i];
+			const story = queue[i];
+			if (!story) {
+				isDifferent = true;
+				break;
+			}
+			if (localStory?.playlistStoryId !== story.playlistStoryId) {
+				isDifferent = true;
+				break;
+			}
+		}
+		if (isDifferent && isPlaylistActive) {
+			Alert.alert("Playlist changed", "Do you want to restart the playlist?", [
+				{ text: "Cancel", style: "cancel" },
+				{
+					text: "Restart",
+					onPress: async () => {
+						setLocalQueue(queue ?? []);
+						await setQueue(
+							queue.map((story) => ({
+								playlistStoryId: story.playlistStoryId,
+								playlistId: playlist._id,
+								id: story.id,
+								title: story.title,
+								imageUrl: sanitizeStorageUrl(story.imageUrl ?? ""),
+								url: sanitizeStorageUrl(story.audioUrl),
+							})),
+							0,
+							true,
+						);
+					},
+				},
+			]);
+			setLocalQueue(queue ?? []);
+			return;
+		}
+		if (isDifferent && !isPlaylistActive) {
+			setLocalQueue(queue ?? []);
+			return;
+		}
+
+		if (queue.length > localQueue.length) {
+			addTracks(
+				queue.slice(localQueue.length).map((story) => ({
+					playlistStoryId: story.playlistStoryId,
+					playlistId: playlist._id,
+					id: story.id,
+					title: story.title,
+					imageUrl: sanitizeStorageUrl(story.imageUrl ?? ""),
+					url: sanitizeStorageUrl(story.audioUrl),
+				})),
+			).then(() => {
+				setLocalQueue(queue ?? []);
+			});
+		}
+	}, [queue, setLocalQueue, localQueue, isPlaylistActive, playlist._id, setQueue, addTracks]);
+	const handlePlayPress = useCallback(async () => {
+		if (isLoading || !queue || queue.length === 0) return;
+		if (isPlaylistActive) {
+			await stop();
+			return;
+		}
+		setLoadingQueue(true);
+		await setQueue(
+			queue.map((story) => ({
+				playlistStoryId: story.playlistStoryId,
+				playlistId: playlist._id,
+				id: story.id,
+				title: story.title,
+				imageUrl: sanitizeStorageUrl(story.imageUrl ?? ""),
+				url: sanitizeStorageUrl(story.audioUrl),
+			})),
+			0,
+			true,
+		);
+		setLoadingQueue(false);
+	}, [isLoading, isPlaylistActive, playlist._id, queue, setQueue, stop]);
 	return (
 		<View className="flex flex-col items-center px-4">
 			<View
@@ -453,11 +603,23 @@ const PlaylistHeader = ({ playlist }: { playlist: PlaylistPreview }) => {
 			</Text>
 
 			<Pressable
-				disabled={playlist.numStories === 0}
-				className="disabled:opacity-50 border-2 border-border p-3 w-3/4 rounded-full mt-2.5 bg-secondary flex flex-row items-center  justify-center gap-x-2"
+				onPress={handlePlayPress}
+				disabled={isLoading || !queue || queue.length === 0 || loadingQueue}
+				className={cn(
+					"disabled:opacity-50 border-2 border-border p-3 w-3/4 rounded-full mt-2.5 bg-secondary flex flex-row items-center  justify-center gap-x-2",
+					isPlaylistActive && "border-destructive bg-background",
+				)}
 			>
-				<Play className="text-border fill-border" size={24} />
-				<Text className="text-border font-bold text-2xl">Play Playlist</Text>
+				{loadingQueue ? (
+					<ActivityIndicator size={24} color="#0395ff" />
+				) : isPlaylistActive ? (
+					<Stop className="text-destructive fill-destructive" size={24} />
+				) : (
+					<Play className="text-border fill-border" size={24} />
+				)}
+				<Text className={cn("font-bold text-2xl", isPlaylistActive ? "text-destructive" : "text-border")}>
+					{loadingQueue ? "Loading playlist..." : isPlaylistActive ? "Stop Playlist" : "Play Playlist"}
+				</Text>
 			</Pressable>
 
 			<View className="w-full flex items-start justify-start mt-6">

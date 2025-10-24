@@ -1,13 +1,12 @@
 import { Pause } from "@/components/ui/icons/pause-icon";
 import { Play } from "@/components/ui/icons/play-icon";
 import { Stop } from "@/components/ui/icons/stop-icon";
-import { audioStore, useAudio, useIsAudioInState } from "@/context/AudioContext";
+import { useActiveQueueItem, useAudio, useIsAudioInState } from "@/context/AudioContext";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
 import { useIsIpad } from "@/hooks/use-is-ipad";
 import { cn } from "@/lib/utils";
-import { useStore } from "@tanstack/react-store";
 import { useGlobalSearchParams, usePathname } from "expo-router";
 import { useCallback } from "react";
 import { Pressable, Text, View } from "react-native";
@@ -33,7 +32,8 @@ export const AudioPreviewPlayer = ({
 const PhonePlayer = ({ onCardPress }: { onCardPress?: (storyId: Id<"stories">) => void }) => {
 	const { play, pause, stop } = useAudio();
 	const isPlaying = useIsAudioInState({ state: State.Playing });
-	const storyId = useStore(audioStore, (state) => state.story.id);
+	const activeQueueItem = useActiveQueueItem();
+	const storyId = activeQueueItem?.id ?? null;
 
 	const { data: story } = useConvexQuery(
 		api.stories.queries.getStory,
@@ -119,7 +119,8 @@ const IpadPlayer = ({ onCardPress }: { onCardPress?: (storyId: Id<"stories">) =>
 	const pathname = usePathname();
 	const params = useGlobalSearchParams();
 	const isPlaying = useIsAudioInState({ state: State.Playing });
-	const storyId = useStore(audioStore, (state) => state.story.id);
+	const activeQueueItem = useActiveQueueItem();
+	const storyId = activeQueueItem?.id ?? null;
 
 	const { data: story } = useConvexQuery(
 		api.stories.queries.getStory,

@@ -6,7 +6,7 @@ import { Share } from "@/components/ui/icons/share-icon";
 import { Sprout } from "@/components/ui/icons/sprout-icon";
 import { Stop } from "@/components/ui/icons/stop-icon";
 import { Separator } from "@/components/ui/separator";
-import { setAudioStoryData, setAudioUrl, useAudio, useAudioPlayState, useIsStoryActive } from "@/context/AudioContext";
+import { useAudio, useAudioPlayState, useIsPlaylistActive, useIsStoryActive } from "@/context/AudioContext";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -167,10 +167,14 @@ const FullscreenButton = ({
 	addCloseCallback,
 	story,
 	triggerClose,
+	playAtIndex,
+	playlistStoryId,
 }: {
 	addCloseCallback: (name: string, callback: (...args: any[]) => void) => void;
 	story: StoryPreview;
 	triggerClose: () => void;
+	playAtIndex?: (playlistStoryId: Id<"playlistStories">) => Promise<void>;
+	playlistStoryId?: Id<"playlistStories">;
 }) => {
 	const pressRef = useRef<boolean>(null);
 	const { _id: storyId, title: storyTitle, imageUrl: storyImageUrl, audioUrl: storyAudioUrl } = story;
@@ -183,11 +187,23 @@ const FullscreenButton = ({
 		addCloseCallback("fullscreen", () => {
 			pressRef.current = false;
 			playInFullscreen({
+				playAtIndex,
+				playlistStoryId,
 				storyData: { _id: storyId, title: storyTitle, imageUrl: storyImageUrl, audioUrl: storyAudioUrl },
 			});
 		});
 		triggerClose();
-	}, [addCloseCallback, playInFullscreen, storyAudioUrl, storyId, storyImageUrl, storyTitle, triggerClose]);
+	}, [
+		addCloseCallback,
+		playAtIndex,
+		playInFullscreen,
+		playlistStoryId,
+		storyAudioUrl,
+		storyId,
+		storyImageUrl,
+		storyTitle,
+		triggerClose,
+	]);
 
 	return (
 		<Pressable
@@ -284,14 +300,22 @@ const Collapsible = ({
 	);
 };
 
-const AudioControlsRow = ({ story }: { story: StoryPreview }) => {
+const AudioControlsRow = ({
+	story,
+	playlistStoryId,
+	playAtIndex,
+}: {
+	story: StoryPreview;
+	playlistStoryId?: Id<"playlistStories">;
+	playAtIndex?: (playlistStoryId: Id<"playlistStories">) => Promise<void>;
+}) => {
 	const [loading, setLoading] = useState(false);
-	const { play, pause, stop, loadAudio } = useAudio();
+	const { play, pause, stop, setQueue } = useAudio();
 
 	const { currentPlayState } = useAudioPlayState();
 	const isBuffering = currentPlayState === State.Ended;
 	const isPlaying = currentPlayState === State.Playing;
-	const storyActive = useIsStoryActive({ storyId: story._id });
+	const storyActive = useIsStoryActive({ storyId: story._id, playlistStoryId });
 	const storyIsPlaying = isPlaying && storyActive;
 
 	const handleStop = useCallback(() => {
@@ -315,15 +339,24 @@ const AudioControlsRow = ({ story }: { story: StoryPreview }) => {
 		}
 
 		setLoading(true);
-		setAudioStoryData({
-			id: story._id,
-			title: story.title,
-			imageUrl: sanitizeStorageUrl(story.imageUrl ?? ""),
-		});
-		setAudioUrl({
-			url: sanitizeStorageUrl(story.audioUrl ?? ""),
-		});
-		await loadAudio(true);
+		if (playlistStoryId && playAtIndex) {
+			await playAtIndex(playlistStoryId);
+			setLoading(false);
+			return;
+		}
+
+		await setQueue(
+			[
+				{
+					id: story._id,
+					title: story.title,
+					imageUrl: sanitizeStorageUrl(story.imageUrl ?? ""),
+					url: sanitizeStorageUrl(story.audioUrl ?? ""),
+				},
+			],
+			0,
+			true,
+		);
 		setTimeout(() => {
 			setLoading(false);
 		}, 250);
@@ -336,7 +369,9 @@ const AudioControlsRow = ({ story }: { story: StoryPreview }) => {
 		isBuffering,
 		storyActive,
 		storyIsPlaying,
-		loadAudio,
+		playlistStoryId,
+		playAtIndex,
+		setQueue,
 		pause,
 		play,
 	]);
@@ -358,8 +393,11 @@ const AudioControlsRow = ({ story }: { story: StoryPreview }) => {
 		if (storyIsPlaying) {
 			return "pause audio";
 		}
+		if (playlistStoryId && playAtIndex) {
+			return "Start playlist from here";
+		}
 		return "play audio";
-	}, [loading, storyIsPlaying]);
+	}, [loading, storyIsPlaying, playlistStoryId, playAtIndex]);
 
 	return (
 		<>
@@ -451,14 +489,26 @@ const RemoveFromPlaylistButton = ({
 }) => {
 	const [removing, setRemoving] = useState(false);
 	const removePlaylistStoryFromPlaylist = useConvexMutation(api.playlists.mutations.removePlaylistStoryFromPlaylist);
-
+	const playlistActive = useIsPlaylistActive({ playlistId: currentPlaylistId });
+	const { clearQueue } = useAudio();
 	const handleRemoveFromPlaylist = useCallback(async () => {
 		if (removing) return;
 		setRemoving(true);
 		await removePlaylistStoryFromPlaylist({ playlistId: currentPlaylistId, playlistStoryId: playlistStoryId });
+		if (playlistActive) {
+			await clearQueue();
+		}
 		setRemoving(false);
 		triggerClose();
-	}, [currentPlaylistId, playlistStoryId, removePlaylistStoryFromPlaylist, removing, triggerClose]);
+	}, [
+		clearQueue,
+		currentPlaylistId,
+		playlistActive,
+		playlistStoryId,
+		removePlaylistStoryFromPlaylist,
+		removing,
+		triggerClose,
+	]);
 
 	return (
 		<Pressable
@@ -523,6 +573,7 @@ const UnlockedStoryContextMenu = ({
 	addCloseCallback,
 	triggerClose,
 	onSharePress,
+	playAtIndex,
 }: {
 	currentPlaylistId?: Id<"playlists">;
 	playlistStoryId?: Id<"playlistStories">;
@@ -530,6 +581,7 @@ const UnlockedStoryContextMenu = ({
 	addCloseCallback: (name: string, callback: (...args: any[]) => void) => void;
 	triggerClose: () => void;
 	onSharePress?: () => void;
+	playAtIndex?: (playlistStoryId: Id<"playlistStories">) => Promise<void>;
 }) => {
 	return (
 		<View className="bg-background w-full rounded-xl border-2 border-border">
@@ -552,9 +604,15 @@ const UnlockedStoryContextMenu = ({
 			<Separator className="h-[2px]" />
 			<AddToPlaylistButton storyId={story._id} addCloseCallback={addCloseCallback} triggerClose={triggerClose} />
 			<Separator className="h-[2px]" />
-			<FullscreenButton addCloseCallback={addCloseCallback} story={story} triggerClose={triggerClose} />
+			<FullscreenButton
+				addCloseCallback={addCloseCallback}
+				story={story}
+				triggerClose={triggerClose}
+				playAtIndex={playAtIndex}
+				playlistStoryId={playlistStoryId}
+			/>
 			<Separator className="h-[2px]" />
-			<AudioControlsRow story={story} />
+			<AudioControlsRow story={story} playlistStoryId={playlistStoryId} playAtIndex={playAtIndex} />
 		</View>
 	);
 };
@@ -566,6 +624,7 @@ export const StoryContextMenu = ({
 	onSharePress,
 	currentPlaylistId,
 	playlistStoryId,
+	playAtIndex,
 }: {
 	story: StoryPreview;
 	addCloseCallback: (name: string, callback: (...args: any[]) => void) => void;
@@ -573,6 +632,7 @@ export const StoryContextMenu = ({
 	onSharePress?: () => void;
 	currentPlaylistId?: Id<"playlists">;
 	playlistStoryId?: Id<"playlistStories">;
+	playAtIndex?: (playlistStoryId: Id<"playlistStories">) => Promise<void>;
 }) => {
 	const { hasSubscription } = useSubscription();
 
@@ -602,6 +662,7 @@ export const StoryContextMenu = ({
 	return (
 		<UnlockedStoryContextMenu
 			currentPlaylistId={currentPlaylistId}
+			playAtIndex={playAtIndex}
 			playlistStoryId={playlistStoryId}
 			addCloseCallback={addCloseCallback}
 			story={story}

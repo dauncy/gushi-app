@@ -5,12 +5,11 @@ import { Headphones } from "@/components/ui/icons/headphones-icon";
 import { Play } from "@/components/ui/icons/play-icon";
 import { Playlist } from "@/components/ui/icons/playlist-icon";
 import { Plus } from "@/components/ui/icons/plus-icon";
-import { audioStore } from "@/context/AudioContext";
+import { useHasActiveQueue } from "@/context/AudioContext";
 import { api } from "@/convex/_generated/api";
 import { PlaylistPreview } from "@/convex/playlists/schema";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { useConvexMutation } from "@convex-dev/react-query";
-import { useStore } from "@tanstack/react-store";
 import * as Haptics from "expo-haptics";
 import { Link, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -279,11 +278,11 @@ const DraggableCard = ({ item }: { item: PlaylistPreview }) => {
 };
 
 const AddPlaylistButton = () => {
-	const storyId = useStore(audioStore, (state) => state.story.id);
+	const hasActiveQueue = useHasActiveQueue();
 
 	const bottomPosition = useSharedValue(16);
 	useEffect(() => {
-		if (storyId) {
+		if (hasActiveQueue) {
 			bottomPosition.value = withDelay(
 				0,
 				withTiming(72, {
@@ -300,7 +299,7 @@ const AddPlaylistButton = () => {
 				}),
 			);
 		}
-	}, [storyId, bottomPosition]);
+	}, [hasActiveQueue, bottomPosition]);
 
 	return (
 		<Animated.View style={{ position: "absolute", bottom: bottomPosition, right: 16 }}>

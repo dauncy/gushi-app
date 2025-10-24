@@ -1,4 +1,4 @@
-import { setAudioStoryData, setAudioUrl, useAudio, useAudioPlayState, useIsStoryActive } from "@/context/AudioContext";
+import { useAudio, useAudioPlayState, useIsStoryActive } from "@/context/AudioContext";
 import { StoryPreview } from "@/convex/stories/schema";
 import { sanitizeStorageUrl } from "@/lib/utils";
 import { memo, useCallback, useMemo } from "react";
@@ -10,7 +10,7 @@ import { Play } from "../ui/icons/play-icon";
 import { Stop } from "../ui/icons/stop-icon";
 
 export const StoryCardPlayButton = memo(({ story }: { story: StoryPreview }) => {
-	const { play, stop, loadAudio } = useAudio();
+	const { play, stop, setQueue } = useAudio();
 	const { currentPlayState } = useAudioPlayState();
 	const isBuffering = currentPlayState === State.Ended;
 	const isPlaying = currentPlayState === State.Playing;
@@ -30,16 +30,19 @@ export const StoryCardPlayButton = memo(({ story }: { story: StoryPreview }) => 
 		if (!audioUrl) {
 			return;
 		}
-		setAudioStoryData({
-			id: storyId,
-			title,
-			imageUrl: sanitizeStorageUrl(imageUrl ?? ""),
-		});
-		setAudioUrl({
-			url: sanitizeStorageUrl(audioUrl),
-		});
-		await loadAudio(true);
-	}, [audioUrl, storyId, title, imageUrl, loadAudio]);
+		await setQueue(
+			[
+				{
+					id: storyId,
+					title,
+					imageUrl: sanitizeStorageUrl(imageUrl ?? ""),
+					url: sanitizeStorageUrl(audioUrl),
+				},
+			],
+			0,
+			true,
+		);
+	}, [audioUrl, setQueue, storyId, title, imageUrl]);
 
 	const playButtonTapGesture = useMemo(() => {
 		return Gesture.Tap()

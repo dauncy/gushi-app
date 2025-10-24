@@ -1,14 +1,16 @@
 import { Marquee } from "@/components/Marquee";
 import { Button } from "@/components/ui/button";
+import { FastForward } from "@/components/ui/icons/fast-forward-icon";
 import { Headphones } from "@/components/ui/icons/headphones-icon";
 import { LetterText } from "@/components/ui/icons/letters-text-icon";
 import { Pause } from "@/components/ui/icons/pause-icon";
 import { Play } from "@/components/ui/icons/play-icon";
+import { Rewind } from "@/components/ui/icons/rewind-icon";
 import { Share } from "@/components/ui/icons/share-icon";
 import { Star } from "@/components/ui/icons/star-icon";
 import { Image } from "@/components/ui/image";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAudio, useAudioCurrentTime, useAudioDuration, useIsAudioInState } from "@/context/AudioContext";
+import { useAudio, useAudioCurrentTime, useAudioDuration, useHasNext, useIsAudioInState } from "@/context/AudioContext";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { SegmentTranscript, StoryExtended } from "@/convex/stories/schema";
@@ -21,7 +23,7 @@ import { FlashList, ListRenderItemInfo, type FlashListRef } from "@shopify/flash
 import { ConvexError } from "convex/values";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
-import { Redirect, useLocalSearchParams } from "expo-router";
+import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { debounce } from "lodash";
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -196,13 +198,41 @@ const ScrubbableProgress = ({
 };
 
 const StoryContent = ({ story }: { story: StoryExtended }) => {
+	const pressRef = useRef(false);
 	const [showClosedCaption, setShowClosedCaption] = useState(false);
-	const { pause, play, seek } = useAudio();
+	const { pause, play, seek, gotoNext, gotoPrev } = useAudio();
 	const [uiTime, setUiTime] = useState(0);
 	const currentTime = useSharedValue(0);
 	const audioCurrentTime = useAudioCurrentTime();
 	const isPlaying = useIsAudioInState({ state: State.Playing });
 	const duration = useAudioDuration();
+	const hasPrev = true;
+	const hasNext = useHasNext();
+	const router = useRouter();
+
+	const handlePrev = useCallback(async () => {
+		if (!hasPrev) return;
+		if (pressRef.current) return;
+		pressRef.current = true;
+		await gotoPrev((item) => {
+			router.setParams({ storyId: item.id });
+			setTimeout(() => {
+				pressRef.current = false;
+			}, 350);
+		});
+	}, [gotoPrev, router, hasPrev]);
+
+	const handleNext = useCallback(async () => {
+		if (!hasNext) return;
+		if (pressRef.current) return;
+		pressRef.current = true;
+		await gotoNext((item) => {
+			router.setParams({ storyId: item.id });
+			setTimeout(() => {
+				pressRef.current = false;
+			}, 350);
+		});
+	}, [gotoNext, router, hasNext]);
 
 	useEffect(() => {
 		currentTime.value = audioCurrentTime;
@@ -270,7 +300,14 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 						<Text className="text-foreground/80 text-xs">{formatTime(duration)}</Text>
 					</View>
 
-					<View className="flex w-full flex-col items-center py-4">
+					<View className="flex w-full flex-row items-center py-4 gap-x-2 justify-center">
+						<Pressable
+							onPress={handlePrev}
+							disabled={!hasPrev}
+							className="disabled:opacity-50 flex size-[44px] rounded-full active:bg-foreground/10 items-center justify-center"
+						>
+							<Rewind className="text-foreground/80 fill-foreground/80" size={24} />
+						</Pressable>
 						<Pressable
 							onPress={togglePlay}
 							className="size-20 active:bg-foreground/10 rounded-full flex items-center justify-center"
@@ -280,6 +317,14 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 							) : (
 								<Play className="text-foreground/80 fill-foreground/80" size={36} />
 							)}
+						</Pressable>
+
+						<Pressable
+							onPress={handleNext}
+							disabled={!hasNext}
+							className="disabled:opacity-50 flex size-[44px] rounded-full active:bg-foreground/10 items-center justify-center"
+						>
+							<FastForward className="text-foreground/80 fill-foreground/80" size={24} />
 						</Pressable>
 					</View>
 

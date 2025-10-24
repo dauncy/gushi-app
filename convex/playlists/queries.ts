@@ -4,7 +4,7 @@ import { verifyAccess } from "@/convex/common/utils";
 import { paginationOptsValidator, PaginationResult } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import { StoryPreview } from "../stories";
-import { storyDocToStoryPreview } from "../stories/utils";
+import { getAudioUrl, getImageUrl, storyDocToStoryPreview } from "../stories/utils";
 import { PlaylistPreview } from "./schema";
 import { ensurePlaylistBelongsToUser } from "./utils";
 
@@ -164,6 +164,27 @@ export const getPlaylistStories = query({
 						continueCursor: "",
 					};
 				}
+				if (error.data.toLowerCase().includes("playlist not found")) {
+					return {
+						page: [],
+						isDone: true,
+						continueCursor: "",
+					};
+				}
+				if (error.data.toLowerCase().includes("playlist does not belong to user")) {
+					return {
+						page: [],
+						isDone: true,
+						continueCursor: "",
+					};
+				}
+				if (error.data.toLowerCase().includes("story not found")) {
+					return {
+						page: [],
+						isDone: true,
+						continueCursor: "",
+					};
+				}
 			}
 			console.warn("[@/convex/playlists/queries.ts] getPlaylistStories error", error);
 			return {
@@ -203,6 +224,110 @@ export const checkStoryInPlaylist = query({
 			}
 			console.warn("[@/convex/playlists/queries.ts] checkStoryInPlaylist error", e);
 			return false;
+		}
+	},
+});
+
+export const getPlaylistAsQueue = query({
+	args: {
+		playlistId: v.id("playlists"),
+	},
+	handler: async (
+		ctx,
+		args,
+	): Promise<
+		{
+			id: Id<"stories">;
+			title: string;
+			imageUrl: string | null;
+			audioUrl: string;
+			playlistStoryId: Id<"playlistStories">;
+		}[]
+	> => {
+		try {
+			const stories: {
+				id: Id<"stories">;
+				title: string;
+				imageUrl: string | null;
+				audioUrl: string;
+				playlistStoryId: Id<"playlistStories">;
+			}[] = [];
+			const chunkSize = 50;
+			const { dbUser, hasSubscription } = await verifyAccess(ctx, { validateSubscription: false });
+			await ensurePlaylistBelongsToUser(ctx, { playlistId: args.playlistId, userId: dbUser._id });
+			// Manual pagination cursor (stable on order)
+			let order = 0;
+			while (true) {
+				const playlistStories = await ctx.db
+					.query("playlistStories")
+					.withIndex("by_playlist_id_order", (q) => q.eq("playlistId", args.playlistId).gte(`order`, order))
+					.order("asc")
+					.take(chunkSize);
+				if (playlistStories.length === 0) {
+					break;
+				}
+				const paginatedStories = await Promise.all(
+					playlistStories.map(async (playlistStory) => {
+						const story = await ctx.db.get(playlistStory.storyId);
+						if (!story) {
+							return null;
+						}
+
+						if (story.subscription_required && !hasSubscription) {
+							return null;
+						}
+
+						if (story.enabled === false) {
+							return null;
+						}
+
+						const [audioUrl, imageUrl] = await Promise.all([
+							getAudioUrl(ctx, story.audioId),
+							getImageUrl(ctx, story.imageId),
+						]);
+
+						if (!audioUrl.url) {
+							return null;
+						}
+
+						return {
+							id: story._id,
+							title: story.title,
+							imageUrl: imageUrl.url,
+							audioUrl: audioUrl.url,
+							playlistStoryId: playlistStory._id,
+						};
+					}),
+				);
+
+				const lastOrder = playlistStories[playlistStories.length - 1]?.order ?? 0;
+				order = lastOrder + 1;
+				stories.push(
+					...(paginatedStories.filter(Boolean) as {
+						id: Id<"stories">;
+						title: string;
+						imageUrl: string | null;
+						audioUrl: string;
+						playlistStoryId: Id<"playlistStories">;
+					}[]),
+				);
+			}
+
+			return stories;
+		} catch (error) {
+			if (error instanceof ConvexError) {
+				if (error.data.toLowerCase().includes("unauthorized")) {
+					return [];
+				}
+				if (error.data.toLowerCase().includes("playlist not found")) {
+					return [];
+				}
+				if (error.data.toLowerCase().includes("playlist does not belong to user")) {
+					return [];
+				}
+			}
+			console.warn("[@/convex/playlists/queries.ts] getPlaylistAsQueue error", error);
+			return [];
 		}
 	},
 });
