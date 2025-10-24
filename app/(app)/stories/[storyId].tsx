@@ -301,7 +301,7 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 						<Text className="text-foreground/80 text-xs">{formatTime(duration)}</Text>
 					</View>
 
-					<View className="flex w-full flex-row items-center py-4 gap-x-2 justify-center">
+					<View className="flex w-full flex-row items-center py-4 pt-3 gap-x-2 justify-center">
 						<Pressable
 							onPress={handlePrev}
 							disabled={!hasPrev}
@@ -699,7 +699,7 @@ const StoryLoading = () => (
 				<Skeleton className="h-10 w-10 rounded-full bg-foreground/20" />
 			</View>
 		</View>
-		<View className="flex w-full mt-12 flex-col">
+		<View className="flex w-full mt-8 flex-col">
 			<Skeleton className="h-3 w-full rounded-full bg-foreground/20" />
 			<View className="flex w-full flex-row justify-between mt-3">
 				<Skeleton className="h-1 w-16 flex rounded-full bg-foreground/20 flex" />
@@ -707,13 +707,15 @@ const StoryLoading = () => (
 			</View>
 		</View>
 
-		<View className="flex w-full mt-12 flex-col items-center">
+		<View className="flex w-full mt-8 flex-row items-center justify-center gap-x-2">
+			<Skeleton className="size-16 rounded-full bg-foreground/20" />
 			<Skeleton className="size-20 rounded-full bg-foreground/20" />
+			<Skeleton className="size-12 rounded-full bg-foreground/20" />
 		</View>
 
-		<View className="flex w-full mt-12 flex-row items-center justify-center gap-x-4">
-			<Skeleton className="w-20 h-9 rounded-full bg-foreground/20" />
-			<Skeleton className="w-20 h-9 rounded-full bg-foreground/20 ml-auto" />
+		<View className="flex w-full mt-8 flex-row items-start justify-start gap-x-4">
+			<Skeleton className="w-20 h-12 rounded-2xl bg-foreground/20" />
+			<Skeleton className="w-20 h-12 rounded-2xl bg-foreground/20 ml-auto" />
 		</View>
 	</View>
 );

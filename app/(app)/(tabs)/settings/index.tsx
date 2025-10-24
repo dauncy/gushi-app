@@ -34,7 +34,7 @@ export default function SettingsListPage() {
 					showsVerticalScrollIndicator={false}
 					alwaysBounceVertical={false}
 				>
-					<AutoPlaySection />
+					{/* <AutoPlaySection /> */}
 					<FeedbackRow
 						title="Report an issue"
 						description="Something not working the way it should? Let us know!"
@@ -67,6 +67,7 @@ export default function SettingsListPage() {
 	);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AutoPlaySection = () => {
 	const [autoPlay, setAutoPlay] = useState(false);
 	useEffect(() => {
@@ -243,7 +244,8 @@ const FreeUserSubscriptionRow = () => {
 	const isIpad = useIsIpad();
 	const { presentPaywall } = usePresentPaywall();
 	return (
-		<View
+		<Pressable
+			onPress={presentPaywall}
 			className={cn(
 				"w-full py-4 px-4 flex flex-row gap-x-4 items-start border-b border-foreground/20 ",
 				!isIpad && "flex-1 self-stretch grow ",
@@ -263,7 +265,7 @@ const FreeUserSubscriptionRow = () => {
 			>
 				<ChevronRight className="size-[24px] text-foreground" />
 			</Pressable>
-		</View>
+		</Pressable>
 	);
 };
 

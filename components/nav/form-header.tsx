@@ -82,13 +82,14 @@ export const FormHeader = ({
 				activeOpacity={0.8}
 				onPress={handleBack}
 			>
-				<Text className="text-destructive/80 font-medium text-lg" maxFontSizeMultiplier={1.2}>
+				<Text className="text-destructive/80 font-medium text-lg" maxFontSizeMultiplier={1.2} allowFontScaling={false}>
 					{"Cancel"}
 				</Text>
 			</TouchableOpacity>
 			<View className="flex-1 items-center justify-center">
 				<Text
 					style={{ fontFamily: "Baloo", lineHeight: 32, fontSize: 24 }}
+					allowFontScaling={false}
 					className="text-foreground font-normal text-2xl"
 					maxFontSizeMultiplier={1.2}
 				>
@@ -96,7 +97,7 @@ export const FormHeader = ({
 				</Text>
 			</View>
 			<TouchableOpacity onPress={handleSubmit} className="mb-4 disabled:opacity-50" disabled={submitDisabled}>
-				<Text className="text-border font-semibold text-lg" maxFontSizeMultiplier={1.2}>
+				<Text className="text-border font-semibold text-lg" maxFontSizeMultiplier={1.2} allowFontScaling={false}>
 					{submitText}
 				</Text>
 			</TouchableOpacity>

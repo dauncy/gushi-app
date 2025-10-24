@@ -171,7 +171,9 @@ export default function AddToPlaylistPage() {
 							className={cn(" flex flex-row items-center justify-center gap-x-2 p-2", submitting && "opacity-50")}
 						>
 							<Plus className="text-border" strokeWidth={2.5} size={20} strokeLinejoin="round" strokeLinecap="round" />
-							<Text className="text-border text-lg font-semibold">{"Create Playlist"}</Text>
+							<Text className="text-border text-lg font-semibold" maxFontSizeMultiplier={1.2} allowFontScaling={false}>
+								{"Create Playlist"}
+							</Text>
 						</Pressable>
 					</View>
 				</View>
@@ -268,6 +270,7 @@ const PlaylistPreviewCard = ({
 					numberOfLines={2}
 					ellipsizeMode="tail"
 					maxFontSizeMultiplier={1.2}
+					allowFontScaling={false}
 				>
 					{playlist.name}
 				</Text>

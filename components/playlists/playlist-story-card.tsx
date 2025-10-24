@@ -40,7 +40,11 @@ const LockedPlaylistStoryCard = ({
 		presentPaywall();
 	}, [presentPaywall]);
 	return (
-		<Pressable onPress={handlePress} onLongPress={drag} className={cn("flex flex-row gap-x-4 w-full p-4 relative")}>
+		<Pressable
+			onPress={handlePress}
+			onLongPress={drag}
+			className={cn("flex flex-row gap-x-4 w-full p-4 relative items-start")}
+		>
 			<StoryImagePreview
 				transition={0}
 				imageUrl={story.imageUrl}
@@ -48,7 +52,7 @@ const LockedPlaylistStoryCard = ({
 				size="sm"
 				recyclingKey={story._id}
 			/>
-			<View className="flex flex-col gap-y-2 flex-1">
+			<View className="flex flex-col gap-y-2 flex-1 justify-start">
 				<Text
 					className="text-foreground text-xl font-semibold"
 					numberOfLines={2}
@@ -152,7 +156,7 @@ const UnlockedPlaylistStoryCard = ({
 			onPress={handlePress}
 			onLongPress={drag}
 			disabled={loading}
-			className={cn("flex flex-row gap-x-4 w-full p-4 disabled:opacity-50")}
+			className={cn("flex flex-row gap-x-4 w-full p-4 items-start disabled:opacity-50")}
 		>
 			<StoryImagePreview
 				active={playlistStoryActive}
@@ -162,11 +166,12 @@ const UnlockedPlaylistStoryCard = ({
 				size="sm"
 				recyclingKey={story._id}
 			/>
-			<View className="flex flex-col gap-y-2 flex-1">
+			<View className="flex flex-col gap-y-2 flex-1 justify-start">
 				<Text
 					className="text-foreground text-xl font-semibold"
 					numberOfLines={2}
 					ellipsizeMode="tail"
+					style={{ lineHeight: 18 }}
 					maxFontSizeMultiplier={1.2}
 				>
 					{story.title}
@@ -241,9 +246,17 @@ export const PlaylistStoryCard = ({
 		>
 			<ReanimatedSwipeable
 				enabled={!disabled}
-				onSwipeableOpenStartDrag={() => setIsSwiping(true)}
-				onSwipeableCloseStartDrag={() => setIsSwiping(false)}
-				onSwipeableOpen={() => setIsSwiping(true)}
+				onSwipeableOpenStartDrag={() => {
+					setIsSwiping(true);
+					Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+				}}
+				onSwipeableCloseStartDrag={() => {
+					setIsSwiping(false);
+					Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+				}}
+				onSwipeableOpen={() => {
+					setIsSwiping(true);
+				}}
 				onSwipeableClose={() => setIsSwiping(false)}
 				friction={2}
 				rightThreshold={10}

@@ -152,7 +152,9 @@ const PlaylistDropDownMenu = ({
 						className="flex flex-row items-center gap-2 p-4 w-full active:bg-foreground/10 rounded-t-md"
 					>
 						<TextCursorInput className="text-foreground" size={20} />
-						<Text className="text-foreground font-medium text-xl">Edit Playlist</Text>
+						<Text className="text-foreground font-medium text-xl" maxFontSizeMultiplier={1.2}>
+							Edit Playlist
+						</Text>
 					</Pressable>
 				</PopoverTrigger>
 				<Separator className="h-[2px]" />
@@ -166,7 +168,9 @@ const PlaylistDropDownMenu = ({
 					) : (
 						<Trash2 className="text-destructive" size={20} />
 					)}
-					<Text className="text-destructive font-medium text-xl">Delete Playlist</Text>
+					<Text className="text-destructive font-medium text-xl" maxFontSizeMultiplier={1.2}>
+						Delete Playlist
+					</Text>
 				</Pressable>
 			</PopoverContent>
 		</Popover>
@@ -617,13 +621,18 @@ const PlaylistHeader = ({ playlist }: { playlist: PlaylistPreview }) => {
 				) : (
 					<Play className="text-border fill-border" size={24} />
 				)}
-				<Text className={cn("font-bold text-2xl", isPlaylistActive ? "text-destructive" : "text-border")}>
+				<Text
+					className={cn("font-bold text-2xl", isPlaylistActive ? "text-destructive" : "text-border")}
+					allowFontScaling={false}
+				>
 					{loadingQueue ? "Loading playlist..." : isPlaylistActive ? "Stop Playlist" : "Play Playlist"}
 				</Text>
 			</Pressable>
 
 			<View className="w-full flex items-start justify-start mt-6">
-				<Text className="text-foreground/80 font-medium text-lg">{playlist.name}</Text>
+				<Text className="text-foreground/80 font-medium text-lg" maxFontSizeMultiplier={1.2}>
+					{playlist.name}
+				</Text>
 			</View>
 		</View>
 	);

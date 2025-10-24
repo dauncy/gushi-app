@@ -219,7 +219,7 @@ export default function AddStoriesPage() {
 					formTitle="Add Stories"
 					alertTitle={ALERT_TITLE}
 					alertMessage={ALERT_MESSAGE}
-					submitText="Add Stories"
+					submitText="Add"
 					onSubmit={handleSubmit}
 				/>
 				<View className="px-2 w-full bg-background pb-4 flex flex-col gap-y-2">
@@ -378,7 +378,7 @@ const BasicStoryCard = ({
 					className="text-foreground text-2xl font-semibold"
 					numberOfLines={2}
 					ellipsizeMode="tail"
-					maxFontSizeMultiplier={1.2}
+					maxFontSizeMultiplier={1}
 				>
 					{story.title}
 				</Text>
