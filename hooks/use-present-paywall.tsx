@@ -9,6 +9,9 @@ export const usePresentPaywall = () => {
 		if (pressableRef.current) {
 			pressableRef.current = false;
 			router.push("/upgrade");
+			setTimeout(() => {
+				pressableRef.current = true;
+			}, 500);
 		}
 	}, [router, pressableRef]);
 

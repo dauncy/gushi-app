@@ -12,6 +12,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { PlaylistPreview } from "@/convex/playlists/schema";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
+import { usePreventFormDismiss } from "@/hooks/use-prevent-form-dismiss";
 import { eventRegister, EVENTS } from "@/lib/events";
 import { cn } from "@/lib/utils";
 import { useConvexMutation } from "@convex-dev/react-query";
@@ -66,6 +67,12 @@ export default function AddToPlaylistPage() {
 			loadMore(10);
 		}
 	}, [loadMore, status]);
+
+	usePreventFormDismiss({
+		isDirty: selectedPlaylists.length > 0,
+		alertTitle: "Discard changes",
+		alertMessage: "Are you sure you want to discard these changes?",
+	});
 
 	const contentContainerStyle: ViewStyle = useMemo(() => {
 		if (results.length === 0 && !refreshing && !isLoading) {

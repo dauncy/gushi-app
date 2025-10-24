@@ -1,5 +1,6 @@
 import { Id } from "@/convex/_generated/dataModel";
 import { Store, useStore } from "@tanstack/react-store";
+import { usePathname, useRouter } from "expo-router";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useRef } from "react";
 import TrackPlayer, {
 	Capability,
@@ -143,6 +144,8 @@ const syncStoreToIndex = (index: number) => {
 
 export const AudioProvider = ({ children }: { children: ReactNode }) => {
 	const initRef = useRef<boolean>(false);
+	const pathname = usePathname();
+	const router = useRouter();
 
 	useEffect(() => {
 		async function init() {
@@ -154,7 +157,7 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 			await TrackPlayer.setupPlayer({
 				waitForBuffer: true,
 				iosCategory: IOSCategory.Playback,
-				iosCategoryMode: IOSCategoryMode.Default,
+				iosCategoryMode: IOSCategoryMode.SpokenAudio,
 			});
 
 			await TrackPlayer.updateOptions({
@@ -162,7 +165,7 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 				capabilities: [
 					Capability.Play,
 					Capability.Pause,
-					Capability.Stop,
+					// Capability.Stop,
 					Capability.SeekTo,
 					Capability.SkipToNext,
 					Capability.SkipToPrevious,
@@ -170,7 +173,7 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 				compactCapabilities: [
 					Capability.Play,
 					Capability.Pause,
-					Capability.Stop,
+					// Capability.Stop,
 					Capability.SeekTo,
 					Capability.SkipToNext,
 					Capability.SkipToPrevious,
@@ -182,34 +185,6 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 		}
 
 		init();
-	}, []);
-
-	useEffect(() => {
-		const subs = [
-			TrackPlayer.addEventListener(Event.RemotePlay, () => TrackPlayer.play()),
-			TrackPlayer.addEventListener(Event.RemotePause, () => TrackPlayer.pause()),
-			TrackPlayer.addEventListener(Event.PlaybackQueueEnded, () => updateAudioEnded({ ended: true })),
-			TrackPlayer.addEventListener(Event.PlaybackProgressUpdated, (event) => {
-				updateAudioCurrentTime({ time: event.position });
-				updateAudioDuration({ duration: event.duration });
-
-				updateAudioEnded({ ended: false });
-			}),
-			TrackPlayer.addEventListener(Event.RemoteSeek, (event) => {
-				updateAudioCurrentTime({ time: event.position });
-				TrackPlayer.seekTo(event.position);
-			}),
-			TrackPlayer.addEventListener(Event.PlaybackState, (event) => {
-				updateAudioPlayState({ playState: event.state });
-			}),
-			TrackPlayer.addEventListener(Event.PlaybackActiveTrackChanged, async () => {
-				const idx = await TrackPlayer.getActiveTrackIndex();
-				if (typeof idx === "number" && idx >= 0) {
-					syncStoreToIndex(idx);
-				}
-			}),
-		];
-		return () => subs.forEach((s) => s.remove());
 	}, []);
 
 	const play = useCallback(async () => {
@@ -286,6 +261,21 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 
 	const gotoNext = useCallback(async (onNext: (item: PlaylistItem) => void) => {
 		try {
+			const queue = audioStore.state.queue;
+
+			if (queue.length === 0) return null;
+			if (queue.length === 1) {
+				const maxDuration = (await TrackPlayer.getProgress()).duration;
+				const item = queue[0];
+				if (item) {
+					if (maxDuration && maxDuration > 0) {
+						await TrackPlayer.seekTo(maxDuration);
+					}
+					onNext(item);
+					return item;
+				}
+				return null;
+			}
 			await TrackPlayer.skipToNext();
 			const idx = await TrackPlayer.getActiveTrackIndex();
 			if (typeof idx !== "number") return null;
@@ -293,7 +283,6 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 				syncStoreToIndex(idx);
 			}
 			updateAudioEnded({ ended: false });
-			const queue = audioStore.state.queue;
 			const item = queue[idx] ?? null;
 			if (!item) {
 				throw new Error("No item found");
@@ -358,6 +347,52 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 			queue: [...prev.queue, ...tracks],
 		}));
 	}, []);
+
+	useEffect(() => {
+		const subs = [
+			TrackPlayer.addEventListener(Event.RemotePlay, () => TrackPlayer.play()),
+			TrackPlayer.addEventListener(Event.RemotePause, () => TrackPlayer.pause()),
+			TrackPlayer.addEventListener(Event.PlaybackQueueEnded, () => updateAudioEnded({ ended: true })),
+			TrackPlayer.addEventListener(Event.PlaybackProgressUpdated, (event) => {
+				updateAudioCurrentTime({ time: event.position });
+				updateAudioDuration({ duration: event.duration });
+
+				updateAudioEnded({ ended: false });
+			}),
+			TrackPlayer.addEventListener(Event.RemoteSeek, (event) => {
+				updateAudioCurrentTime({ time: event.position });
+				TrackPlayer.seekTo(event.position);
+			}),
+			TrackPlayer.addEventListener(Event.PlaybackState, (event) => {
+				updateAudioPlayState({ playState: event.state });
+			}),
+			TrackPlayer.addEventListener(Event.PlaybackActiveTrackChanged, async () => {
+				console.log("playback active track changed");
+				const idx = await TrackPlayer.getActiveTrackIndex();
+				if (typeof idx === "number" && idx >= 0) {
+					syncStoreToIndex(idx);
+				}
+			}),
+
+			TrackPlayer.addEventListener(Event.RemoteNext, () => {
+				console.log("remote next");
+				gotoNext((item) => {
+					if (pathname.startsWith(`/stories/`)) {
+						router.setParams({ storyId: item.id });
+					}
+				});
+			}),
+			TrackPlayer.addEventListener(Event.RemotePrevious, () => {
+				console.log("remote previous");
+				gotoPrev((item) => {
+					if (pathname.startsWith(`/stories/`)) {
+						router.setParams({ storyId: item.id });
+					}
+				});
+			}),
+		];
+		return () => subs.forEach((s) => s.remove());
+	}, [gotoNext, gotoPrev, pathname, router]);
 
 	return (
 		<AudioContext.Provider

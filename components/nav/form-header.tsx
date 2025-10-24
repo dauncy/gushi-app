@@ -1,3 +1,4 @@
+import * as Haptics from "expo-haptics";
 import { Href, useRouter } from "expo-router";
 import { useCallback, useRef } from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
@@ -25,7 +26,7 @@ export const FormHeader = ({
 }) => {
 	const clickRef = useRef(false);
 	const router = useRouter();
-	const handleBack = useCallback(() => {
+	const handleBack = useCallback(async () => {
 		if (clickRef.current) return;
 		if (backDisabled) return;
 		clickRef.current = true;
@@ -37,11 +38,13 @@ export const FormHeader = ({
 			}
 			return;
 		}
+		await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
 		Alert.alert(alertTitle, alertMessage, [
 			{
 				text: alertTitle,
 				style: "destructive",
-				onPress: () => {
+				onPress: async () => {
+					await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 					if (router.canGoBack()) {
 						router.back();
 					} else {

@@ -1,4 +1,5 @@
 import { usePreventRemove } from "@react-navigation/native";
+import * as Haptics from "expo-haptics";
 import { useNavigation } from "expo-router";
 import { Alert } from "react-native";
 
@@ -13,7 +14,7 @@ export const usePreventFormDismiss = ({
 }) => {
 	const navigation = useNavigation();
 
-	usePreventRemove(true, (data) => {
+	usePreventRemove(true, async (data) => {
 		if (data.data.action.type === "POP_TO") {
 			navigation.dispatch(data.data.action);
 			return;
@@ -26,11 +27,13 @@ export const usePreventFormDismiss = ({
 			navigation.dispatch(data.data.action);
 			return;
 		}
+		await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
 		Alert.alert(alertTitle, alertMessage, [
 			{
 				text: alertTitle,
 				style: "destructive",
-				onPress: () => {
+				onPress: async () => {
+					await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 					navigation.dispatch(data.data.action);
 				},
 			},

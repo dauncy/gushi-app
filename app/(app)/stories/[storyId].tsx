@@ -6,11 +6,12 @@ import { LetterText } from "@/components/ui/icons/letters-text-icon";
 import { Pause } from "@/components/ui/icons/pause-icon";
 import { Play } from "@/components/ui/icons/play-icon";
 import { Rewind } from "@/components/ui/icons/rewind-icon";
+import { RotateCcw } from "@/components/ui/icons/rotate-ccw-icon";
 import { Share } from "@/components/ui/icons/share-icon";
 import { Star } from "@/components/ui/icons/star-icon";
 import { Image } from "@/components/ui/image";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAudio, useAudioCurrentTime, useAudioDuration, useHasNext, useIsAudioInState } from "@/context/AudioContext";
+import { useAudio, useAudioCurrentTime, useAudioDuration, useIsAudioInState } from "@/context/AudioContext";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { SegmentTranscript, StoryExtended } from "@/convex/stories/schema";
@@ -200,14 +201,14 @@ const ScrubbableProgress = ({
 const StoryContent = ({ story }: { story: StoryExtended }) => {
 	const pressRef = useRef(false);
 	const [showClosedCaption, setShowClosedCaption] = useState(false);
-	const { pause, play, seek, gotoNext, gotoPrev } = useAudio();
+	const { pause, play, seek, gotoNext, gotoPrev, restartTrack } = useAudio();
 	const [uiTime, setUiTime] = useState(0);
 	const currentTime = useSharedValue(0);
 	const audioCurrentTime = useAudioCurrentTime();
 	const isPlaying = useIsAudioInState({ state: State.Playing });
 	const duration = useAudioDuration();
 	const hasPrev = true;
-	const hasNext = useHasNext();
+	const hasNext = true;
 	const router = useRouter();
 
 	const handlePrev = useCallback(async () => {
@@ -329,7 +330,7 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 					</View>
 
 					{/* CC Toggle */}
-					<View className="flex w-full flex-col items-start pb-6 pl-2 bg-background">
+					<View className="flex w-full flex-row items-end pb-6 pl-2 bg-background">
 						<Button
 							className={cn("bg-background rounded-xl border border-foreground", showClosedCaption && "bg-foreground")}
 							onPress={() => setShowClosedCaption((p) => !p)}
@@ -340,6 +341,19 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 								size={20}
 							/>
 						</Button>
+
+						<Pressable
+							onPress={restartTrack}
+							className="rounded-xl border border-foreground ml-auto px-4 py-2 h-12 active:bg-foreground group flex items-center justify-center"
+						>
+							<RotateCcw
+								className="text-foreground/80 group-active:text-background"
+								size={20}
+								strokeWidth={2}
+								strokeLinejoin="round"
+								strokeLinecap="round"
+							/>
+						</Pressable>
 					</View>
 				</View>
 			</View>
@@ -484,6 +498,7 @@ const TranscriptRow = memo<TranscriptRowProps>(
 
 						return (
 							<Text
+								allowFontScaling={false}
 								key={`${segment.start_time}-${wIdx}`}
 								className={cn("text-3xl", textColor, fontWeight)}
 								style={{
@@ -556,12 +571,14 @@ const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed
 			>
 				<View className="flex overflow-hidden flex-1 mr-4 flex-col">
 					<Marquee speed={0.5} spacing={48} style={{ maxWidth: isCollapsed ? 150 : undefined }}>
-						<Text className="text-foreground/80 text-2xl font-bold">{story.title}</Text>
+						<Text className="text-foreground/80 text-2xl font-bold" maxFontSizeMultiplier={1.2}>
+							{story.title}
+						</Text>
 					</Marquee>
 				</View>
 
 				{/* Fixed width for buttons to prevent them from being cut off */}
-				<View className="flex flex-row gap-x-4 items-center justify-center h-full" style={{ width: 88 }}>
+				<View className="flex flex-row gap-x-4 items-center justify-center" style={{ width: 88 }}>
 					<FavoriteButton story={story} />
 
 					<Button
@@ -694,8 +711,9 @@ const StoryLoading = () => (
 			<Skeleton className="size-20 rounded-full bg-foreground/20" />
 		</View>
 
-		<View className="flex w-full mt-12 flex-col ">
+		<View className="flex w-full mt-12 flex-row items-center justify-center gap-x-4">
 			<Skeleton className="w-20 h-9 rounded-full bg-foreground/20" />
+			<Skeleton className="w-20 h-9 rounded-full bg-foreground/20 ml-auto" />
 		</View>
 	</View>
 );

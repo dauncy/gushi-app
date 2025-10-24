@@ -13,6 +13,7 @@ import { Pressable, Text, View } from "react-native";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 import { State } from "react-native-track-player";
 import { StoryImagePreview } from "../stories/story-image";
+import { RotateCcw } from "../ui/icons/rotate-ccw-icon";
 
 export const AudioPreviewPlayer = ({
 	onCardPress,
@@ -30,7 +31,7 @@ export const AudioPreviewPlayer = ({
 };
 
 const PhonePlayer = ({ onCardPress }: { onCardPress?: (storyId: Id<"stories">) => void }) => {
-	const { play, pause, stop } = useAudio();
+	const { play, pause, stop, restartTrack } = useAudio();
 	const isPlaying = useIsAudioInState({ state: State.Playing });
 	const activeQueueItem = useActiveQueueItem();
 	const storyId = activeQueueItem?.id ?? null;
@@ -77,14 +78,26 @@ const PhonePlayer = ({ onCardPress }: { onCardPress?: (storyId: Id<"stories">) =
 				)}
 			>
 				<StoryImagePreview imageUrl={story.imageUrl} size="sm" />
-				<View className="flex flex-col">
+				<View className="flex flex-col flex-1">
 					<Text className="text-foreground text-base font-bold" numberOfLines={1} ellipsizeMode="tail">
 						{story.title}
 					</Text>
 				</View>
-				<View className="flex items-center justify-center flex-row gap-2 ml-auto">
+				<View className="flex items-center justify-center flex-row gap-1 ml-auto">
 					<Pressable
-						className="size-8 rounded-full flex items-center justify-center p-2 active:bg-foreground/10"
+						className="size-[34px] rounded-full flex items-center justify-center  active:bg-foreground/10"
+						onPress={restartTrack}
+					>
+						<RotateCcw
+							className="text-foreground"
+							size={16}
+							strokeWidth={3.5}
+							strokeLinejoin="round"
+							strokeLinecap="round"
+						/>
+					</Pressable>
+					<Pressable
+						className="size-[34px] rounded-full flex items-center justify-center active:bg-foreground/10"
 						onPress={() => {
 							if (isPlaying) {
 								pause();
@@ -101,7 +114,7 @@ const PhonePlayer = ({ onCardPress }: { onCardPress?: (storyId: Id<"stories">) =
 					</Pressable>
 
 					<Pressable
-						className="size-8 rounded-full flex items-center justify-center p-2 active:bg-foreground/10"
+						className="size-[34px] rounded-full flex items-center justify-center active:bg-foreground/10"
 						onPress={() => {
 							stop();
 						}}

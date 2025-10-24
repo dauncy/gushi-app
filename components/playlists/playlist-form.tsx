@@ -7,7 +7,7 @@ import { toastConfig } from "@/components/ui/toast";
 import { useCustomAuth } from "@/context/AuthContext";
 import { Id } from "@/convex/_generated/dataModel";
 import { usePreventFormDismiss } from "@/hooks/use-prevent-form-dismiss";
-import { cn, getConvexSiteURL } from "@/lib/utils";
+import { cn, getConvexSiteURL, sanitizeStorageUrl } from "@/lib/utils";
 import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
 import { Href } from "expo-router";
@@ -180,7 +180,7 @@ export const PlaylistForm = ({
 							{image ? (
 								<>
 									<Image
-										source={{ uri: image.url }}
+										source={{ uri: sanitizeStorageUrl(image.url) }}
 										className="size-full rounded-md"
 										cachePolicy="memory-disk"
 										contentFit="cover"
