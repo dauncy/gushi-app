@@ -49,7 +49,6 @@ const initRevenueCat = async (onUpdate: (customerInfo: CustomerInfo) => void) =>
 };
 
 export default function RootLayout() {
-	console.log("RootLayout", process.env.EXPO_PUBLIC_CONVEX_URL, process.env.EXPO_PUBLIC_CONVEX_SITE_URL);
 	const hasMounted = useRef(false);
 	const initialCustomerRef = useRef(false);
 	const [appReady, setAppReady] = useState(false);

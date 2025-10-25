@@ -12,7 +12,7 @@ export const Header = () => {
 					allowFontScaling={false}
 					style={{ fontSize: 24, lineHeight: 24, letterSpacing: -1 }}
 				>
-					GUSHI
+					GUSHI Stories
 				</Text>
 			</View>
 		</View>

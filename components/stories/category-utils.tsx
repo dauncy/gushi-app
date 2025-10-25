@@ -1,24 +1,24 @@
+import { Apple } from "../ui/icons/apple-icon";
 import { Lightbulb } from "../ui/icons/lightbulb-icon";
 import { Moon } from "../ui/icons/moon-icon";
-import { Rocket } from "../ui/icons/rocket-icon";
 
 export const CategoryToIcon = {
-	bedtime: Moon,
-	lesson: Lightbulb,
-	adventure: Rocket,
+	["calm & cozy"]: Moon,
+	["gentle lessons"]: Apple,
+	["curious minds"]: Lightbulb,
 };
 
 export const CategoryToColor = {
-	bedtime: {
+	["gentle lessons"]: {
 		background: "#ff2d01",
 		foreground: "#fffbf3",
 	},
-	lesson: {
+	["calm & cozy"]: {
 		background: "#0395ff",
 		foreground: "#fffbf3",
 	},
-	adventure: {
-		background: "#0D331180",
+	["curious minds"]: {
+		background: "#7a64ee",
 		foreground: "#fffbf3",
 	},
 };

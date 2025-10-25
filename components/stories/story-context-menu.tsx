@@ -25,6 +25,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { State } from "react-native-track-player";
+import { LibraryBig } from "../ui/icons/library-icon";
 import { Playlist } from "../ui/icons/playlist-icon";
 import { Trash2 } from "../ui/icons/trash-icon";
 
@@ -44,7 +45,7 @@ const DescriptionRow = ({ description }: { description: string }) => {
 
 			<View className="flex-row flex gap-x-2 items-start">
 				<View className="w-4 h-4" style={{ minWidth: 16 }} />
-				<Text className="text-foreground/80 text-sm font-normal flex-1" maxFontSizeMultiplier={1.2}>
+				<Text className="text-foreground text-sm font-normal flex-1" maxFontSizeMultiplier={1.2}>
 					{description}
 				</Text>
 			</View>
@@ -52,11 +53,37 @@ const DescriptionRow = ({ description }: { description: string }) => {
 	);
 };
 
+const LearningThemesRow = ({ learningThemes }: { learningThemes: string[] }) => {
+	return (
+		<View className="flex flex-col gap-y-1 p-3 px-4 w-full">
+			<View className="flex flex-row gap-x-2 items-center">
+				<LibraryBig className="size-4 text-foreground" size={16} />
+				<Text
+					className="text-foreground font-medium"
+					style={{ fontSize: 14, lineHeight: 16 }}
+					maxFontSizeMultiplier={1.2}
+				>
+					Learning themes
+				</Text>
+			</View>
+
+			<View className="flex-row flex gap-x-2 items-start">
+				<View className="w-4 h-4" style={{ minWidth: 16 }} />
+				<Text className="text-foreground text-sm font-normal flex-1" maxFontSizeMultiplier={1.2}>
+					{learningThemes.join(", ")}
+				</Text>
+			</View>
+		</View>
+	);
+};
+
 const ShareButton = ({
+	last = false,
 	storyId,
 	storyTitle,
 	onSharePress,
 }: {
+	last?: boolean;
 	storyId: Id<"stories">;
 	storyTitle: string;
 	onSharePress?: () => void;
@@ -69,7 +96,10 @@ const ShareButton = ({
 	return (
 		<Pressable
 			onPress={handleShare}
-			className="p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-foreground/10"
+			className={cn(
+				"p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-foreground/10",
+				last && "rounded-b-xl",
+			)}
 		>
 			<Share className="size-4 text-foreground" size={16} />
 			<Text
@@ -529,6 +559,20 @@ const RemoveFromPlaylistButton = ({
 	);
 };
 
+const TitleRow = ({ title }: { title: string }) => {
+	return (
+		<View className="flex flex-row items-center gap-x-2 pt-2 px-4 w-full">
+			<Text
+				className="text-foreground font-medium"
+				style={{ fontSize: 18, lineHeight: 22.5, fontFamily: "Baloo" }}
+				maxFontSizeMultiplier={1.2}
+			>
+				{title}
+			</Text>
+		</View>
+	);
+};
+
 const LockedStoryContextMenu = ({
 	currentPlaylistId,
 	playlistStoryId,
@@ -546,8 +590,12 @@ const LockedStoryContextMenu = ({
 }) => {
 	return (
 		<View className="bg-background w-full rounded-xl border-2 border-border">
+			<TitleRow title={story.title} />
+			<Separator className="h-[2px]" />
 			{story.description && <DescriptionRow description={story.description} />}
 			{story.description && <Separator className="h-[2px]" />}
+			{story.learning_themes && <LearningThemesRow learningThemes={story.learning_themes} />}
+			{story.learning_themes && <Separator className="h-[2px]" />}
 			{currentPlaylistId && playlistStoryId && (
 				<>
 					<RemoveFromPlaylistButton
@@ -585,8 +633,14 @@ const UnlockedStoryContextMenu = ({
 }) => {
 	return (
 		<View className="bg-background w-full rounded-xl border-2 border-border">
+			<TitleRow title={story.title} />
+			<Separator className="h-[2px]" />
 			{story.description && <DescriptionRow description={story.description} />}
 			{story.description && <Separator className="h-[2px]" />}
+			{story.learning_themes && <LearningThemesRow learningThemes={story.learning_themes} />}
+			{story.learning_themes && <Separator className="h-[2px]" />}
+			<AddToFavoritesButton storyId={story._id} />
+			<Separator className="h-[2px]" />
 			{currentPlaylistId && playlistStoryId && (
 				<>
 					<RemoveFromPlaylistButton
@@ -598,13 +652,10 @@ const UnlockedStoryContextMenu = ({
 					<Separator className="h-[2px]" />
 				</>
 			)}
-			<ShareButton storyId={story._id} storyTitle={story.title} onSharePress={onSharePress} />
-			<Separator className="h-[2px]" />
-			<AddToFavoritesButton storyId={story._id} />
-			<Separator className="h-[2px]" />
 			<AddToPlaylistButton storyId={story._id} addCloseCallback={addCloseCallback} triggerClose={triggerClose} />
 			<Separator className="h-[2px]" />
-			<FullscreenButton
+			<ShareButton last={true} storyId={story._id} storyTitle={story.title} onSharePress={onSharePress} />
+			{/* <FullscreenButton
 				addCloseCallback={addCloseCallback}
 				story={story}
 				triggerClose={triggerClose}
@@ -612,7 +663,7 @@ const UnlockedStoryContextMenu = ({
 				playlistStoryId={playlistStoryId}
 			/>
 			<Separator className="h-[2px]" />
-			<AudioControlsRow story={story} playlistStoryId={playlistStoryId} playAtIndex={playAtIndex} />
+			<AudioControlsRow story={story} playlistStoryId={playlistStoryId} playAtIndex={playAtIndex} /> */}
 		</View>
 	);
 };

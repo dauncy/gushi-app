@@ -6,7 +6,6 @@ import * as Haptics from "expo-haptics";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Modal, TouchableWithoutFeedback, View } from "react-native";
 import Animated, { Easing, runOnJS, SlideInDown, SlideOutDown } from "react-native-reanimated";
-import { StoryCard } from "./story-card";
 import { StoryContextMenu } from "./story-context-menu";
 
 interface StoryModalProps {
@@ -75,22 +74,6 @@ export const StoryModal = ({ visible, story, onClose }: StoryModalProps) => {
 									})}
 								className="flex-1 items-center justify-center gap-y-2"
 							>
-								<View
-									collapsable={false}
-									style={{
-										width: isIpad ? "25.5%" : "51%",
-										alignSelf: "stretch",
-										marginHorizontal: "auto",
-										shadowColor: "#000",
-										shadowOffset: { width: 0.5, height: 0.85 },
-										shadowOpacity: 0.5,
-										shadowRadius: 8,
-									}}
-								>
-									<View className="rounded-xl absolute inset-0 bg-background" />
-									<StoryCard story={story} hasPlayButton={false} />
-								</View>
-
 								<View
 									className={cn("w-full max-w-[66%]", isIpad && "max-w-[33%%]")}
 									style={{

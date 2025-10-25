@@ -1,7 +1,7 @@
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { QueryCtx } from "@/convex/_generated/server";
 import { verifyAccess } from "@/convex/common/utils";
-import { StorySubDataPromise } from "./schema";
+import { StoryPreview, StorySubDataPromise } from "./schema";
 
 export const getImageUrl = async (ctx: QueryCtx, imageId: Id<"images">) => {
 	const image = await ctx.db.get(imageId);
@@ -39,7 +39,7 @@ export const getStoryCategories = async (ctx: QueryCtx, storyId: Id<"stories">) 
 	return categories.filter((category): category is NonNullable<typeof category> => Boolean(category));
 };
 
-export const storyDocToStoryPreview = async (ctx: QueryCtx, story: Doc<"stories">) => {
+export const storyDocToStoryPreview = async (ctx: QueryCtx, story: Doc<"stories">): Promise<StoryPreview> => {
 	const { hasSubscription } = await verifyAccess(ctx, { validateSubscription: false });
 	const subscriptionRequired = story.subscription_required;
 	const storyPromises: Promise<StorySubDataPromise>[] = [
@@ -74,5 +74,8 @@ export const storyDocToStoryPreview = async (ctx: QueryCtx, story: Doc<"stories"
 		featured: !!story.featured,
 		description: story.description,
 		categories: categories.map((category) => ({ _id: category._id, name: category.name })),
+		tags: story.tags ?? [],
+		age_range: story.age_range,
+		learning_themes: story.learning_themes ?? [],
 	};
 };

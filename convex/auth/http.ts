@@ -36,7 +36,6 @@ export const getWellKnownJWKsHttp = httpAction(async (ctx) => {
 
 export const loginHttp = httpAction(async (ctx, req) => {
 	const { revenuecat_user_id } = await req.json();
-	console.log("loginHttp", revenuecat_user_id);
 	if (!revenuecat_user_id) {
 		return new Response("Revenuecat user ID is required", { status: 401 });
 	}

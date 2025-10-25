@@ -114,6 +114,9 @@ export const getStory = query({
 				body: maybeStory.body,
 				blurHash: imageData.blurHash,
 				updatedAt: maybeStory.updatedAt,
+				tags: maybeStory.tags ?? [],
+				learning_themes: maybeStory.learning_themes ?? [],
+				age_range: maybeStory.age_range,
 			};
 		} catch (error) {
 			console.warn("[convex/stories/queries.ts]: getStory() => --- ERROR --- ", error);

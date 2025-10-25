@@ -367,7 +367,6 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 				updateAudioPlayState({ playState: event.state });
 			}),
 			TrackPlayer.addEventListener(Event.PlaybackActiveTrackChanged, async () => {
-				console.log("playback active track changed");
 				const idx = await TrackPlayer.getActiveTrackIndex();
 				if (typeof idx === "number" && idx >= 0) {
 					syncStoreToIndex(idx);
@@ -375,7 +374,6 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 			}),
 
 			TrackPlayer.addEventListener(Event.RemoteNext, () => {
-				console.log("remote next");
 				gotoNext((item) => {
 					if (pathname.startsWith(`/stories/`)) {
 						router.setParams({ storyId: item.id });
@@ -383,7 +381,6 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 				});
 			}),
 			TrackPlayer.addEventListener(Event.RemotePrevious, () => {
-				console.log("remote previous");
 				gotoPrev((item) => {
 					if (pathname.startsWith(`/stories/`)) {
 						router.setParams({ storyId: item.id });

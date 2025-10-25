@@ -11,12 +11,25 @@ export const StoryCardHeader = memo(
 		return (
 			<View className="flex flex-col gap-y-1 flex-1 grow stretch">
 				<Text
-					className="text-[#0D3311] text-lg font-medium"
+					className="text-foreground text-lg font-medium"
 					maxFontSizeMultiplier={1.2}
-					style={{ fontSize: 16, lineHeight: 20 }}
+					style={{ fontSize: 18, lineHeight: 22.5, fontFamily: "Baloo" }}
 				>
 					{title}
 				</Text>
+				{story.tags && story.tags.length > 0 && (
+					<View className="w-full flex flex-row gap-[1.5px] items-start flex-wrap pb-1 -mt-0.5">
+						{story.tags.map((t) => (
+							<Text
+								key={t}
+								className="p-1 rounded-md bg-[#9cbff1] text-[9px] text-[#1e397c] font-medium"
+								allowFontScaling={false}
+							>
+								{t}
+							</Text>
+						))}
+					</View>
+				)}
 				<View className="w-full flex flex-row gap-x-2 items-center mt-auto">
 					<View className="flex flex-row items-center gap-x-2 flex-1">
 						<Clock className="size-4 text-[#0D3311]/80" size={16} />

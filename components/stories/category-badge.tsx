@@ -1,6 +1,5 @@
 import { memo } from "react";
-import { Text, View } from "react-native";
-import { Circle } from "../ui/icons/circle-icon";
+import { View } from "react-native";
 import { CategoryToColor, CategoryToIcon } from "./category-utils";
 
 export const CategoryBadge = memo(({ categoryName }: { categoryName: string }) => {
@@ -8,16 +7,13 @@ export const CategoryBadge = memo(({ categoryName }: { categoryName: string }) =
 		background: "#0395ff",
 		foreground: "#fffbf3",
 	};
-	const Icon = CategoryToIcon[categoryName.toLowerCase() as keyof typeof CategoryToIcon] ?? Circle;
+	const Icon = CategoryToIcon[categoryName.toLowerCase() as keyof typeof CategoryToIcon] ?? null;
 	return (
 		<View
-			className="flex flex-row items-center gap-x-1 py-0.5 px-1 rounded-md"
-			style={{ backgroundColor: color.background, borderColor: color.foreground, borderWidth: 1 }}
+			className="flex flex-row items-center gap-x-1 p-1 rounded-md"
+			style={{ backgroundColor: color.background, borderColor: color.foreground, borderWidth: 0.5 }}
 		>
-			<Icon color={color.foreground} size={16} />
-			<Text className="text-sm font-medium" style={{ color: color.foreground }} allowFontScaling={false}>
-				{categoryName}
-			</Text>
+			<Icon fill={color.foreground} size={16} stroke={color.foreground} />
 		</View>
 	);
 });

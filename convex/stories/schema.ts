@@ -52,6 +52,9 @@ const storiesSchema = z.object({
 	audioId: zid("audio"),
 	createdAt: z.string().datetime(),
 	updatedAt: z.string().datetime(),
+	tags: z.array(z.string()).optional().default([]),
+	learning_themes: z.array(z.string()).optional().default([]),
+	age_range: z.union([z.literal("3-6"), z.literal("4-7"), z.literal("5-8"), z.literal("4-8")]).optional(),
 });
 
 export type StoryPrivate = z.infer<typeof storiesSchema>;

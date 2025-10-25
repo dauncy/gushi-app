@@ -7,6 +7,7 @@ import { useIsIpad } from "@/hooks/use-is-ipad";
 import { BlurView } from "expo-blur";
 import { useMemo, useState } from "react";
 import { View } from "react-native";
+import { AgeRangeBadge } from "./age-range-bade";
 import { CategoryBadge } from "./category-badge";
 import { FeaturedBadge } from "./featured-badge";
 import { StoryCardHeader } from "./story-card-header";
@@ -74,7 +75,7 @@ export const LockedStoryCard = ({
 				{story.featured && <FeaturedBadge />}
 				<StoryImagePreview imageUrl={story.imageUrl} blurHash={story.blurHash ?? undefined} size={"featured"} />
 			</View>
-			<View className="w-full flex flex-row gap-x-2 items-start flex-wrap p-1">
+			<View className="w-full flex flex-row gap-x-1 items-start flex-wrap p-1">
 				{story.categories.map((c) => (
 					<CategoryBadge key={c._id} categoryName={c.name} />
 				))}
@@ -143,8 +144,9 @@ export const UnlockedStoryCard = ({
 					active={active}
 				/>
 				{story.featured && <FeaturedBadge />}
+				{story.age_range && <AgeRangeBadge ageRange={story.age_range} />}
 			</View>
-			<View className="w-full flex flex-row gap-x-2 items-start flex-wrap p-1">
+			<View className="w-full flex flex-row gap-x-1 items-start flex-wrap p-1">
 				{story.categories.map((c) => (
 					<CategoryBadge key={c._id} categoryName={c.name} />
 				))}

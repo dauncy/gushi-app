@@ -89,7 +89,7 @@ const StoryImagePreviewComp = ({
 			{active && (
 				<View
 					className={cn(
-						"absolute inset-0 bg-black/50 lex items-center justify-center",
+						"absolute inset-0 bg-black/50 lex items-center justify-center z-20",
 						size !== "featured" && "rounded-md",
 						size === "featured" && "rounded-t-xl",
 					)}

@@ -22,7 +22,6 @@ interface Category {
 export const CategoriesSelector = memo(() => {
 	const { data: categories, isLoading } = useConvexQuery(api.stories.queries.getFeaturedCategories, {});
 
-	// const isLoading = true
 	const sanitizedCatgeories = useMemo(() => {
 		if (!categories || categories.length === 0) {
 			return [];
@@ -39,7 +38,7 @@ export const CategoriesSelector = memo(() => {
 		return [
 			...sanitized,
 			{
-				name: "Create your own",
+				name: "Personalize",
 				id: "create-your-own",
 				icon: Grid2X2Plus,
 				soon: true,
@@ -77,9 +76,9 @@ CategoriesSelector.displayName = "CategoriesSelector";
 
 const LoadingCategory = ({ last }: { last: boolean }) => {
 	return (
-		<View className="flex flex-col p-1 px-3.5 rounded-3xl items-center gap-y-2.5">
+		<View className="flex flex-col p-1 px-1 rounded-3xl items-center gap-y-2.5">
 			<Skeleton className=" rounded-full bg-foreground/20 w-[28px] h-[28px]" />
-			<Skeleton className={cn("w-[50px] h-3 rounded-md bg-foreground/20", last && "w-[88px]")} />
+			<Skeleton className={cn("w-[72px] h-3 rounded-md bg-foreground/20")} />
 		</View>
 	);
 };
@@ -115,10 +114,10 @@ const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
 				handleSelect();
 			}}
 			key={categoryData.id}
-			className={cn("flex flex-col gap-y-1 items-center p-1 px-3.5")}
+			className={cn("flex flex-col gap-y-1 items-center p-1 px-1.5")}
 		>
 			<categoryData.icon
-				className={cn("", categoryData.soon && "opacity-50")}
+				className={cn("", categoryData.soon && "opacity-60")}
 				size={28}
 				color={iconcolor}
 				fill={selected ? "#fffbf3" : "none"}
@@ -127,18 +126,19 @@ const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
 				allowFontScaling={false}
 				style={textStyle}
 				className={cn(
-					"text-foreground/40 text-sm font-medium mt-auto capitalize",
+					"text-foreground/40 text-sm font-medium mt-auto capitalize text-center",
 					selected && "font-semibold",
-					categoryData.soon && "opacity-50",
+					categoryData.soon && "opacity-60",
 				)}
 			>
 				{categoryData.name}
 			</Text>
+
 			{categoryData.soon && (
 				<>
-					<View className="absolute inset-0 bg-black/30 opacity-50 z-10 rounded-2xl"></View>
+					<View className="absolute inset-0 bg-black/20 opacity-50 z-10 rounded-2xl"></View>
 					<View
-						className="p-1 px-2 rounded-md bg-[#fffbf3] absolute top-1 right-2 z-20 border border-[#ff2d01]"
+						className="p-1 px-1 rounded-md bg-[#fffbf3] absolute top-1 right-1 z-20 border border-[#ff2d01]"
 						style={{
 							shadowColor: "#ffffff",
 							shadowOffset: {
@@ -149,8 +149,8 @@ const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
 							shadowRadius: 8,
 						}}
 					>
-						<Text className="text-[#ff2d01] text-[8px] font-bold mt-auto" allowFontScaling={false}>
-							Launching soon
+						<Text className="text-[#ff2d01] text-[8px] font-semibold mt-auto" allowFontScaling={false}>
+							Coming soon
 						</Text>
 					</View>
 				</>
