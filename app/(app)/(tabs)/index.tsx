@@ -21,6 +21,7 @@ export default function Home() {
 }
 
 const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => void }) => {
+	const scrollEnd = useRef(false);
 	const initRef = useRef(false);
 	const storyListRef = useRef<FlashListRef<StoryPreview>>(null);
 	const { hasSubscription } = useSubscription();
@@ -47,7 +48,11 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 
 	const onEndReached = useCallback(() => {
 		if (status === "CanLoadMore") {
+			scrollEnd.current = true;
 			loadMore(10);
+			setTimeout(() => {
+				scrollEnd.current = false;
+			}, 750);
 		}
 	}, [loadMore, status]);
 
@@ -96,6 +101,10 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 		if (!initRef.current) {
 			initRef.current = true;
 			return;
+		}
+		if (scrollEnd.current) return;
+		if (isLoading) {
+			storyListRef.current?.scrollToTop({ animated: false });
 		}
 		if (isLoading || refreshing) return;
 		storyListRef.current?.scrollToIndex({ index: 0, animated: false, viewOffset: -8 });

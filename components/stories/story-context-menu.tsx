@@ -561,7 +561,7 @@ const RemoveFromPlaylistButton = ({
 
 const TitleRow = ({ title }: { title: string }) => {
 	return (
-		<View className="flex flex-row items-center gap-x-2 pt-2 px-4 w-full">
+		<View className="flex flex-row items-center gap-x-2 pt-4 pb-1 px-4 w-full">
 			<Text
 				className="text-foreground font-medium"
 				style={{ fontSize: 18, lineHeight: 22.5, fontFamily: "Baloo" }}

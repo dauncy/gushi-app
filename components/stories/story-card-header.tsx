@@ -18,12 +18,12 @@ export const StoryCardHeader = memo(
 					{title}
 				</Text>
 				{story.tags && story.tags.length > 0 && (
-					<View className="w-full flex flex-row gap-[1.5px] items-start flex-wrap pb-1 -mt-0.5">
+					<View className="w-full flex flex-row gap-[1.75px] items-start flex-wrap pb-1 -mt-0.5">
 						{story.tags.map((t) => (
 							<Text
 								key={t}
-								className="p-1 rounded-md bg-[#9cbff1] text-[9px] text-[#1e397c] font-medium"
-								allowFontScaling={false}
+								className="p-1 rounded-md bg-[#9cbff1]/30 text-[10px] text-[#1e397c] font-semibold"
+								maxFontSizeMultiplier={1.2}
 							>
 								{t}
 							</Text>
@@ -32,8 +32,8 @@ export const StoryCardHeader = memo(
 				)}
 				<View className="w-full flex flex-row gap-x-2 items-center mt-auto">
 					<View className="flex flex-row items-center gap-x-2 flex-1">
-						<Clock className="size-4 text-[#0D3311]/80" size={16} />
-						<Text className="text-[#0D3311]/80 text-sm font-medium" allowFontScaling={false}>
+						<Clock className="size-4 text-[#0D3311]/80" size={14} />
+						<Text className="text-[#0D3311]/80 text-xs font-medium" maxFontSizeMultiplier={1.2}>
 							{secondsToMinuteString(duration)}
 						</Text>
 					</View>

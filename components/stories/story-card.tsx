@@ -73,6 +73,7 @@ export const LockedStoryCard = ({
 		>
 			<View className="w-full rounded-t-xl w-full relative" style={{ height: cardDimensions.width }}>
 				{story.featured && <FeaturedBadge />}
+				{story.age_range && <AgeRangeBadge ageRange={story.age_range} />}
 				<StoryImagePreview imageUrl={story.imageUrl} blurHash={story.blurHash ?? undefined} size={"featured"} />
 			</View>
 			<View className="w-full flex flex-row gap-x-1 items-start flex-wrap p-1">
@@ -84,8 +85,8 @@ export const LockedStoryCard = ({
 				<StoryCardHeader story={story} hasPlayButton={false} />
 			</View>
 
-			<View className="absolute inset-0 rounded-xl bg-black opacity-40 overflow-hidden" style={{ zIndex: 1 }} />
-			<View className="absolute inset-0 items-center justify-center rounded-xl overflow-hidden" style={{ zIndex: 3 }}>
+			<View className="absolute inset-0 rounded-xl bg-black opacity-40 overflow-hidden z-20" />
+			<View className="absolute inset-0 items-center justify-center rounded-xl overflow-hidden z-30">
 				<View
 					style={{
 						shadowColor: "#ffffff",
@@ -102,9 +103,9 @@ export const LockedStoryCard = ({
 				</View>
 			</View>
 			<BlurView
-				intensity={8}
+				intensity={4}
 				tint="dark"
-				className="absolute inset-0 rounded-xl bg-black overflow-hidden"
+				className="absolute inset-0 rounded-xl bg-black overflow-hidden z-30"
 				style={{ zIndex: 2, borderRadius: 12 }}
 			/>
 		</View>

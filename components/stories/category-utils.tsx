@@ -1,11 +1,18 @@
-import { Apple } from "../ui/icons/apple-icon";
+import { BookHeart, BookHeartSelected, BookHeartSelectedAlt } from "../ui/icons/book-heart";
 import { Lightbulb } from "../ui/icons/lightbulb-icon";
 import { Moon } from "../ui/icons/moon-icon";
-
 export const CategoryToIcon = {
 	["calm & cozy"]: Moon,
-	["gentle lessons"]: Apple,
+	["gentle lessons"]: BookHeart,
 	["curious minds"]: Lightbulb,
+};
+
+export const SelectedCategoryIcon = {
+	["gentle lessons"]: BookHeartSelected,
+};
+
+export const SelectedCategoryIconAlt = {
+	["gentle lessons"]: BookHeartSelectedAlt,
 };
 
 export const CategoryToColor = {

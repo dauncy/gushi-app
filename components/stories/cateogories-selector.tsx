@@ -10,7 +10,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { Circle } from "../ui/icons/circle-icon";
 import { Grid2X2Plus } from "../ui/icons/grid-2-plus-icon";
 import { Skeleton } from "../ui/skeleton";
-import { CategoryToColor, CategoryToIcon } from "./category-utils";
+import { CategoryToColor, CategoryToIcon, SelectedCategoryIconAlt } from "./category-utils";
 
 interface Category {
 	name: string;
@@ -85,6 +85,9 @@ const LoadingCategory = ({ last }: { last: boolean }) => {
 
 const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
 	const categoryId = useSelectedCategory();
+	// @ts-ignore
+	const AltIcon: null | LucideIcon =
+		SelectedCategoryIconAlt[categoryData.name.toLowerCase() as keyof typeof SelectedCategoryIconAlt] ?? null;
 	const selected = categoryId === categoryData.id;
 
 	const handleSelect = useCallback(() => {
@@ -104,7 +107,11 @@ const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
 
 	const color = colors.background;
 
-	const textStyle = { ...(selected ? { color, borderColor: colors.foreground } : {}) };
+	const textStyle = {
+		...(selected
+			? { color, borderColor: colors.foreground, fontSize: 12, lineHeight: 16, fontFamily: "Baloo" }
+			: { fontSize: 12, lineHeight: 16, fontFamily: "Baloo" }),
+	};
 	const iconcolor = selected ? colors.background : "#0D331140";
 	return (
 		<TouchableOpacity
@@ -116,17 +123,21 @@ const CategoryPill = memo(({ categoryData }: { categoryData: Category }) => {
 			key={categoryData.id}
 			className={cn("flex flex-col gap-y-1 items-center p-1 px-1.5")}
 		>
-			<categoryData.icon
-				className={cn("", categoryData.soon && "opacity-60")}
-				size={28}
-				color={iconcolor}
-				fill={selected ? "#fffbf3" : "none"}
-			/>
+			{AltIcon && selected ? (
+				<AltIcon size={28} />
+			) : (
+				<categoryData.icon
+					className={cn("", categoryData.soon && "opacity-60")}
+					size={28}
+					color={iconcolor}
+					fill={selected ? "#fffbf3" : "none"}
+				/>
+			)}
 			<Text
 				allowFontScaling={false}
 				style={textStyle}
 				className={cn(
-					"text-foreground/40 text-sm font-medium mt-auto capitalize text-center",
+					"text-foreground/30 text-sm font-medium mt-auto capitalize text-center",
 					selected && "font-semibold",
 					categoryData.soon && "opacity-60",
 				)}
