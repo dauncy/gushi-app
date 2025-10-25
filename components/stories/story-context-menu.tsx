@@ -193,6 +193,7 @@ const AddToPlaylistButton = ({
 	);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const FullscreenButton = ({
 	addCloseCallback,
 	story,
@@ -334,10 +335,12 @@ const AudioControlsRow = ({
 	story,
 	playlistStoryId,
 	playAtIndex,
+	last = true,
 }: {
 	story: StoryPreview;
 	playlistStoryId?: Id<"playlistStories">;
 	playAtIndex?: (playlistStoryId: Id<"playlistStories">) => Promise<void>;
+	last?: boolean;
 }) => {
 	const [loading, setLoading] = useState(false);
 	const { play, pause, stop, setQueue } = useAudio();
@@ -453,7 +456,10 @@ const AudioControlsRow = ({
 				<Separator className="h-[2px]" />
 				<Pressable
 					onPress={handleStop}
-					className="p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-foreground/10 bg-background rounded-b-xl"
+					className={cn(
+						"p-3 px-4 w-full flex flex-row items-center gap-x-2 active:bg-foreground/10 bg-background",
+						last && "rounded-b-xl",
+					)}
 				>
 					<Stop className="size-4 text-foreground fill-foreground" size={16} />
 					<Text
@@ -588,14 +594,27 @@ const LockedStoryContextMenu = ({
 	triggerClose: () => void;
 	onSharePress?: () => void;
 }) => {
+	const isPlaylist = currentPlaylistId && playlistStoryId;
 	return (
 		<View className="bg-background w-full rounded-xl border-2 border-border">
-			<TitleRow title={story.title} />
-			<Separator className="h-[2px]" />
-			{story.description && <DescriptionRow description={story.description} />}
-			{story.description && <Separator className="h-[2px]" />}
-			{story.learning_themes && <LearningThemesRow learningThemes={story.learning_themes} />}
-			{story.learning_themes && <Separator className="h-[2px]" />}
+			{!isPlaylist && (
+				<>
+					<TitleRow title={story.title} />
+					<Separator className="h-[2px]" />
+				</>
+			)}
+			{story.description && !isPlaylist && (
+				<>
+					<DescriptionRow description={story.description} />
+					<Separator className="h-[2px]" />
+				</>
+			)}
+			{story.learning_themes && !isPlaylist && (
+				<>
+					<LearningThemesRow learningThemes={story.learning_themes} />
+					<Separator className="h-[2px]" />
+				</>
+			)}
 			{currentPlaylistId && playlistStoryId && (
 				<>
 					<RemoveFromPlaylistButton
@@ -631,14 +650,33 @@ const UnlockedStoryContextMenu = ({
 	onSharePress?: () => void;
 	playAtIndex?: (playlistStoryId: Id<"playlistStories">) => Promise<void>;
 }) => {
+	const isPlaylist = currentPlaylistId && playlistStoryId;
 	return (
 		<View className="bg-background w-full rounded-xl border-2 border-border">
-			<TitleRow title={story.title} />
-			<Separator className="h-[2px]" />
-			{story.description && <DescriptionRow description={story.description} />}
-			{story.description && <Separator className="h-[2px]" />}
-			{story.learning_themes && <LearningThemesRow learningThemes={story.learning_themes} />}
-			{story.learning_themes && <Separator className="h-[2px]" />}
+			{!isPlaylist && (
+				<>
+					<TitleRow title={story.title} />
+					<Separator className="h-[2px]" />
+				</>
+			)}
+			{story.description && !isPlaylist && (
+				<>
+					<DescriptionRow description={story.description} />
+					<Separator className="h-[2px]" />
+				</>
+			)}
+			{story.learning_themes && !isPlaylist && (
+				<>
+					<LearningThemesRow learningThemes={story.learning_themes} />
+					<Separator className="h-[2px]" />
+				</>
+			)}
+			{isPlaylist && (
+				<>
+					<AudioControlsRow story={story} playlistStoryId={playlistStoryId} playAtIndex={playAtIndex} last={false} />
+					<Separator className="h-[2px]" />
+				</>
+			)}
 			<AddToFavoritesButton storyId={story._id} />
 			<Separator className="h-[2px]" />
 			{currentPlaylistId && playlistStoryId && (

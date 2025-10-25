@@ -4,10 +4,16 @@ agent:
 tunnels:
   actions:
     addr: 3211
+    hostname: suppletory-cindy-reuseable.ngrok-free.dev
+    host_header: actions.suppletory-cindy-reuseable.ngrok-free.dev
     proto: http
   client:
     addr: 3210
+    hostname: suppletory-cindy-reuseable.ngrok-free.dev
+    host_header: client.suppletory-cindy-reuseable.ngrok-free.dev
     proto: http
   web:
     addr: 3000
+    hostname: suppletory-cindy-reuseable.ngrok-free.dev
+    host_header: web.suppletory-cindy-reuseable.ngrok-free.dev
     proto: http

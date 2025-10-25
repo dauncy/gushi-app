@@ -325,7 +325,8 @@ const PlayistStoryContextMenu = ({
 				insets={contentInsets}
 				className="rounded-xl p-0 bg-background"
 				align="end"
-				alignOffset={-16}
+				alignOffset={-32}
+				sideOffset={-32}
 				side="bottom"
 			>
 				<StoryContextMenu

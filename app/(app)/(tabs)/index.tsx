@@ -157,7 +157,15 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 				ListEmptyComponent={
 					<>
 						{isLoading ? (
-							<View style={{ flexWrap: "wrap", display: "flex", flexDirection: "row" }}>
+							<View
+								style={{
+									flexWrap: "wrap",
+									display: "flex",
+									flexDirection: "row",
+									gap: 8,
+									paddingHorizontal: isIpad ? 0 : 0,
+								}}
+							>
 								{Array.from({ length: 10 }).map((_, idx) => (
 									<StoryCardLoading key={`loading-${idx}`} />
 								))}

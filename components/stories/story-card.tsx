@@ -19,9 +19,9 @@ export const StoryCardLoading = () => {
 	return (
 		<View
 			style={{
-				width: isIpad ? "25%" : "50%", // Takes exactly half the container
-				paddingHorizontal: isIpad ? 8 : 4, // Padding instead of margin for consistent spacing
-				paddingBottom: isIpad ? 12 : 8,
+				width: isIpad ? "25%" : "48.75%", // Takes exactly half the container
+				paddingHorizontal: isIpad ? 8 : 0, // Padding instead of margin for consistent spacing
+				paddingBottom: isIpad ? 12 : 0,
 			}}
 		>
 			<View
@@ -31,23 +31,27 @@ export const StoryCardLoading = () => {
 				className="flex flex-col rounded-xl w-full bg-[#fffbf3]/60 border-2 border-[#0395ff] relative"
 			>
 				<View className="w-full rounded-t-xl" style={{ height: cardDimensions.width }}>
-					<Skeleton className="size-full rounded-t-xl bg-foreground/20" />
+					<Skeleton className="size-full rounded-t-xl rounded-b-none bg-foreground/20" />
 				</View>
 				<View className="w-full flex flex-row gap-x-2 items-start flex-wrap p-1">
-					<Skeleton className="w-24 h-6 rounded bg-foreground/20" />
-					<Skeleton className="w-16 h-6 rounded bg-foreground/20" />
+					<Skeleton className="size-[26px] rounded bg-foreground/20" />
+					<Skeleton className="size-[26px] rounded bg-foreground/20" />
 				</View>
 				<View className="p-2 flex flex-col gap-y-3 pb-4">
-					<View className="flex flex-col gap-y-1">
-						<Skeleton className="w-3/5 h-4 rounded-xl bg-foreground/20" />
-						<Skeleton className="w-1/3 h-4 rounded-xl bg-foreground/20" />
+					<View className="flex flex-col gap-y-2">
+						<Skeleton className="w-full h-[18px] rounded bg-foreground/20" />
+						<Skeleton className="w-2/5 h-[18px] rounded bg-foreground/20" />
+					</View>
+					<View className="flex flex-col gap-[1.5px] flex-wrap">
+						<Skeleton className="h-[16px] w-24 rounded bg-foreground/20" />
+						<Skeleton className="h-[16px] w-12 rounded bg-foreground/20" />
 					</View>
 					<View className="flex flex-row gap-x-2 items-center">
 						<View className="flex flex-row items-center gap-x-2 flex-1">
 							<Skeleton className="size-4 rounded-full bg-foreground/20" />
 							<Skeleton className="w-1/3 h-4 rounded-xl bg-foreground/20" />
 						</View>
-						<View className="flex size-[34px]"></View>
+						<View className="flex size-10"></View>
 					</View>
 				</View>
 			</View>
