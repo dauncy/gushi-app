@@ -54,3 +54,7 @@ export const verifyActionAccess = async (
 
 	return { dbUser, hasSubscription: dbUser.subscriptionType !== null };
 };
+
+export const isDevelopment = () => {
+	return process.env.CONVEX_SITE_URL === "http://127.0.0.1:3211";
+};

@@ -22,7 +22,7 @@ import { StoryModal } from "./story-modal";
 
 const LockedStorySearchCard = ({ story }: { story: StoryPreview }) => {
 	return (
-		<View className="w-full  p-2 py-4 pb-6 flex-row gap-x-4 relative">
+		<View className="w-full  p-2 py-4 pb-6 flex-row gap-x-4 bg-background relative ">
 			<StoryImagePreview size={"md"} imageUrl={story.imageUrl} blurHash={story.blurHash ?? undefined} />
 			<View className="flex flex-col gap-y-2 flex-1 mt-1">
 				<View className="flex-row flex flex-1 gap-x-4 items-center">
@@ -82,7 +82,7 @@ const LockedStorySearchCard = ({ story }: { story: StoryPreview }) => {
 
 const UnlockedStorySearchCard = ({ story }: { story: StoryPreview }) => {
 	return (
-		<View className="w-full p-2 py-4 pb-6  flex-row gap-x-4 ">
+		<View className="w-full p-2 py-4 pb-6 bg-background  flex-row gap-x-4 border-b border-foreground/20">
 			<StoryImagePreview size={"md"} imageUrl={story.imageUrl} blurHash={story.blurHash ?? undefined} />
 			<View className="flex flex-col gap-y-2 flex-1 mt-1">
 				<View className="flex-row flex flex-1 gap-x-4 items-center">

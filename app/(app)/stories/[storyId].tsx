@@ -5,6 +5,7 @@ import { Headphones } from "@/components/ui/icons/headphones-icon";
 import { LetterText } from "@/components/ui/icons/letters-text-icon";
 import { Pause } from "@/components/ui/icons/pause-icon";
 import { Play } from "@/components/ui/icons/play-icon";
+import { Playlist } from "@/components/ui/icons/playlist-icon";
 import { Rewind } from "@/components/ui/icons/rewind-icon";
 import { RotateCcw } from "@/components/ui/icons/rotate-ccw-icon";
 import { Share } from "@/components/ui/icons/share-icon";
@@ -332,11 +333,17 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 					{/* CC Toggle */}
 					<View className="flex w-full flex-row items-end pb-6 pl-2 bg-background">
 						<Button
-							className={cn("bg-background rounded-xl border border-foreground", showClosedCaption && "bg-foreground")}
+							className={cn(
+								"group bg-[#9cbff1]/40 rounded-xl border border-foreground/30 active:bg-[#9cbff1]/60",
+								showClosedCaption && "bg-[#1e397c]",
+							)}
 							onPress={() => setShowClosedCaption((p) => !p)}
 						>
 							<LetterText
-								className={cn("text-foreground/80 size-6", showClosedCaption && "text-background")}
+								className={cn(
+									"group-active:text-foreground text-foreground/50 size-6",
+									showClosedCaption && "text-[#fab161]",
+								)}
 								strokeWidth={2}
 								size={20}
 							/>
@@ -344,10 +351,10 @@ const StoryContent = ({ story }: { story: StoryExtended }) => {
 
 						<Pressable
 							onPress={restartTrack}
-							className="rounded-xl border border-foreground ml-auto px-4 py-2 h-12 active:bg-foreground group flex items-center justify-center"
+							className="bg-[#9cbff1]/40 rounded-xl border border-foreground/30 ml-auto px-4 py-2 h-12 active:bg-[#9cbff1]/60 group flex items-center justify-center"
 						>
 							<RotateCcw
-								className="text-foreground/80 group-active:text-background"
+								className="text-foreground/50 group-active:text-foreground"
 								size={20}
 								strokeWidth={2}
 								strokeLinejoin="round"
@@ -571,23 +578,25 @@ const StoryHeader = ({ story, isCollapsed }: { story: StoryExtended; isCollapsed
 			>
 				<View className="flex overflow-hidden flex-1 mr-4 flex-col">
 					<Marquee speed={0.5} spacing={48} style={{ maxWidth: isCollapsed ? 150 : undefined }}>
-						<Text className="text-foreground/80 text-2xl font-bold" maxFontSizeMultiplier={1.2}>
+						<Text className="text-foreground text-2xl font-bold" maxFontSizeMultiplier={1.2}>
 							{story.title}
 						</Text>
 					</Marquee>
 				</View>
 
 				{/* Fixed width for buttons to prevent them from being cut off */}
-				<View className="flex flex-row gap-x-4 items-center justify-center" style={{ width: 88 }}>
+				<View className="flex flex-row gap-x-4 items-center justify-center">
 					<FavoriteButton story={story} />
+
+					<AddToPlaylistButton story={story} />
 
 					<Button
 						onPress={handleShare}
 						size="icon"
 						variant="ghost"
-						className="bg-foreground/10 rounded-full border border-foreground"
+						className="group bg-[#9cbff1]/40 rounded-full border border-foreground/30 active:bg-[#9cbff1]/60"
 					>
-						<Share className="text-foreground size-6" strokeWidth={1.5} size={20} />
+						<Share className="group-active:text-foreground text-foreground/50 size-6" strokeWidth={1.5} size={20} />
 					</Button>
 				</View>
 			</Animated.View>
@@ -613,7 +622,7 @@ const FavoriteButton = ({ story }: { story: StoryExtended }) => {
 	}, [isFavorite, debounceToggle, setIsFavorite]);
 
 	if (isLoading) {
-		return <Skeleton className="size-10 rounded-full bg-foreground/20" />;
+		return <Skeleton className="size-10 rounded-full bg-[#9cbff1]/40 border border-foreground/30" />;
 	}
 
 	return (
@@ -622,16 +631,37 @@ const FavoriteButton = ({ story }: { story: StoryExtended }) => {
 			size="icon"
 			variant="ghost"
 			className={cn(
-				"bg-foreground/10 rounded-full border border-foreground",
-				isFavorite && "bg-secondary border-border",
+				"bg-[#9cbff1]/40 rounded-full border border-foreground/30 active:bg-[#9cbff1]/60",
+				isFavorite && "bg-[#1e397c] border-[#1e397c]",
 			)}
 			onPress={toggleFavorite}
 		>
 			<Star
-				className={cn("text-foreground size-6", isFavorite && "text-border fill-border")}
+				className={cn("text-foreground/50 size-6", isFavorite && "text-[#fab161] fill-[#fab161]")}
 				strokeWidth={1.5}
 				size={20}
 			/>
+		</Button>
+	);
+};
+
+const AddToPlaylistButton = ({ story }: { story: StoryExtended }) => {
+	const pressedRef = useRef(false);
+	const router = useRouter();
+	const handleAddToPlaylist = useCallback(async () => {
+		if (pressedRef.current) return;
+		pressedRef.current = true;
+		router.push(`/stories/add-to-playlist?storyId=${story._id}`);
+		pressedRef.current = false;
+	}, [story._id, router]);
+	return (
+		<Button
+			size="icon"
+			variant="ghost"
+			className={cn("group bg-[#9cbff1]/40 rounded-full border border-foreground/30 active:bg-[#9cbff1]/60")}
+			onPress={handleAddToPlaylist}
+		>
+			<Playlist className={"group-active:text-foreground text-foreground/50 size-6"} strokeWidth={1.5} size={20} />
 		</Button>
 	);
 };

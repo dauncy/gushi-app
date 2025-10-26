@@ -103,7 +103,7 @@ const FavoritesList = () => {
 					ListEmptyComponent={
 						<>
 							{isLoading ? (
-								<View style={{ flexWrap: "wrap", display: "flex", flexDirection: "row" }}>
+								<View style={{ flexWrap: "wrap", display: "flex", flexDirection: "row", gap: 8 }}>
 									{Array.from({ length: 10 }).map((_, idx) => (
 										<StoryCardLoading key={`loading-${idx}`} />
 									))}

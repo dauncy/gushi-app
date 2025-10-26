@@ -30,7 +30,7 @@ export default function SettingsListPage() {
 						alignItems: "stretch",
 						flexGrow: 1,
 					}}
-					className="bg-foreground/10 gap-y-8 flex-1"
+					className=" gap-y-8 flex-1"
 					showsVerticalScrollIndicator={false}
 					alwaysBounceVertical={false}
 				>
@@ -341,13 +341,17 @@ const MonthlyUserSubscriptionRow = ({ clickRef }: { clickRef: RefObject<boolean>
 				</View>
 			);
 		}
+		const isAnnual = offering.identifier === "$rc_annual";
+		const priceStr = isAnnual
+			? `${offering.product.pricePerYearString}/year`
+			: `${offering.product.pricePerMonthString}/month`;
 		return (
-			<View className="flex flex-col gap-y-0 flex-1">
+			<View className="flex flex-col gap-y-0">
 				<Text className="text-border font-semibold text-lg" maxFontSizeMultiplier={1.2}>
 					{offering.product.title}
 				</Text>
-				<Text className="text-foreground text-sm" maxFontSizeMultiplier={1.2}>
-					{offering.product.pricePerMonthString}/month
+				<Text className="text-foreground text-[14px] font-medium" maxFontSizeMultiplier={1.2}>
+					{priceStr}
 				</Text>
 			</View>
 		);
@@ -369,23 +373,24 @@ const MonthlyUserSubscriptionRow = ({ clickRef }: { clickRef: RefObject<boolean>
 						placeholder={{ blurhash: BLUR_HASH }}
 						transition={100}
 						source={GushiThumbnail}
-						className="size-[56px] rounded-lg"
+						className="size-[64px] rounded-lg"
 						contentFit="contain"
 						cachePolicy={"memory-disk"}
 					/>
 				</View>
-				{content}
-
-				{!loading && (
-					<Pressable
-						onPress={handleCancelSubscription}
-						className="px-8 py-1 min-h-10 border border-destructive rounded-full active:bg-foreground/10 self-center items-center justify-center"
-					>
-						<Text className="text-destructive text-sm" maxFontSizeMultiplier={1.2}>
-							{"Cancel"}
-						</Text>
-					</Pressable>
-				)}
+				<View className="flex-1 flex flex-col gap-y-1.5">
+					{content}
+					{!loading && (
+						<Pressable
+							onPress={handleCancelSubscription}
+							className="active:bg-foreground/10 p-1 rounded-md -mt-1 w-max self-start"
+						>
+							<Text className="text-destructive text-sm" maxFontSizeMultiplier={1.2}>
+								{"Cancel Subscription"}
+							</Text>
+						</Pressable>
+					)}
+				</View>
 			</View>
 		</View>
 	);

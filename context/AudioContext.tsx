@@ -304,7 +304,7 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 			const idx = await TrackPlayer.getActiveTrackIndex();
 			if (typeof idx !== "number") return null;
 			const item = queue[idx - 1] ?? null;
-			if (position < 3) {
+			if (position < 3 || queue.length === 1) {
 				const restartItem = queue[idx] ?? null;
 				restartItem && onPrev(restartItem);
 				await TrackPlayer.seekTo(0);

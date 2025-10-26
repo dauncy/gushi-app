@@ -1,8 +1,10 @@
 import { components, internal } from "@/convex/_generated/api";
 import { ActionCtx, internalAction } from "@/convex/_generated/server";
+import { ONE_MINUTE_MS } from "@/lib/time";
 import { RevenueCatCustomer, RevenueCatCustomerAliases } from "@/lib/types";
 import { ActionCache } from "@convex-dev/action-cache";
 import { v } from "convex/values";
+import { isDevelopment } from "../common/utils";
 import { getCustomer, getCustomerAliases } from "./utils";
 
 export const getCustomerAction = internalAction({
@@ -18,7 +20,7 @@ export const getCustomerAction = internalAction({
 
 const customerCache = new ActionCache(components.actionCache, {
 	name: "customerCache",
-	ttl: 10 * 60 * 1000,
+	ttl: isDevelopment() ? ONE_MINUTE_MS : 10 * ONE_MINUTE_MS,
 	action: internal.subscriptions.actions.getCustomerAction,
 });
 
