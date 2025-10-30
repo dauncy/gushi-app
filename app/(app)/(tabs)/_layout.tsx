@@ -1,4 +1,3 @@
-import { Header } from "@/components/nav/Header";
 import { Home } from "@/components/ui/icons/home-icon";
 import { Playlist } from "@/components/ui/icons/playlist-icon";
 import { Search } from "@/components/ui/icons/search-icon";
@@ -19,7 +18,7 @@ export default function TabsLayout() {
 			<Tabs
 				backBehavior="history"
 				screenOptions={() => ({
-					header: () => <Header />,
+					headerShown: false,
 					tabBarShowLabel: true,
 					tabBarStyle: {
 						backgroundColor: "#fffbf3",
@@ -88,6 +87,7 @@ export default function TabsLayout() {
 						headerShown: false,
 						title: "Playlists",
 						tabBarAccessibilityLabel: "Playlists",
+						popToTopOnBlur: true,
 						tabBarIcon: ({ color, size, focused }) => (
 							<Playlist size={size} className={focused ? "text-[#0395ff] fill-[#0395ff]" : "text-black/30"} />
 						),

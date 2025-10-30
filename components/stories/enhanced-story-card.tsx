@@ -93,7 +93,8 @@ const EnhancedStoryCardComp = ({
 						})}
 					>
 						<View
-							className="absolute top-2 right-2 size-[28px] z-50"
+							hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+							className="absolute top-2 right-0 size-[34px] z-50"
 							style={{
 								shadowColor: "#000000",
 								shadowOffset: { width: 0.75, height: 1.75 },

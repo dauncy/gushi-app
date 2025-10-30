@@ -3,7 +3,13 @@ import { Stack } from "expo-router";
 export default function PlaylistsLayout() {
 	return (
 		<Stack>
-			<Stack.Screen name="index" options={{ headerShown: false }} />
+			<Stack.Screen
+				name="index"
+				options={{
+					headerShown: false,
+					animation: "none",
+				}}
+			/>
 			<Stack.Screen
 				name="create"
 				options={{
@@ -17,7 +23,7 @@ export default function PlaylistsLayout() {
 					},
 				}}
 			/>
-			<Stack.Screen name="[playlistId]" options={{ headerShown: false }} />
+			<Stack.Screen name="[playlistId]" options={{ headerShown: false, animation: "none" }} />
 		</Stack>
 	);
 }

@@ -2,11 +2,18 @@ import { LockKeyhole } from "@/components/ui/icons/lock-icon";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIsStoryActive } from "@/context/AudioContext";
 import { useSubscription } from "@/context/SubscriptionContext";
+import { Id } from "@/convex/_generated/dataModel";
 import { StoryPreview } from "@/convex/stories/schema";
+import { useFavorite } from "@/hooks/use-favorite";
 import { useIsIpad } from "@/hooks/use-is-ipad";
+import { cn } from "@/lib/utils";
 import { BlurView } from "expo-blur";
-import { useMemo, useState } from "react";
-import { View } from "react-native";
+import { debounce } from "lodash";
+import { useCallback, useMemo, useState } from "react";
+import { Pressable, View } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { runOnJS } from "react-native-reanimated";
+import { Star } from "../ui/icons/star-icon";
 import { AgeRangeBadge } from "./age-range-bade";
 import { CategoryBadge } from "./category-badge";
 import { FeaturedBadge } from "./featured-badge";
@@ -151,10 +158,13 @@ export const UnlockedStoryCard = ({
 				{story.featured && <FeaturedBadge />}
 				{story.age_range && <AgeRangeBadge ageRange={story.age_range} />}
 			</View>
-			<View className="w-full flex flex-row gap-x-1 items-start flex-wrap p-1">
-				{story.categories.map((c) => (
-					<CategoryBadge key={c._id} categoryName={c.name} />
-				))}
+			<View className="flex flex-row p-2 items-start w-full ">
+				<View className="flex-1  flex flex-row gap-x-1 items-start flex-wrap">
+					{story.categories.map((c) => (
+						<CategoryBadge key={c._id} categoryName={c.name} />
+					))}
+				</View>
+				<FavoriteButton storyId={story._id} />
 			</View>
 			<View className="w-full flex flex-row gap-x-2 p-2 pb-4 items-stretch grow stretch">
 				<StoryCardHeader story={story} hasPlayButton={hasPlayButton} />
@@ -188,5 +198,51 @@ export const StoryCard = ({ story, hasPlayButton = true }: { story: StoryPreview
 			setCardDimensions={setCardDimensions}
 			hasPlayButton={hasPlayButton}
 		/>
+	);
+};
+
+const FavoriteButton = ({ storyId }: { storyId: Id<"stories"> }) => {
+	const { handleToggleFavorite, favorite, isLoading } = useFavorite({ storyId });
+	const [isFavorite, setIsFavorite] = useState(!!favorite);
+
+	const debounceToggle = debounce(async (favorite: boolean) => {
+		await handleToggleFavorite(favorite);
+	}, 250);
+
+	const toggleFavorite = useCallback(async () => {
+		if (isFavorite) {
+			debounceToggle(false);
+		} else {
+			debounceToggle(true);
+		}
+		setIsFavorite((p) => !p);
+	}, [isFavorite, debounceToggle, setIsFavorite]);
+
+	const tap = Gesture.Tap().onStart(() => {
+		"worklet";
+		runOnJS(toggleFavorite)();
+	});
+
+	if (isLoading) {
+		return <Skeleton className="size-[34px] rounded-full bg-[#9cbff1]/40 border border-foreground/30" />;
+	}
+
+	return (
+		<GestureDetector gesture={tap}>
+			<Pressable
+				hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+				disabled={isLoading}
+				className={cn(
+					"p-1 z-20 flex items-center justify-center bg-[#9cbff1]/40 rounded-full border border-foreground/30 active:bg-[#9cbff1]/60",
+					isFavorite && "bg-[#1e397c] border-[#1e397c]",
+				)}
+			>
+				<Star
+					className={cn("text-foreground/50 size-6", isFavorite && "text-[#fab161] fill-[#fab161]")}
+					strokeWidth={1.5}
+					size={16}
+				/>
+			</Pressable>
+		</GestureDetector>
 	);
 };

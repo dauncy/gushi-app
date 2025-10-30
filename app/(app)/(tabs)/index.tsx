@@ -1,9 +1,11 @@
 import { AudioPreviewPlayer } from "@/components/audio/audio-preview";
+import { Header } from "@/components/nav/Header";
 import { CategoriesSelector } from "@/components/stories/cateogories-selector";
 import { EnhancedStoryCard } from "@/components/stories/enhanced-story-card";
 import { StoryCardLoading } from "@/components/stories/story-card";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import { StoryPreview } from "@/convex/stories";
 import { useConvexPaginatedQuery } from "@/hooks/use-convex-paginated-query";
 import { useConvexQuery } from "@/hooks/use-convexQuery";
@@ -12,18 +14,22 @@ import { usePlayInFullscreen } from "@/hooks/use-play-in-fullscreen";
 import { usePresentPaywall } from "@/hooks/use-present-paywall";
 import { useSelectedCategory } from "@/stores/category-store";
 import { FlashList, type FlashListRef } from "@shopify/flash-list";
-import { useFocusEffect, useRouter } from "expo-router";
-import { memo, useCallback, useEffect, useMemo, useRef } from "react";
+import { useRouter } from "expo-router";
+import { memo, RefObject, useCallback, useEffect, useMemo, useRef } from "react";
 import { ActivityIndicator, RefreshControl, Text, View } from "react-native";
 
 export default function Home() {
 	return <HomePage />;
 }
 
-const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => void }) => {
+const StoryListComp = ({
+	onCardPress,
+	storyListRef,
+}: {
+	onCardPress: (story: StoryPreview) => void;
+	storyListRef: RefObject<FlashListRef<StoryPreview> | null>;
+}) => {
 	const scrollEnd = useRef(false);
-	const initRef = useRef(false);
-	const storyListRef = useRef<FlashListRef<StoryPreview>>(null);
 	const { hasSubscription } = useSubscription();
 	const categoryId = useSelectedCategory();
 	const { isLoading, refreshing, refresh, loadMore, results, status } = useConvexPaginatedQuery(
@@ -68,8 +74,9 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 	}, [results]);
 
 	const handleListRefetch = useCallback(async () => {
+		storyListRef.current?.scrollToTop({ animated: false });
 		await Promise.all([refetchFeaturedStory(), refresh()]);
-	}, [refetchFeaturedStory, refresh]);
+	}, [refetchFeaturedStory, refresh, storyListRef]);
 
 	const listData = useMemo(() => {
 		const data: StoryPreview[] = [];
@@ -96,25 +103,6 @@ const StoryListComp = ({ onCardPress }: { onCardPress: (story: StoryPreview) => 
 		freeStories,
 		categoryId,
 	]);
-
-	useEffect(() => {
-		if (!initRef.current) {
-			initRef.current = true;
-			return;
-		}
-		if (scrollEnd.current) return;
-		if (isLoading) {
-			storyListRef.current?.scrollToTop({ animated: false });
-		}
-		if (isLoading || refreshing) return;
-		storyListRef.current?.scrollToIndex({ index: 0, animated: false, viewOffset: -8 });
-	}, [categoryId, isLoading, refreshing]);
-
-	useFocusEffect(
-		useCallback(() => {
-			storyListRef.current?.scrollToIndex({ index: 0, animated: false, viewOffset: -8 });
-		}, []),
-	);
 
 	const isIpad = useIsIpad();
 	const calcMargin = useCallback(
@@ -193,8 +181,17 @@ const StoryList = memo(StoryListComp);
 StoryList.displayName = "StoryList";
 
 const HomePage = () => {
+	const storyListRef = useRef<FlashListRef<StoryPreview>>(null);
 	const { playInFullscreen } = usePlayInFullscreen();
 	const { hasSubscription } = useSubscription();
+	const prevCategoryRef = useRef<Id<"categories"> | null>(null);
+	const categoryId = useSelectedCategory();
+
+	useEffect(() => {
+		if (categoryId !== prevCategoryRef.current) {
+			prevCategoryRef.current = categoryId;
+		}
+	}, [categoryId]);
 	const unlocked = ({
 		subscription_required,
 		audioUrl,
@@ -211,10 +208,33 @@ const HomePage = () => {
 	const router = useRouter();
 	return (
 		<View style={{ flex: 1 }} className="relative bg-[#fffbf3] flex flex-col">
+			<Header
+				onLogoPress={() => {
+					if (categoryId !== prevCategoryRef.current) {
+						storyListRef.current?.scrollToIndex({ index: 0, animated: false, viewOffset: -8 });
+						return;
+					}
+
+					if (categoryId === null) {
+						storyListRef.current?.scrollToIndex({ index: 0, animated: false, viewOffset: -8 });
+						return;
+					}
+				}}
+			/>
 			<View className="w-full px-2" style={{ paddingTop: 12, paddingBottom: 12 }}>
-				<CategoriesSelector />
+				<CategoriesSelector
+					onCategoryPress={(cat) => {
+						if (cat !== prevCategoryRef.current) {
+							storyListRef.current?.scrollToIndex({ index: 0, animated: false, viewOffset: -8 });
+							setTimeout(() => {
+								storyListRef.current?.scrollToIndex({ index: 0, animated: false, viewOffset: -8 });
+							}, 100);
+						}
+					}}
+				/>
 			</View>
 			<StoryList
+				storyListRef={storyListRef}
 				onCardPress={(story) => {
 					if (unlocked(story)) {
 						playInFullscreen({
