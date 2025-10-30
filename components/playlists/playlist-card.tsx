@@ -6,7 +6,6 @@ import { memo, useCallback, useMemo, useRef, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { ChevronRight } from "../ui/icons/chevron-right-icon";
 import { CircleDashed } from "../ui/icons/circle-dashed";
-import { Playlist } from "../ui/icons/playlist-icon";
 import { Scroll } from "../ui/icons/scroll-icon";
 import { Skeleton } from "../ui/skeleton";
 
@@ -21,8 +20,8 @@ const imageVariants = cva("flex items-center justify-center", {
 			sm: "size-10 ",
 		},
 		rounded: {
-			default: "rounded-lg",
-			sm: "rounded-md",
+			default: "rounded-full",
+			sm: "rounded-full",
 		},
 	},
 	defaultVariants: {
@@ -32,19 +31,34 @@ const imageVariants = cva("flex items-center justify-center", {
 });
 
 export const PlaylistImage = memo(
-	({ imageUrl, size = "default" }: { imageUrl: string | null; size?: "sm" | "default" }) => {
+	({ imageUrl, size = "default", name = "" }: { imageUrl: string | null; size?: "sm" | "default"; name: string }) => {
 		const [imageError, setImageError] = useState(false);
+		const initials = useMemo(() => {
+			return name
+				.split(" ")
+				.slice(0, 2)
+				.map((n) => n[0])
+				.join("")
+				.toUpperCase();
+		}, [name]);
 		return (
-			<View className={cn("bg-foreground/20 flex items-center justify-center", imageVariants({ size, rounded: size }))}>
+			<View
+				className={cn(
+					"bg-foreground/20 flex items-center justify-center rounded-full border-2 border-foreground/20",
+					imageVariants({ size, rounded: size }),
+				)}
+			>
 				{imageUrl && !imageError ? (
 					<Image
 						source={{ uri: sanitizeStorageUrl(imageUrl) }}
-						className={cn("size-full", imageVariants({ rounded: size, size }))}
+						className={cn("size-full rounded-full", imageVariants({ rounded: size, size }))}
 						resizeMode="cover"
 						onError={() => setImageError(true)}
 					/>
 				) : (
-					<Playlist className="text-foreground/60 fill-foreground/60" strokeWidth={0.5} size={28} />
+					<Text className="text-foreground text-xl font-medium" allowFontScaling={false}>
+						{initials}
+					</Text>
 				)}
 			</View>
 		);
@@ -115,10 +129,10 @@ export const PlaylistCard = ({ playlist, drag }: { playlist: PlaylistPreview; dr
 		<Pressable
 			onLongPress={handleLongPress}
 			onPress={handleNavigate}
-			className={cn("w-full p-4  flex flex-row gap-x-4")}
+			className={cn("w-full p-4  flex flex-row gap-x-2")}
 		>
-			<PlaylistImage imageUrl={playlist.image} />
-			<View className="flex-1 flex flex-col gap-y-0.5">
+			<PlaylistImage imageUrl={playlist.image} name={playlist.name} />
+			<View className="flex-1 flex flex-col gap-y-[1px] mt-1">
 				<Text className="text-foreground font-semibold text-xl" maxFontSizeMultiplier={1.2}>
 					{playlist.name}
 				</Text>
@@ -136,13 +150,13 @@ export const PlaylistCard = ({ playlist, drag }: { playlist: PlaylistPreview; dr
 export const PlaylistCardLoading = () => {
 	return (
 		<View className="w-full p-4 flex flex-row gap-x-4">
-			<Skeleton className="size-[56px] rounded-lg bg-foreground/10" />
+			<Skeleton className="size-[56px] rounded-full border-2 border-foreground/20 bg-foreground/20" />
 			<View className="flex-1 flex flex-col gap-y-1 mt-1">
-				<Skeleton className="h-4 w-32 bg-foreground/10" />
-				<Skeleton className="h-3 w-16 bg-foreground/10" />
+				<Skeleton className="h-4 w-32 bg-foreground/20" />
+				<Skeleton className="h-3 w-16 bg-foreground/20" />
 			</View>
 			<View className="flex items-center justify-start">
-				<Skeleton className="size-[24px] rounded-full bg-foreground/10 mt-1" />
+				<Skeleton className="size-[24px] rounded-full bg-foreground/20 mt-1" />
 			</View>
 		</View>
 	);

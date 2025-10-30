@@ -2,6 +2,7 @@ import { AudioPreviewPlayer } from "@/components/audio/audio-preview";
 import { SecondaryHeader } from "@/components/nav/secondary-header";
 import { PlaylistStoryCard, PlaylistStoryLoading } from "@/components/playlists/playlist-story-card";
 import { EllipsisVertical } from "@/components/ui/icons/ellipsis-vertical";
+import { Pen } from "@/components/ui/icons/pen-icon";
 import { Play } from "@/components/ui/icons/play-icon";
 import { Playlist } from "@/components/ui/icons/playlist-icon";
 import { Plus } from "@/components/ui/icons/plus-icon";
@@ -23,7 +24,7 @@ import { useConvexQuery } from "@/hooks/use-convexQuery";
 import { cn, sanitizeStorageUrl } from "@/lib/utils";
 import { useConvexMutation } from "@convex-dev/react-query";
 import * as Haptics from "expo-haptics";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, RefreshControl, Text, View, ViewStyle } from "react-native";
 import { runOnJS, useSharedValue, withSpring } from "react-native-reanimated";
@@ -35,6 +36,8 @@ import ReorderableList, {
 	reorderItems,
 } from "react-native-reorderable-list";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const BackgroundImage = require("@/assets/images/gushi-bg.png");
 
 export default function PlaylistIdPage() {
 	const params = useLocalSearchParams();
@@ -61,7 +64,10 @@ export default function PlaylistIdPage() {
 	}
 
 	return (
-		<View className="flex-1 relative bg-foreground/10">
+		<View className="flex-1 relative bg-background">
+			<View className="absolute inset-0">
+				<Image source={BackgroundImage} className="size-full opacity-40" />
+			</View>
 			<SecondaryHeader
 				dismissTo={"/playlists"}
 				rightNode={
@@ -574,11 +580,11 @@ const PlaylistHeader = ({ playlist }: { playlist: PlaylistPreview }) => {
 	return (
 		<View className="flex flex-col items-center px-4">
 			<View
-				className="size-[224px] rounded-3xl bg-foreground/20 flex items-center justify-center"
+				className="size-[164px] relative rounded-full border-4 border-foreground/40 bg-transparent flex items-center justify-center"
 				style={{
 					shadowColor: "#000000",
-					shadowOffset: { width: 2.75, height: 4 },
-					shadowOpacity: 0.25,
+					shadowOffset: { width: 2.75, height: 5 },
+					shadowOpacity: 0.4,
 					shadowRadius: 10,
 				}}
 			>
@@ -586,17 +592,24 @@ const PlaylistHeader = ({ playlist }: { playlist: PlaylistPreview }) => {
 					<Image
 						source={{ uri: sanitizeStorageUrl(playlist.image) }}
 						onError={() => setImageError(true)}
-						className="size-full rounded-3xl"
+						className="size-full rounded-full"
 					/>
 				) : (
-					<Playlist
-						className="text-foreground/40 fill-foreground/40"
-						strokeWidth={0.5}
-						strokeLinecap="round"
-						strokeLinejoin="round"
-						size={116}
-					/>
+					<Text style={{ fontSize: 64 }} className="text-foreground/80 font-medium" allowFontScaling={false}>
+						{playlist.name
+							.split(" ")
+							.slice(0, 2)
+							.map((n) => n[0])
+							.join("")
+							.toUpperCase()}
+					</Text>
 				)}
+
+				<Link asChild href={`/playlists/${playlist._id}/edit`}>
+					<Pressable className="active:opacity-80 absolute -bottom-1 flex p-1 size-[34px] items-center justify-center right-4 z-10  border border-border bg-background rounded-full">
+						<Pen className="text-border" size={20} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+					</Pressable>
+				</Link>
 			</View>
 			<Text
 				style={{ fontFamily: "Baloo", fontWeight: "bold", fontSize: 32, lineHeight: 48 }}
@@ -630,7 +643,7 @@ const PlaylistHeader = ({ playlist }: { playlist: PlaylistPreview }) => {
 			</Pressable>
 
 			<View className="w-full flex items-start justify-start mt-6">
-				<Text className="text-foreground/80 font-medium text-lg" maxFontSizeMultiplier={1.2}>
+				<Text className="text-foreground font-semibold text-lg" maxFontSizeMultiplier={1.2}>
 					{playlist.name}
 				</Text>
 			</View>
@@ -641,7 +654,7 @@ const PlaylistHeader = ({ playlist }: { playlist: PlaylistPreview }) => {
 const PlaylistHeaderSkeleton = () => {
 	return (
 		<View className="flex flex-col items-center px-4">
-			<Skeleton className="size-[224px] rounded-3xl bg-foreground/20 flex items-center justify-center" />
+			<Skeleton className="size-[164px] rounded-full border-4 border-foreground/20 bg-foreground/20 flex items-center justify-center" />
 			<Skeleton className="h-8 w-40 rounded-md bg-foreground/20 mt-4" />
 
 			<Skeleton className="h-11 w-3/4 rounded-md bg-foreground/20 mt-4" />
@@ -655,22 +668,22 @@ const PlaylistHeaderSkeleton = () => {
 
 const PlaylistEmptyState = () => {
 	return (
-		<View className="flex-1  flex items-center justify-center flex-col gap-y-2 w-full p-8">
+		<View className="flex-1 flex items-center justify-center flex-col gap-y-2 w-full p-8">
 			<View className="flex flex-row items-end gap-x-1">
-				<View className="flex rounded-full bg-background size-[34px] items-center justify-center">
-					<Play size={24} className="text-foreground/60 fill-foreground/60" />
+				<View className="flex rounded-full bg-foreground/10 size-[34px] items-center justify-center">
+					<Play size={24} className="text-foreground/60 fill-foreground" />
 				</View>
-				<View className="flex rounded-full bg-background size-[56px] items-center justify-center">
+				<View className="flex rounded-full bg-foreground/10 size-[56px] items-center justify-center">
 					<Scroll size={34} className="text-border fill-border" />
 				</View>
-				<View className="flex rounded-full bg-background size-[34px] items-center justify-center">
+				<View className="flex rounded-full bg-foreground/10 size-[34px] items-center justify-center">
 					<Playlist size={24} className="text-destructive/60 fill-destructive/60" />
 				</View>
 			</View>
 			<View className="flex flex-col gap-y-0 w-full items-center justify-center">
 				<Text
 					style={{ letterSpacing: 0.5, fontFamily: "Baloo", fontWeight: "bold", fontSize: 28 }}
-					className="text-foreground/80"
+					className="text-foreground"
 					maxFontSizeMultiplier={1.2}
 				>
 					{"No stories added"}
@@ -685,7 +698,7 @@ const PlaylistEmptyState = () => {
 
 const PlaylistStoriesLoading = () => {
 	return (
-		<View className="flex flex-col w-full px-4 pt-2">
+		<View className="flex flex-col w-full pt-2">
 			{Array.from({ length: 10 }).map((_, index) => (
 				<PlaylistStoryLoading key={`playlist-story-loading-${index}`} />
 			))}

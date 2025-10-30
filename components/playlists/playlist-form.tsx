@@ -173,7 +173,7 @@ export const PlaylistForm = ({
 					<View className="flex-1 flex flex-col items-center  p-8 gap-y-8 w-full">
 						<View
 							className={cn(
-								"size-48 rounded-md bg-foreground/10 items-center justify-center relative",
+								"size-48 rounded-full border-4 border-foreground/10 bg-foreground/10 items-center justify-center relative",
 								isSubmitting && "opacity-50",
 							)}
 						>
@@ -181,11 +181,14 @@ export const PlaylistForm = ({
 								<>
 									<Image
 										source={{ uri: sanitizeStorageUrl(image.url) }}
-										className="size-full rounded-md"
+										className="size-full rounded-full"
 										cachePolicy="memory-disk"
 										contentFit="cover"
 									/>
 
+									{/* <Pressable className="active:opacity-80 absolute -bottom-1 flex p-1 size-[34px] items-center justify-center right-4 z-10  border border-border bg-background rounded-full">
+					  <Pen className="text-border" size={20} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+					</Pressable> */}
 									<Pressable
 										onPress={() => setImage(null)}
 										style={{
@@ -194,9 +197,14 @@ export const PlaylistForm = ({
 											shadowOpacity: 0.4,
 											shadowRadius: 8,
 										}}
-										className="absolute -top-4 -right-4 size-[34px] rounded-full bg-[#a1a1aa] items-center justify-center border border-background/80"
+										className="absolute -bottom-1 right-5 size-[34px] rounded-full bg-background items-center justify-center border border-destructive"
 									>
-										<X className="size-[24px] text-background/80" />
+										<X
+											className="size-[24px] text-destructive"
+											strokeWidth={2.5}
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										/>
 									</Pressable>
 								</>
 							) : uploading ? (

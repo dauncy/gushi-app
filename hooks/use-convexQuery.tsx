@@ -23,5 +23,8 @@ export function useConvexQuery<R extends FunctionReference<"query">>(
 		...opts,
 		enabled: opts?.enabled ?? true,
 		staleTime: opts?.staleTime ?? 0,
+		refetchOnMount: opts?.refetchOnMount ?? true,
+		refetchOnWindowFocus: opts?.refetchOnWindowFocus ?? true,
+		refetchOnReconnect: opts?.refetchOnReconnect ?? true,
 	});
 }

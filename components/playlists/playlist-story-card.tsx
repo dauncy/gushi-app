@@ -238,7 +238,7 @@ export const PlaylistStoryCard = ({
 	return (
 		<View
 			className={cn(
-				"overflow-hidden",
+				"overflow-hidden bg-background border-b border-foreground/10",
 				isSwiping && "bg-background/80 relative",
 				disabled && "opacity-50",
 				deleting && "opacity-50",
@@ -384,7 +384,7 @@ const RightAction = ({
 
 export const PlaylistStoryLoading = () => {
 	return (
-		<View className="flex flex-row gap-x-4 w-full py-4">
+		<View className="flex flex-row gap-x-4 w-full py-4 border-b border-foreground/10 bg-background px-4">
 			<Skeleton className="size-10 rounded-lg bg-foreground/20" />
 			<View className="flex flex-col gap-y-1 flex-1 mt-1">
 				<Skeleton className="h-3 w-32 rounded-md bg-foreground/20" />

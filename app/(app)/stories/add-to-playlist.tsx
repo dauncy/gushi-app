@@ -263,7 +263,7 @@ const PlaylistPreviewCard = ({
 				disabled && "opacity-50",
 			)}
 		>
-			<PlaylistImage imageUrl={playlist.image} size="sm" />
+			<PlaylistImage imageUrl={playlist.image} size="sm" name={playlist.name} />
 			<View className="flex flex-col gap-y-2 flex-1 w-full">
 				<Text
 					className="text-foreground text-2xl font-semibold"

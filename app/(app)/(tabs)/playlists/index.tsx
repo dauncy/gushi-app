@@ -5,6 +5,7 @@ import { Headphones } from "@/components/ui/icons/headphones-icon";
 import { Play } from "@/components/ui/icons/play-icon";
 import { Playlist } from "@/components/ui/icons/playlist-icon";
 import { Plus } from "@/components/ui/icons/plus-icon";
+import { Image } from "@/components/ui/image";
 import { useHasActiveQueue } from "@/context/AudioContext";
 import { api } from "@/convex/_generated/api";
 import { PlaylistPreview } from "@/convex/playlists/schema";
@@ -23,6 +24,7 @@ import ReorderableList, {
 	reorderItems,
 	useReorderableDrag,
 } from "react-native-reorderable-list";
+const BackgroundImage = require("@/assets/images/gushi-bg.png");
 
 export default function PlaylistsListPage() {
 	const router = useRouter();
@@ -197,7 +199,10 @@ export default function PlaylistsListPage() {
 	}, [isLoading, localResults.length, refreshing, results.length]);
 
 	return (
-		<View className="flex-1 relative bg-foreground/10">
+		<View className="flex-1 relative bg-background">
+			<View className="absolute inset-0">
+				<Image source={BackgroundImage} className="size-full opacity-40" />
+			</View>
 			<SecondaryHeader title="Playlists" />
 			<View style={{ flex: 1 }} className="relative flex-col px-0">
 				<ReorderableList
@@ -246,20 +251,20 @@ const EmptyState = () => {
 	return (
 		<View className="flex-1 flex items-center justify-center flex-col gap-y-2 w-full p-8">
 			<View className="flex flex-row items-end gap-x-1">
-				<View className="flex rounded-full bg-background size-[34px] items-center justify-center">
-					<Headphones size={24} className="text-foreground/60" />
+				<View className="flex rounded-full bg-foreground/10 size-[34px] items-center justify-center">
+					<Headphones size={24} className="text-foreground" />
 				</View>
-				<View className="flex rounded-full bg-background size-[56px] items-center justify-center">
+				<View className="flex rounded-full bg-foreground/10 size-[56px] items-center justify-center">
 					<Playlist size={34} className="text-border fill-border" />
 				</View>
-				<View className="flex rounded-full bg-background size-[34px] items-center justify-center">
-					<Play size={24} className="text-destructive/60 fill-destructive/60" />
+				<View className="flex rounded-full bg-foreground/10 size-[34px] items-center justify-center">
+					<Play size={24} className="text-destructive fill-destructive" />
 				</View>
 			</View>
 			<View className="flex flex-col gap-y-0 w-full items-center justify-center">
 				<Text
 					style={{ letterSpacing: 0.5, fontFamily: "Baloo", fontWeight: "bold", fontSize: 28 }}
-					className="text-foreground/80"
+					className="text-foreground"
 					maxFontSizeMultiplier={1.2}
 				>
 					{"No playlists yet"}

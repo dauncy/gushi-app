@@ -9,7 +9,7 @@ import { useIsIpad } from "@/hooks/use-is-ipad";
 import { cn } from "@/lib/utils";
 import { BlurView } from "expo-blur";
 import { debounce } from "lodash";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Pressable, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { runOnJS } from "react-native-reanimated";
@@ -222,6 +222,10 @@ const FavoriteButton = ({ storyId }: { storyId: Id<"stories"> }) => {
 		"worklet";
 		runOnJS(toggleFavorite)();
 	});
+
+	useEffect(() => {
+		setIsFavorite(!!favorite);
+	}, [favorite]);
 
 	if (isLoading) {
 		return <Skeleton className="size-[34px] rounded-full bg-[#9cbff1]/40 border border-foreground/30" />;

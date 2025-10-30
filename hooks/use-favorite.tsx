@@ -11,7 +11,18 @@ export const useFavorite = ({ storyId }: { storyId: Id<"stories"> }) => {
 		isLoading: isFavoriteLoading,
 		data: favorite,
 		refetch: refetchFavorite,
-	} = useConvexQuery(api.favorites.queries.getFavoriteStatusByStoryId, { storyId });
+		isFetching: isFavoriteFetching,
+		isRefetching: isFavoriteRefetching,
+	} = useConvexQuery(
+		api.favorites.queries.getFavoriteStatusByStoryId,
+		{ storyId },
+		{
+			refetchOnMount: true,
+			staleTime: 0,
+			refetchOnWindowFocus: true,
+			refetchOnReconnect: true,
+		},
+	);
 
 	const handleToggleFavorite = useCallback(
 		async (favorite: boolean) => {
@@ -29,6 +40,8 @@ export const useFavorite = ({ storyId }: { storyId: Id<"stories"> }) => {
 			favorite,
 			isLoading: isFavoriteLoading,
 			handleToggleFavorite,
+			isFavoriteFetching,
+			isFavoriteRefetching,
 		};
-	}, [isLoading, handleToggleFavorite, favorite, isFavoriteLoading]);
+	}, [isLoading, handleToggleFavorite, favorite, isFavoriteLoading, isFavoriteFetching, isFavoriteRefetching]);
 };
